@@ -4,6 +4,27 @@
                              http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
          version="3.0">
 
+  <context-param>
+    <param-name>dbUrl</param-name>
+    <param-value>jdbc:mysql://127.0.0.1:3306/StudentCompany?serverTimezone=UTC</param-value>
+  </context-param>
+
+  <context-param>
+    <param-name>dbUser</param-name>
+    <param-value>root</param-value>
+  </context-param>
+
+  <context-param>
+    <param-name>dbPassword</param-name>
+    <param-value>password_2024</param-value>
+
+  </context-param>
+
+  <context-param>
+    <param-name>dbDriver</param-name>
+    <param-value>com.mysql.cj.jdbc.Driver</param-value>
+  </context-param>
+
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>
