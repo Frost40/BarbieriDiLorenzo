@@ -6,19 +6,31 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class ComplaintDAO {
-    private ArrayList<Complaint> getOngoingInternshipsComplaints(ArrayList<Integer> internshipsIds) throws SQLException {
+    public ArrayList<Complaint> getOngoingInternshipsComplaints(ArrayList<Integer> internshipsIds) throws SQLException {
         ArrayList<Complaint> complaints = null;
 
         return complaints;
     }
 
-    private Complaint getOngoingInternshipComplaints(int internshipId) throws SQLException {
+    public Complaint getOngoingInternshipComplaints(int internshipId) throws SQLException {
         Complaint complaint = null;
 
         return complaint;
     }
 
-    private void uploadComplaint(String test) throws SQLException {
+    public void uploadComplaint(String text) throws SQLException {
+
+    }
+
+    public void hasBeenRead(int complaintId) throws SQLException {
+
+    }
+
+    public void requestClosure(int complaintId, boolean requestFromStudent) throws SQLException {
+
+    }
+
+    public void rejectClosure(int complaintId) throws SQLException {
 
     }
 }

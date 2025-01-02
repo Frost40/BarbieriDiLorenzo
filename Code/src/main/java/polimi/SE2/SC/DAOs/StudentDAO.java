@@ -13,25 +13,25 @@ public class StudentDAO {
         this.connection = connection;
     }
 
-    private Student findStudentWithCredentials(String email, String password) throws SQLException {
+    public Student findStudentWithCredentials(String email, String password) throws SQLException {
         Student student = null;
 
         return student;
     }
 
-    private Student getStudentById(int id) throws SQLException {
+    public Student getStudentById(int id) throws SQLException {
         Student student = null;
 
         return student;
     }
 
-    private ArrayList<Student> getAllStudents() throws SQLException {
+    public ArrayList<Student> getAllStudents() throws SQLException {
         ArrayList<Student> students = null;
 
         return students;
     }
 
-    private int registerStudent(String email, String password, String name, String userType, String surname, String nationality, String cityOfBrith) throws SQLException {
+    public int registerStudent(String email, String password, String name, String userType, String surname, String nationality, String cityOfBrith) throws SQLException {
         int generatedId = 0;
 
         return generatedId;
