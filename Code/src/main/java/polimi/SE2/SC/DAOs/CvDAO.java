@@ -2,10 +2,17 @@ package polimi.SE2.SC.DAOs;
 
 import polimi.SE2.SC.beans.Cv;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class CvDAO {
+    private Connection connection;
+
+    public CvDAO(Connection connection) {
+        this.connection = connection;
+    }
+
     public Cv getStudentCv(int studentId) throws SQLException {
         Cv cv = null;
 

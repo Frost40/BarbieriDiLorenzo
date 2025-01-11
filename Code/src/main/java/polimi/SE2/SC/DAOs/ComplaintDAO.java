@@ -2,10 +2,17 @@ package polimi.SE2.SC.DAOs;
 
 import polimi.SE2.SC.beans.Complaint;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class ComplaintDAO {
+    private Connection connection;
+
+    public ComplaintDAO(Connection connection) {
+        this.connection = connection;
+    }
+
     public ArrayList<Complaint> getOngoingInternshipsComplaints(ArrayList<Integer> internshipsIds) throws SQLException {
         ArrayList<Complaint> complaints = null;
 

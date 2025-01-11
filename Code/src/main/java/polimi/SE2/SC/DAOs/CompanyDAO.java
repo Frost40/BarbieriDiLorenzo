@@ -2,9 +2,16 @@ package polimi.SE2.SC.DAOs;
 
 import polimi.SE2.SC.beans.Company;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 public class CompanyDAO {
+    private Connection connection;
+
+    public CompanyDAO(Connection connection) {
+        this.connection = connection;
+    }
+
     public Company findCompanyWithCredential(String email, String password) throws SQLException {
         Company company = null;
 

@@ -2,11 +2,18 @@ package polimi.SE2.SC.DAOs;
 
 import polimi.SE2.SC.beans.Message;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MessageDAO {
+    private Connection connection;
+
+    public MessageDAO(Connection connection) {
+        this.connection = connection;
+    }
+
     public ArrayList<Message> getNoReadMessages(int receiverId) throws SQLException {
         ArrayList<Message> messages = null;
 

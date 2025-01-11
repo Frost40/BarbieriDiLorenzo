@@ -3,10 +3,17 @@ package polimi.SE2.SC.DAOs;
 import polimi.SE2.SC.beans.Internship;
 import polimi.SE2.SC.beans.StudentHasInternship;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class StudentHasInternshipDAO {
+    private Connection connection;
+
+    public StudentHasInternshipDAO(Connection connection) {
+        this.connection = connection;
+    }
+
     public void acceptRecommendationStudent(int id) throws SQLException {
 
     }
