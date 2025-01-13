@@ -45,7 +45,22 @@ public class Logout extends HttpServlet {
         this.connection = ConnectionHandler.getConnection(servletContext);
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {}
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Remove the session
+        HttpSession session = request.getSession(false);
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {}
+        // If the session is still not-null invalidate it
+        if(session != null) {
+
+            session.invalidate();
+        }
+
+        // Redirect
+        response.sendRedirect(getServletContext().getContextPath());
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Auto-generated method stub
+        doGet(request, response);
+    }
 }
