@@ -17,7 +17,7 @@ public class StudentDAO {
 
     public Student findStudentWithCredentials(String email, String password) throws SQLException {
         Student student = null;
-        String performedAction = " finding a user by username and password ";
+        String performedAction = " finding a student by email and password ";
         String query = "SELECT * FROM Student WHERE email = ? AND password = ?";
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
@@ -59,6 +59,7 @@ public class StudentDAO {
                 throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
             }
         }
+
         return student;
     }
 
