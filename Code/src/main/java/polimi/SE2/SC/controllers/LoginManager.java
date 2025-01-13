@@ -17,6 +17,9 @@ import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import polimi.SE2.SC.DAOs.CompanyDAO;
+import polimi.SE2.SC.DAOs.StudentDAO;
+import polimi.SE2.SC.beans.User;
 import polimi.SE2.SC.utils.ConnectionHandler;
 
 @WebServlet("/LoginManager")
@@ -47,5 +50,79 @@ public class LoginManager extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {}
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {}
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+
+        StudentDAO studentDAO = new StudentDAO(connection);
+        CompanyDAO companyDAO = new CompanyDAO(connection);
+        User user = null;
+
+
+        // Checking that the given arguments are not null
+        if(email == null || password == null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().println("Missing parameter");
+            return;
+        }
+
+        if (email.length() > 100 || email.length() <= 0 || !isAnEmail(email)) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().println("Invalid email!");
+            return;
+        }
+
+        if (password.length() <= 0 || password.length() > 10) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().println("Invalid password");
+            return;
+        }
+
+        // Trying student authentication
+        try {
+            user = studentDAO.findStudentWithCredentials(email, password);
+
+        } catch (SQLException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().println(e.getMessage());
+            return;
+        }
+
+        if(user == null) {
+            // Trying company authentication
+            try {
+                user = companyDAO.findCompanyWithCredential(email, password);
+
+            } catch (SQLException e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().println(e.getMessage());
+                return;
+            }
+
+            if(user == null) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().println("Email or password is incorrect");
+                return;
+            }
+        }
+
+        HttpSession session = request.getSession();
+        session.setAttribute("currentUser", user);
+
+        //JSON serialization
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        Gson gson = new GsonBuilder().create();
+        String json = gson.toJson(user);
+        response.getWriter().write(json);
+    }
+
+    private boolean isAnEmail(String emailAddress) {
+        String EMAIL_REGEX = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+
+        Pattern pattern = Pattern.compile(EMAIL_REGEX);
+        Matcher matcher = pattern.matcher(emailAddress);
+        return matcher.matches();
+    }
 }
