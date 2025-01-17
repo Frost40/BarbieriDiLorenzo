@@ -4,6 +4,8 @@ import polimi.SE2.SC.beans.Complaint;
 import polimi.SE2.SC.beans.Feedback;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -26,9 +28,65 @@ public class ComplaintDAO {
         return complaint;
     }
 
-    public ArrayList<Complaint> getNotReadComplaints(int userId) throws SQLException {
-        ArrayList<Complaint> complaints = null;
+    public ArrayList<Complaint> getNotReadComplaints(int userId, boolean isStudent) throws SQLException {
+        ArrayList<Complaint> complaints = new ArrayList<>();
+        String performedAction = " extracting all complaints that have not been read by the user ";
+        String query = null;
 
+        if (isStudent) {
+            query = "SELECT c.*, shi.id AS studentInternshipId " +
+                    "FROM Complaint c " +
+                    "JOIN StudentHasInternship shi ON c.studentHasInternshipId = shi.id " +
+                    "WHERE shi.studentId = ? AND c.read = FALSE;";
+        } else {
+            query = "SELECT c.*, shi.id AS studentInternshipId, i.id AS internshipId, i.companyId " +
+                    "FROM Complaint c " +
+                    "JOIN StudentHasInternship shi ON c.studentHasInternshipId = shi.id " +
+                    "JOIN Internship i ON shi.internshipId = i.id " +
+                    "WHERE i.companyId = ? AND c.read = FALSE;";
+        }
+
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, userId);
+
+            resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                Complaint complaint = new Complaint();
+
+                complaint.setId(resultSet.getInt("id"));
+                complaint.setText(resultSet.getString("text"));
+                complaint.setRead(resultSet.getBoolean("read"));
+                complaint.setClosedByStudent(resultSet.getBoolean("closedByStudent"));
+                complaint.setClosedByCompany(resultSet.getBoolean("closedByCompany"));
+                complaint.setStudentHasInternshipId(resultSet.getInt("studentHasInternshipId"));
+
+                complaints.add(complaint);
+            }
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                resultSet.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the result set when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
         return complaints;
     }
 

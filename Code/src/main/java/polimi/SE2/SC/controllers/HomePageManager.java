@@ -56,6 +56,7 @@ public class HomePageManager extends HttpServlet {
 
         CvDAO cvDAO = null;
         InternshipDAO internshipDAO = null;
+        boolean isStudent = false;
 
         Cv cv = null;
         ArrayList<Internship> internships = null;
@@ -70,6 +71,8 @@ public class HomePageManager extends HttpServlet {
                 response.getWriter().println(e.getMessage());
                 return;
             }
+
+            isStudent = true;
 
         } else if (user instanceof Company company) {
             // Handle company-specific logic
@@ -96,7 +99,11 @@ public class HomePageManager extends HttpServlet {
         ComplaintDAO complaintDAO = new ComplaintDAO(connection);
         ArrayList<Complaint> unreadComplaints = null;
         try {
-            unreadComplaints = complaintDAO.getNotReadComplaints(user.getId());
+            if (isStudent) {
+                unreadComplaints = complaintDAO.getNotReadComplaints(user.getId(), true);
+            } else {
+                unreadComplaints = complaintDAO.getNotReadComplaints(user.getId(), false);
+            }
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().println(e.getMessage());
@@ -120,9 +127,9 @@ public class HomePageManager extends HttpServlet {
         Gson gson = new GsonBuilder().create();
 
         Map<String, Object> jsonObject = new HashMap<>();
-        if (user instanceof Student) {
+        if (isStudent) {
             jsonObject.put("cv", cv);
-        } else if (user instanceof Company) {
+        } else {
             jsonObject.put("internships", internships);
         }
         jsonObject.put("unreadMessages", unreadMessages);
