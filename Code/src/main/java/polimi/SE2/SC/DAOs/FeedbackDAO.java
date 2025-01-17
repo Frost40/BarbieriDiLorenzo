@@ -26,6 +26,12 @@ public class FeedbackDAO {
         return feedbacks;
     }
 
+    public ArrayList<Feedback> getNotReadFeedbacks(int companyId) throws SQLException {
+        ArrayList<Feedback> feedbacks = null;
+
+        return feedbacks;
+    }
+
     public void uploadFeedback(String text, int rating) throws SQLException {
 
     }

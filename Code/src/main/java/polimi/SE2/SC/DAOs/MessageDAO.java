@@ -14,7 +14,7 @@ public class MessageDAO {
         this.connection = connection;
     }
 
-    public ArrayList<Message> getNoReadMessages(int receiverId) throws SQLException {
+    public ArrayList<Message> getNotReadMessages(int receiverId) throws SQLException {
         ArrayList<Message> messages = null;
 
         return messages;

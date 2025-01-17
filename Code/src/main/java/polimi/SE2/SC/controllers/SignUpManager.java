@@ -121,7 +121,7 @@ public class SignUpManager extends HttpServlet {
                     return;
                 }
 
-                //In case the system filed to retrieve user's id it redirects to errorPage
+                //In case the system failed to retrieve user's id it redirects to errorPage
                 if (userId == 0) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     response.getWriter().println("An error occurred while retrieving user's id");

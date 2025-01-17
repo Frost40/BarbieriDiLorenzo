@@ -62,13 +62,13 @@ public class LoginManager extends HttpServlet {
         // Checking that the given arguments are not null
         if(email == null || password == null) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("Missing parameter");
+            response.getWriter().println("Some data is missing from the login module!");
             return;
         }
 
         if (email.length() > 100 || email.length() <= 0 || !isAnEmail(email)) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("Invalid email!");
+            response.getWriter().println("Invalid email address!");
             return;
         }
 
@@ -101,7 +101,7 @@ public class LoginManager extends HttpServlet {
 
             if(user == null) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().println("Email or password is incorrect");
+                response.getWriter().println("Email or password are incorrect");
                 return;
             }
         }

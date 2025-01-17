@@ -1,6 +1,7 @@
 package polimi.SE2.SC.DAOs;
 
 import polimi.SE2.SC.beans.Complaint;
+import polimi.SE2.SC.beans.Feedback;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -23,6 +24,12 @@ public class ComplaintDAO {
         Complaint complaint = null;
 
         return complaint;
+    }
+
+    public ArrayList<Complaint> getNotReadComplaints(int userId) throws SQLException {
+        ArrayList<Complaint> complaints = null;
+
+        return complaints;
     }
 
     public void uploadComplaint(String text) throws SQLException {
