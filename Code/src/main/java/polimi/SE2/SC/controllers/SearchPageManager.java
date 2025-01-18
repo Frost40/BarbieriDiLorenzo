@@ -3,6 +3,9 @@ package polimi.SE2.SC.controllers;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +20,8 @@ import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import polimi.SE2.SC.DAOs.InternshipDAO;
+import polimi.SE2.SC.beans.Internship;
 import polimi.SE2.SC.utils.ConnectionHandler;
 
 @WebServlet("/SearchPageManager")
@@ -45,7 +50,29 @@ public class SearchPageManager extends HttpServlet {
         this.connection = ConnectionHandler.getConnection(servletContext);
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {}
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        InternshipDAO internshipDAO = new InternshipDAO(connection);
+        ArrayList<Internship> allInternships = null;
+        try {
+            allInternships = internshipDAO.getAllInternships();
+        } catch (SQLException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().println(e.getMessage());
+            return;
+        }
+
+        // JSON serialization
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        Gson gson = new GsonBuilder().create();
+
+        Map<String, Object> jsonObject = new HashMap<>();
+        jsonObject.put("allInternships", allInternships);
+
+        String json = gson.toJson(jsonObject);
+        response.getWriter().write(json);
+    }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {}
 }

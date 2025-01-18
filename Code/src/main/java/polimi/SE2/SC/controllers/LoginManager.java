@@ -51,7 +51,7 @@ public class LoginManager extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {}
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String email = request.getParameter("email");
+        String email = request.getParameter("id");
         String password = request.getParameter("password");
 
         StudentDAO studentDAO = new StudentDAO(connection);
