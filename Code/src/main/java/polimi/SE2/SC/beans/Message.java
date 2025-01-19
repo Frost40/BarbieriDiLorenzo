@@ -4,6 +4,7 @@ public class Message {
     private int id;
     private String message;
     private boolean read;
+    private boolean fromInternship;
     private int senderId;
     private int receiverId;
 
@@ -29,6 +30,14 @@ public class Message {
 
     public void setRead(boolean read) {
         this.read = read;
+    }
+
+    public boolean isFromInternship() {
+        return fromInternship;
+    }
+
+    public void setFromInternship(boolean fromInternship) {
+        this.fromInternship = fromInternship;
     }
 
     public int getSenderId() {

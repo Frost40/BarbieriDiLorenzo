@@ -62,7 +62,6 @@ public class DisplaySingleChat extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("currentUser");
 
-        boolean isStudent = user instanceof Student;
         int internshipId;
 
         if(internshipIdString == null || internshipIdString.isEmpty()) {

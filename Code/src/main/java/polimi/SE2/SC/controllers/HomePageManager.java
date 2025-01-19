@@ -56,12 +56,12 @@ public class HomePageManager extends HttpServlet {
 
         CvDAO cvDAO = null;
         InternshipDAO internshipDAO = null;
-        boolean isStudent = false;
+        boolean isStudent = user instanceof Student;
 
         Cv cv = null;
         ArrayList<Internship> internships = null;
 
-        if (user instanceof Student student) {
+        if (isStudent) {
             // Handle student-specific logic
             cvDAO = new CvDAO(connection);
             try {
@@ -72,9 +72,7 @@ public class HomePageManager extends HttpServlet {
                 return;
             }
 
-            isStudent = true;
-
-        } else if (user instanceof Company company) {
+        } else {
             // Handle company-specific logic
             internshipDAO = new InternshipDAO(connection);
             try {

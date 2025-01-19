@@ -3,6 +3,9 @@ package polimi.SE2.SC.controllers;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +20,10 @@ import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import polimi.SE2.SC.DAOs.CvDAO;
+import polimi.SE2.SC.DAOs.InternshipDAO;
+import polimi.SE2.SC.DAOs.MessageDAO;
+import polimi.SE2.SC.beans.*;
 import polimi.SE2.SC.utils.ConnectionHandler;
 
 @WebServlet("/MessagesManager")
@@ -45,7 +52,43 @@ public class MessagesManager extends HttpServlet {
         this.connection = ConnectionHandler.getConnection(servletContext);
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {}
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("currentUser");
+
+        boolean isStudent = user instanceof Student;
+        HashMap<Internship, ArrayList<Message>> allChatsForStudent = null;
+        HashMap<Internship, HashMap<Student, ArrayList<Message>>> allChatsForCompany = null;
+
+        MessageDAO messageDAO = new MessageDAO(connection);
+        try {
+            if (isStudent) {
+                allChatsForStudent = messageDAO.getAllChatsForStudent(user.getId());
+            } else {
+                allChatsForCompany = messageDAO.getAllChatsForCompany(user.getId());
+            }
+        } catch (SQLException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().println(e.getMessage());
+            return;
+        }
+
+        // JSON serialization
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        Gson gson = new GsonBuilder().create();
+
+        Map<String, Object> jsonObject = new HashMap<>();
+        if (isStudent) {
+            jsonObject.put("allChats", allChatsForStudent);
+        } else {
+            jsonObject.put("allChats", allChatsForCompany);
+        }
+
+        String json = gson.toJson(jsonObject);
+        response.getWriter().write(json);
+    }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {}
 }
