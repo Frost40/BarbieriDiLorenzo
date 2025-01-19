@@ -89,7 +89,7 @@ public class HomePageManager extends HttpServlet {
         MessageDAO messageDAO = new MessageDAO(connection);
         ArrayList<Message> unreadMessages = null;
         try {
-            unreadMessages = messageDAO.getNotReadMessages(user.getId());
+            unreadMessages = messageDAO.getNotReadMessages(user.getId(), isStudent);
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().println(e.getMessage());
@@ -99,11 +99,7 @@ public class HomePageManager extends HttpServlet {
         ComplaintDAO complaintDAO = new ComplaintDAO(connection);
         ArrayList<Complaint> unreadComplaints = null;
         try {
-            if (isStudent) {
-                unreadComplaints = complaintDAO.getNotReadComplaints(user.getId(), true);
-            } else {
-                unreadComplaints = complaintDAO.getNotReadComplaints(user.getId(), false);
-            }
+            unreadComplaints = complaintDAO.getNotReadComplaints(user.getId(), isStudent);
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().println(e.getMessage());

@@ -1,13 +1,10 @@
 package polimi.SE2.SC.controllers;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import polimi.SE2.SC.DAOs.ComplaintDAO;
+import polimi.SE2.SC.beans.Complaint;
+import polimi.SE2.SC.beans.Student;
+import polimi.SE2.SC.beans.User;
+import polimi.SE2.SC.utils.ConnectionHandler;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -17,14 +14,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Optional;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import polimi.SE2.SC.DAOs.ComplaintDAO;
-import polimi.SE2.SC.beans.Complaint;
-import polimi.SE2.SC.beans.Student;
-import polimi.SE2.SC.beans.User;
-import polimi.SE2.SC.utils.ConnectionHandler;
+import static polimi.SE2.SC.utils.UtilityFunctions.parsingChecker;
 
 @WebServlet("/CloseComplaint")
 @MultipartConfig
@@ -55,7 +51,7 @@ public class CloseComplaint extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {}
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String complaintIdString = request.getParameter("id");
+        String complaintIdString = request.getParameter("complaintId");
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("currentUser");
 
@@ -123,20 +119,5 @@ public class CloseComplaint extends HttpServlet {
         }
 
         response.setStatus(HttpServletResponse.SC_OK);
-    }
-
-    private Optional<Integer> parsingChecker(HttpServletRequest request, HttpServletResponse response, String stringToParse) throws ServletException, IOException {
-        int idToReturn;
-
-        try {
-            idToReturn = Integer.parseInt(stringToParse);
-
-        } catch (NumberFormatException e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().println(e.getMessage());
-            return Optional.empty();
-        }
-
-        return Optional.of(idToReturn);
     }
 }
