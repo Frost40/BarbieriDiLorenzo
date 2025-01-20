@@ -15,6 +15,14 @@ public class CompanyDAO {
         this.connection = connection;
     }
 
+    /**
+     * Method used to uniquely identify a company type of user via email and password
+     * 
+     * @param email Company email
+     * @param password Account password
+     * @return Company associated to those credentials
+     * @throws SQLException
+     */
     public Company findCompanyWithCredential(String email, String password) throws SQLException {
         Company company = null;
         String performedAction = " finding a company by username and password ";
@@ -75,6 +83,13 @@ public class CompanyDAO {
         return company;
     }
 
+    /**
+     * Method used to retrive a company using its unique email
+     * 
+     * @param email Company email
+     * @return Company associated with the given email
+     * @throws SQLException
+     */
     public Company getCompanyByEmail(String email) throws SQLException {
         Company company = null;
         String performedAction = " finding a company type user by email ";
@@ -128,6 +143,17 @@ public class CompanyDAO {
         return company;
     }
 
+    /**
+     * Method used to register a new company into the S&C database
+     * 
+     * @param email Company email
+     * @param password Associated password
+     * @param name Company name
+     * @param mainOffice Company main office 
+     * @param offices Other offices the company has
+     * @return The aut generated id relative to the newly added company
+     * @throws SQLException
+     */
     public int registerCompany(String email, String password, String name, String mainOffice, String offices) throws SQLException {
         int generatedId = 0;
         String performedAction = " creating a new company in the database ";

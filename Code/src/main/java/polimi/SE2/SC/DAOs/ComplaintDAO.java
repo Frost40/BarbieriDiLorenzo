@@ -16,6 +16,13 @@ public class ComplaintDAO {
         this.connection = connection;
     }
 
+    /**
+     * Method used to extract a specific complaint given its id 
+     * 
+     * @param id Complaint id
+     * @return The associated compliant
+     * @throws SQLException
+     */
     public Complaint getComplaint(int id) throws SQLException {
         Complaint complaint = null;
         String performedAction = " extracting complaint using unique id ";
@@ -74,6 +81,14 @@ public class ComplaintDAO {
         return complaint;
     }
 
+    /**
+     * Method used to retrieve all complaints a given user has not read yet
+     * 
+     * @param userId The user we are interested in
+     * @param isStudent Boolean used to distinguish between Student and Company table in the DB
+     * @return List of unread complaints
+     * @throws SQLException
+     */
     public ArrayList<Complaint> getNotReadComplaints(int userId, boolean isStudent) throws SQLException {
         ArrayList<Complaint> complaints = new ArrayList<>();
         String performedAction = " extracting all complaints that have not been read by the user ";
@@ -136,6 +151,14 @@ public class ComplaintDAO {
         return complaints;
     }
 
+    /**
+     * Method used to retrieve all complaints relative to a specific user
+     *
+     * @param userId The user we are interested in
+     * @param isStudent Boolean used to distinguish between Student and Company table in the DB
+     * @return List of user complaints
+     * @throws SQLException
+     */
     public ArrayList<Complaint> getUserComplaints(int userId, boolean isStudent) throws SQLException {
         ArrayList<Complaint> complaints = new ArrayList<>();
         String performedAction = " extracting all complaints that have not been read by the user ";
@@ -207,8 +230,46 @@ public class ComplaintDAO {
 
     }
 
+    /**
+     * Method that updated the closedByStudent or closedByCompany columns
+     * based on the type of user who requested the complaint closure
+     *
+     * @param complaintId Complaint to be updated
+     * @param requestFromStudent Boolean true if was the student to request the closure
+     * @throws SQLException
+     */
     public void requestClosure(int complaintId, boolean requestFromStudent) throws SQLException {
+        String performedAction = " setting which between company and student requested the complaint closure ";
+        String query;
+        if (requestFromStudent) {
+            query = "UPDATE Complaint " +
+                    "SET closedByStudent = TRUE " +
+                    "WHERE id = ?";
+        } else {
+            query = "UPDATE Complaint " +
+                    "SET closedByCompany = TRUE " +
+                    "WHERE id = ?";
+        }
+        PreparedStatement preparedStatement = null;
 
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, complaintId);
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
     }
 
     public void rejectClosure(int complaintId) throws SQLException {
