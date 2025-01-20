@@ -62,8 +62,6 @@ public class DisplaySingleChat extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("currentUser");
 
-        int internshipId;
-
         if(internshipIdString == null || internshipIdString.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().println("Null complaint id!");
@@ -71,6 +69,7 @@ public class DisplaySingleChat extends HttpServlet {
         }
 
         // Parsing the complaint ID string back into an integer
+        int internshipId;
         Optional<Integer> parsedId = parsingChecker(request, response, internshipIdString);
         if (parsedId.isPresent())			internshipId = parsedId.get();
         else	return;
