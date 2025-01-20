@@ -94,8 +94,43 @@ public class CvDAO {
         return cvs;
     }
 
-    public void uploadNewCv(String filePath, String experiences, String programmingSkills, String otherSkills) throws SQLException {
+    /**
+     * Method used to upload a new CV into the database
+     *
+     * @param filePath The path in which the CV is contained in the server
+     * @param experiences Set of experiences relative to the CV
+     * @param programmingSkills Set of programming skills relative to the CV
+     * @param otherSkills Set of other general skills relative to the CV
+     * @param studentId The id of the student who uploaded the CV
+     * @throws SQLException
+     */
+    public void uploadNewCv(String filePath, String experiences, String programmingSkills, String otherSkills, int studentId) throws SQLException {
+        String performedAction = " adding the new CV into the DB ";
+        String query = "INSERT into Cv (filePath, experiences, programmingSkills, otherSkills, studentId) VALUES (?, ?, ?, ?, ?)";
+        PreparedStatement preparedStatement = null;
 
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, filePath);
+            preparedStatement.setString(2, experiences);
+            preparedStatement.setString(3, programmingSkills);
+            preparedStatement.setString(4, otherSkills);
+            preparedStatement.setInt(5, studentId);
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
     }
 
     /**
