@@ -143,22 +143,40 @@ public class SendMessage extends HttpServlet {
 
         }
 
-        // Adding the message to the database
-        try {
-            if (isStudent) {
-                // If a student is the current user: student = sender and internship = receiver
+        // Adding the message to the database and setting all previous chat messages to read
+        if (isStudent) {
+            // If a student is the current user: student = sender and internship = receiver
+            try {
                 messageDAO.insertMessage(message, false, sender.getId(), internshipReceiver.getId());
-            } else {
-                // If a company is the current user: internship = sender and student = receiver
-                messageDAO.insertMessage(message, true, sender.getId(), studentReceiver.getId());
+            } catch (SQLException e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().println(e.getMessage());
+                return;
             }
-        } catch (SQLException e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().println(e.getMessage());
-            return;
+
+            try {
+                messageDAO.setChatToRead(sender.getId(), internshipReceiver.getId());
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            // If a company is the current user: internship = sender and student = receiver
+            try {
+                messageDAO.insertMessage(message, true, sender.getId(), studentReceiver.getId());
+            } catch (SQLException e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().println(e.getMessage());
+                return;
+            }
+
+            try {
+                messageDAO.setChatToRead(studentReceiver.getId(), sender.getId());
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
 
-        //Getting all comments related to the image from database
+        // Getting the newly updated chat
         try {
             if (isStudent) {
                 chat = messageDAO.getAllChatMessages(sender.getId(), internshipReceiver.getId());

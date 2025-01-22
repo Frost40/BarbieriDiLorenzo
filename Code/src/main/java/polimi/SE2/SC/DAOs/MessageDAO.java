@@ -326,4 +326,52 @@ public class MessageDAO {
     public void hasBeenRead(int messageId) throws SQLException {
 
     }
+
+    /**
+     * Method used to set all messages inside a chat to read
+     * 
+     * @param userId Student identifier
+     * @param internshipId Internship identifier
+     * @throws SQLException
+     */
+    public void setChatToRead(int userId, int internshipId) throws SQLException {
+        String performedAction = " setting all message in the chat between student and internship to read ";
+        String query = "UPDATE Message " +
+                "SET `read` = ? " +
+                "WHERE (receiverId = ? AND senderId = ?) " +
+                "OR (receiverId = ? AND senderId = ?)";
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setBoolean(1, true);
+            preparedStatement.setInt(2, userId);
+            preparedStatement.setInt(3, internshipId);
+            preparedStatement.setInt(4, internshipId);
+            preparedStatement.setInt(5, userId);
+
+            preparedStatement.executeUpdate();
+            
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                resultSet.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the result set when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
+    }
+
 }
