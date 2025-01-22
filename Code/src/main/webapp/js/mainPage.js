@@ -11,11 +11,40 @@
     var registerDiv                   = document.getElementById("register-div");
     var registerButton                = document.getElementById("register_button");
     var registerEmailInput            = registerButton.closest("form").querySelector('input[name="email"]');
-    var registerUsernameInput         = registerButton.closest("form").querySelector('input[name="username"]');
+    var registerUsernameInput         = registerButton.closest("form").querySelector('input[name="name"]');
     var registerPasswordInput 	      = registerButton.closest("form").querySelector('input[name="password"]');
     var registerRepeatPasswordInput   = registerButton.closest("form").querySelector('input[name="repeat_pwd"]');
     var registerWarningDiv            = document.getElementById('register_warning_id');
 
+    const studentRadio = document.getElementById('student-radio');
+    const companyRadio = document.getElementById('company-radio');
+    const studentFields = document.getElementById('student-fields');
+    const companyFields = document.getElementById('company-fields');
+    const registerMainOfficeInput = document.getElementById('register-mainOffice');
+    const registerOfficesInput = document.getElementById('register-offices');
+    const registerSurnameInput = document.getElementById('register-surname');
+    const registerNationalityInput = document.getElementById('register-nationality');
+    const registerCityOfBirthInput = document.getElementById('register-cityOfBirth');
+
+
+    studentRadio.addEventListener('change', () => {
+        studentFields.style.display = 'block';
+        companyFields.style.display = 'none';
+        registerMainOfficeInput.required = false;
+        registerOfficesInput.required = false;
+        registerSurnameInput.required = true;
+        registerNationalityInput.required = true;
+        registerCityOfBirthInput.required = true;
+    });
+    companyRadio.addEventListener('change', () => {
+        studentFields.style.display = 'none';
+        companyFields.style.display = 'block';
+        registerSurnameInput.required = false;
+        registerNationalityInput.required = false;
+        registerCityOfBirthInput.required = false;
+        registerMainOfficeInput.required = true;
+        registerOfficesInput.required = true;
+    });
     // Attaches to login button
     loginButton.addEventListener("click", (e) => {
 
@@ -49,16 +78,15 @@
         // Does a form check
         if (form.checkValidity()) {
             // Checks if the register input fields are null
-            if (registerEmailInput.value           == "" || registerUsernameInput.value        == "" ||
-                registerPasswordInput.value        == "" || registerRepeatPasswordInput.value  == "") {
+            if (registerEmailInput.value           === "" || registerUsernameInput.value        === "" ||
+                registerPasswordInput.value        === "" || registerRepeatPasswordInput.value  === "") {
 
                 registerWarningDiv.textContent   = "One or more parameters are missing";
                 registerWarningDiv.style.display = 'block';
                 return;
             }
-
             // Checks if repeat_pwd and password field are not equal. If so sets a warning
-            if (registerRepeatPasswordInput.value != registerPasswordInput.value) {
+            if (registerRepeatPasswordInput.value !== registerPasswordInput.value) {
 
                 registerWarningDiv.textContent   = "Passwords do not match";
                 registerWarningDiv.style.display = 'block';
@@ -71,13 +99,33 @@
                 registerWarningDiv.style.display = 'block';
                 return;
             }
-
             if (containsSpecialCharacters(registerUsernameInput.value)) {
                 registerWarningDiv.textContent   = "The username can not contain special characters";
                 registerWarningDiv.style.display = 'block';
                 return;
             }
+            // Get the selected user type
+            const selectedUserType = document.querySelector('input[name="userType"]:checked').value;
 
+            // Check for required fields based on user type
+            if (selectedUserType === "student") {
+                if (document.getElementById('register-surname').value === "" ||
+                    document.getElementById('register-nationality').value === "" ||
+                    document.getElementById('register-cityOfBirth').value === "") {
+
+                    registerWarningDiv.textContent = "One or more parameters are missing";
+                    registerWarningDiv.style.display = 'block';
+                    return;
+                }
+            } else if (selectedUserType === "company") {
+                if (document.getElementById('register-mainOffice').value === "" || document.getElementById('register-offices').value === "" ) {
+
+                    registerWarningDiv.textContent = "One or more parameters are missing";
+                    registerWarningDiv.style.display = 'block';
+                    return;
+                }
+            }
+            console.log("Form is valid. Sending to server.");
             sendToServer(form, registerWarningDiv, 'SignUpManager', false);
 
         } else {
@@ -85,6 +133,7 @@
             form.reportValidity();
         }
     });
+
 
     //Attaches to register view button
     openRegisterButton.addEventListener("click", function(e) {
@@ -104,7 +153,7 @@
     var self = this;
 
     function sendToServer(form, error_div, request_url, isLogin) {
-
+        console.log("In send to server");
         makeCall("POST", request_url, form, function(req) {
             if (req.readyState === XMLHttpRequest.DONE) {
                 var message = req.responseText;

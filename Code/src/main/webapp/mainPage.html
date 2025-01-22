@@ -10,7 +10,7 @@
     <title>Login Page</title>
 </head>
 <body>
-<h1>Welcome to ImageGallery!</h1>
+<h1>Welcome to the S&C Platform!</h1>
 
 <div class="container">
     <!-- Login Section -->
@@ -19,7 +19,7 @@
         <form class="login-form" id="login-form" action="#">
             <div class="form-group">
                 <label for="login-email">Email</label>
-                <input id="login-email" type="text" placeholder="Enter username or email" name="id" required maxlength="100">
+                <input id="login-email" type="text" placeholder="Enter your email" name="id" required maxlength="100">
             </div>
             <div class="form-group">
                 <label for="login-password">Password</label>
@@ -41,8 +41,8 @@
                 <input id="register-email" type="email" placeholder="Enter your email" name="email" required>
             </div>
             <div class="form-group">
-                <label for="register-username">Username</label>
-                <input id="register-username" type="text" placeholder="Enter your username" name="username" required>
+                <label for="register-username">Name</label>
+                <input id="register-username" type="text" placeholder="Enter your username" name="name" required>
             </div>
             <div class="form-group">
                 <label for="register-password">Password</label>
@@ -52,6 +52,46 @@
                 <label for="repeat-password">Repeat Password</label>
                 <input id="repeat-password" type="password" placeholder="Confirm chosen password" name="repeat_pwd" required>
             </div>
+            <div class="form-group">
+                <input type="hidden" id="user-type">
+                <label for="user-type">User Type:</label>
+                <div>
+                    <input type="radio" id="student-radio" name="userType" value="student">
+                    <label for="student-radio">Student</label>
+                </div>
+                <div>
+                    <input type="radio" id="company-radio" name="userType" value="company">
+                    <label for="company-radio">Company</label>
+                </div>
+            </div>
+
+            <div id="student-fields" style="display: none;">
+                <div class="form-group">
+                    <label for="register-surname">Surname</label>
+                    <input id="register-surname" type="text" placeholder="Enter your surname" name="surname" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-nationality">Nationality</label>
+                    <input id="register-nationality" type="text" placeholder="Enter your nationality" name="nationality" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-cityOfBirth">City of Birth</label>
+                    <input id="register-cityOfBirth" type="text" placeholder="Enter your city of birth" name="cityOfBirth" required>
+                </div>
+            </div>
+
+            <div id="company-fields" style="display: none;">
+                <div class="form-group">
+                    <label for="register-mainOffice">Main Office</label>
+                    <input id="register-mainOffice" type="text" placeholder="Enter your main office location" name="mainOffice" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-offices">Offices</label>
+                    <input id="register-offices" type="text" placeholder="Enter a comma-separated list of office locations (optional)" name="offices">
+                </div>
+            </div>
+
+
             <input id="register_button" class="btn btn-large btn-gossamer" type="button" value="Register"/>
         </form>
         <div id="register_warning_id" class="warning-message" style="display: none;">Data not valid!</div>
