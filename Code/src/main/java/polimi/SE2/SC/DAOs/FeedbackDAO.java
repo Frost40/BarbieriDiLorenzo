@@ -31,6 +31,14 @@ public class FeedbackDAO {
         return feedbacks;
     }
 
+    /**
+     * Method used to retrieve form the Feedback table in the database
+     * the list of all feedbacks that have not been read by a company
+     *
+     * @param companyId Identifier of the company whose feedbacks we want to extract
+     * @return Array list containing the feedbacks
+     * @throws SQLException
+     */
     public ArrayList<Feedback> getNotReadFeedbacks(int companyId) throws SQLException {
         ArrayList<Feedback> feedbacks = new ArrayList<>();
         String performedAction = " extracting all feedbacks that have not been read by the company ";

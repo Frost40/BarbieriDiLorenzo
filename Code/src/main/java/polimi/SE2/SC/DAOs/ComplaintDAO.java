@@ -25,7 +25,7 @@ public class ComplaintDAO {
      */
     public Complaint getComplaint(int id) throws SQLException {
         Complaint complaint = null;
-        String performedAction = " extracting complaint using unique id ";
+        String performedAction = " extracting complaint using its unique id ";
         String query = "SELECT * FROM Complaint where id = ?";
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
@@ -75,10 +75,60 @@ public class ComplaintDAO {
         return complaints;
     }
 
-    public Complaint getOngoingInternshipComplaints(int internshipId) throws SQLException {
-        Complaint complaint = null;
+    /**
+     * Method used to retrieve from the database all complaints that are still
+     * open for a giving ongoing internship (studentHasInternship connection)
+     *
+     * @param studentHasInternshipId Identifier for the ongoing internship
+     * @return Array list containing all extracted complaints
+     * @throws SQLException
+     */
+    public ArrayList<Complaint> getOngoingInternshipOpenComplaints(int studentHasInternshipId) throws SQLException {
+        ArrayList<Complaint> complaints = new ArrayList<>();
+        String performedAction = " extracting all complaints that are still open for a given ongoing internship ";
+        String query = "SELECT * FROM Complaint WHERE studentHasInternshipId = ? AND NOT (closedByCompany = TRUE AND closedByStudent = TRUE)";
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
 
-        return complaint;
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, studentHasInternshipId);
+
+            resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                Complaint complaint = new Complaint();
+
+                complaint.setId(resultSet.getInt("id"));
+                complaint.setText(resultSet.getString("text"));
+                complaint.setRead(resultSet.getBoolean("read"));
+                complaint.setClosedByStudent(resultSet.getBoolean("closedByStudent"));
+                complaint.setClosedByCompany(resultSet.getBoolean("closedByCompany"));
+                complaint.setStudentHasInternshipId(resultSet.getInt("studentHasInternshipId"));
+
+                complaints.add(complaint);
+            }
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                resultSet.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the result set when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
+        return complaints;
     }
 
     /**
@@ -161,7 +211,7 @@ public class ComplaintDAO {
      */
     public ArrayList<Complaint> getUserComplaints(int userId, boolean isStudent) throws SQLException {
         ArrayList<Complaint> complaints = new ArrayList<>();
-        String performedAction = " extracting all complaints that have not been read by the user ";
+        String performedAction = " extracting all complaints relative to a user ";
         String query = null;
 
         if (isStudent) {
@@ -221,9 +271,37 @@ public class ComplaintDAO {
         return complaints;
     }
 
+    /**
+     * Method used to upload a new complaint into the database
+     *
+     * @param text Message text describing the problem the user wants to complaint about
+     * @param studentHasInternshipId Identifier for the ongoing internship the complaint is related to
+     * @throws SQLException
+     */
+    public void uploadComplaint(String text, int studentHasInternshipId) throws SQLException {
+        String performedAction = " inserting a new complaint into the DB ";
+        String query = "INSERT into Complaint (text, `read`, closedByStudent, closedByCompany, studentHasInternshipId) VALUES (?, FALSE, FALSE, FALSE, ?)";
+        PreparedStatement preparedStatement = null;
 
-    public void uploadComplaint(String text) throws SQLException {
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, text);
+            preparedStatement.setInt(2, studentHasInternshipId);
 
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
     }
 
     public void hasBeenRead(int complaintId) throws SQLException {
