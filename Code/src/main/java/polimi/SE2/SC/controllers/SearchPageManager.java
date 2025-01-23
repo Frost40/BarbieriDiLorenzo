@@ -21,7 +21,9 @@ import javax.servlet.http.HttpSession;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import polimi.SE2.SC.DAOs.InternshipDAO;
+import polimi.SE2.SC.beans.Company;
 import polimi.SE2.SC.beans.Internship;
+import polimi.SE2.SC.beans.User;
 import polimi.SE2.SC.utils.ConnectionHandler;
 
 @WebServlet("/SearchPageManager")
@@ -51,6 +53,14 @@ public class SearchPageManager extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("currentUser");
+
+        if (user instanceof Company) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().println("Company accounts are not authorize to view the Search Page");
+            return;
+        }
         InternshipDAO internshipDAO = new InternshipDAO(connection);
         ArrayList<Internship> allInternships = null;
         try {

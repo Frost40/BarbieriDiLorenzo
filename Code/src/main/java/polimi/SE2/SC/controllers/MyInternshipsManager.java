@@ -3,6 +3,7 @@ package polimi.SE2.SC.controllers;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.function.ToDoubleBiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +18,9 @@ import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import polimi.SE2.SC.DAOs.StudentHasInternshipDAO;
+import polimi.SE2.SC.beans.Student;
+import polimi.SE2.SC.beans.User;
 import polimi.SE2.SC.utils.ConnectionHandler;
 
 @WebServlet("/MyInternshipsManager")
@@ -45,7 +49,18 @@ public class MyInternshipsManager extends HttpServlet {
         this.connection = ConnectionHandler.getConnection(servletContext);
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {}
+    // TODO: Decide about creating ad hoc class (populationMyInternshipsPage) to send to the client
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("currentUser");
+
+        boolean isStudent = user instanceof Student;
+
+        StudentHasInternshipDAO studentHasInternshipDAO = new StudentHasInternshipDAO(connection);
+        if (isStudent) {
+
+        }
+    }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {}
 }

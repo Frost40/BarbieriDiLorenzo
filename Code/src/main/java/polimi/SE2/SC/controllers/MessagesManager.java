@@ -52,6 +52,7 @@ public class MessagesManager extends HttpServlet {
         this.connection = ConnectionHandler.getConnection(servletContext);
     }
 
+    // TODO: Decide about creating ad hoc class (populationMessagesPage) to send to the client
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("currentUser");
@@ -77,7 +78,10 @@ public class MessagesManager extends HttpServlet {
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        Gson gson = new GsonBuilder().create();
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .enableComplexMapKeySerialization()
+                .create();
 
         Map<String, Object> jsonObject = new HashMap<>();
         if (isStudent) {

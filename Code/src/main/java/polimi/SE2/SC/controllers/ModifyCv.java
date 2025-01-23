@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,6 +28,7 @@ import polimi.SE2.SC.beans.User;
 import polimi.SE2.SC.utils.ConnectionHandler;
 
 import static polimi.SE2.SC.utils.UtilityFunctions.parsingChecker;
+import static polimi.SE2.SC.utils.UtilityFunctions.splitStringByComma;
 
 @WebServlet("/ModifyCv")
 @MultipartConfig
@@ -170,6 +173,21 @@ public class ModifyCv extends HttpServlet {
             return;
         }
 
+        // Updating the instance of CV with the new data inserted by the student
+        cv.setExperiences(splitStringByComma(experiences));
+        cv.setProgrammingSkills(splitStringByComma(programmingSkills));
+        cv.setOtherSkills(splitStringByComma(otherSkills));
+
+        // JSON serialization
         response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        Gson gson = new GsonBuilder().create();
+
+        Map<String, Object> jsonObject = new HashMap<>();
+        jsonObject.put("modifiedCv", cv);
+
+        String json = gson.toJson(jsonObject);
+        response.getWriter().write(json);
     }
 }
