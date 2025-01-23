@@ -144,7 +144,7 @@ public class UploadComplaint extends HttpServlet {
             return;
         }
 
-        // Retrieving all tye complaints that are still open for the given ongoing internship
+        // Retrieving all the complaints that are still open for the given ongoing internship
         ArrayList<Complaint> complaints = null;
         try {
             complaints = complaintDAO.getOngoingInternshipOpenComplaints(ongoingInternshipId);

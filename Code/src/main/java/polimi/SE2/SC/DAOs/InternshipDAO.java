@@ -1,7 +1,6 @@
 package polimi.SE2.SC.DAOs;
 
 import polimi.SE2.SC.beans.Internship;
-import polimi.SE2.SC.beans.Message;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -42,7 +41,7 @@ public class InternshipDAO {
                 internship.setId(resultSet.getInt("id"));
                 internship.setName(resultSet.getString("name"));
                 internship.setDescription(resultSet.getString("description"));
-                internship.setRating(resultSet.getInt("rating"));
+                internship.setRating(resultSet.getDouble("rating"));
                 internship.setCompanyId(resultSet.getInt("companyId"));
 
                 internships.add(internship);
@@ -97,7 +96,7 @@ public class InternshipDAO {
                 internship.setId(resultSet.getInt("id"));
                 internship.setName(resultSet.getString("name"));
                 internship.setDescription(resultSet.getString("description"));
-                internship.setRating(resultSet.getInt("rating"));
+                internship.setRating(resultSet.getDouble("rating"));
                 internship.setCompanyId(resultSet.getInt("companyId"));
             }
 
@@ -144,7 +143,7 @@ public class InternshipDAO {
                 internship.setId(resultSet.getInt("id"));
                 internship.setName(resultSet.getString("name"));
                 internship.setDescription(resultSet.getString("description"));
-                internship.setRating(resultSet.getInt("rating"));
+                internship.setRating(resultSet.getDouble("rating"));
                 internship.setCompanyId(resultSet.getInt("companyId"));
 
                 internships.add(internship);
@@ -196,6 +195,41 @@ public class InternshipDAO {
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, description);
             preparedStatement.setInt(3, id);
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
+    }
+
+    /**
+     * Method used to update the internship rating
+     *
+     * @param id Identifier of the internship to update
+     * @param rating New rating
+     * @throws SQLException
+     */
+    public void updateInternshipRating(int id, double rating) throws SQLException {
+        String performedAction = " overwriting the previous rating with the new one ";
+        String query =  "UPDATE Internship " +
+                "SET rating = ? " +
+                "WHERE id = ?";
+        PreparedStatement preparedStatement = null;
+
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setDouble(1, rating);
+            preparedStatement.setInt(2, id);
 
             preparedStatement.executeUpdate();
 
