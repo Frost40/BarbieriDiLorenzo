@@ -1,8 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     var user = JSON.parse(sessionStorage.getItem('user'));
-
     if (!user) {
-        window.location.href = "login.html"; // Redirect to login if no user is present
+        window.location.href = "mainPage.html"; // Redirect to login if no user is present
     } else {
         var pageOrchestrator = new PageOrchestrator(user);
 
@@ -12,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = "homePage.html"; // Redirect to home page
         } else {
             // Use showPage for other pages
-            pageOrchestrator.showPage('home');
+            pageOrchestrator.showPage('home page');
         }
     }
 });
@@ -23,11 +22,11 @@ function PageOrchestrator(user){
     let actualPage = null;
 
     // Initialize all the pages
-    let homePage = new homePage(user, this);
-    let myInternshipsPage = new myInternshipsPage(this);
-    let searchPage = new searchPage(user, this);
-    let messagesPage = new messagesPage(user, this);
-    let notificationSection = new notificationSection(user, this);
+    let homePage = new HomePage(user, this);
+    let myInternshipsPage = new MyInternshipsPage(this);
+    let searchPage = new SearchPage(user, this);
+    let messagesPage = new MessagesPage(user, this);
+    let notificationSection = new NotificationSection(user, this);
 
     this.logout = function (){
         makeCall("POST", "Logout", null,
@@ -83,7 +82,7 @@ function PageOrchestrator(user){
                 notificationSection.open(info1, info2, info3);
                 break;
 
-            case 'login':
+            case 'main page':
                 this.logout();
                 break;
 

@@ -9,10 +9,76 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="js/utils.js" defer></script>
     <script src="js/homePage.js" defer></script>
+    <script src="js/myInternshipsPage.js" defer></script>
+    <script src="js/searchPage.js" defer></script>
+    <script src="js/messagesPage.js" defer></script>
     <script src="js/notificationSection.js" defer></script>
     <script src="js/pageOrchestrator.js" defer></script>
 </head>
 <body>
+<!-- Sidebar -->
+<div class="sidenav">
+    <!-- User Info -->
+    <div class="user-info">
+        <p id="username">Username</p>
+        <p id="email">Email</p>
+    </div>
 
+    <!-- Notifications Dropdown -->
+    <button class="dropdown-btn">Notifications
+        <i class="fa fa-caret-down"></i>
+    </button>
+    <div id="dynamic-notifications" class="dropdown-container">
+        <!-- Complaints -->
+        <button class="dropdown-btn">Complaints
+            <i class="fa fa-caret-down"></i>
+        </button>
+        <div id="complaints-dropdown" class="dropdown-container">
+            <!-- Dynamic complaints options -->
+        </div>
+    </div>
+
+    <!-- Messages Button -->
+    <button class="messages-btn">Messages</button>
+
+    <!-- New Create/Modify CV Button -->
+    <button id="cv-action-btn">Create New CV</button>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+    <h2>My CV</h2>
+    <div id="cv-container">
+        <!-- Experiences Section -->
+        <div id="experiences-container" class="cv-section">
+            <h3>Experiences</h3>
+            <textarea id="experiences-input" placeholder="Enter your experiences here..." readonly></textarea>
+        </div>
+
+        <!-- Programming Skills Section -->
+        <div id="programming-skills-container" class="cv-section">
+            <h3>Programming Skills</h3>
+            <textarea id="programming-skills-input" placeholder="Enter your programming skills here..." readonly></textarea>
+        </div>
+
+        <!-- Other Skills Section -->
+        <div id="other-skills-container" class="cv-section">
+            <h3>Other Skills</h3>
+            <textarea id="other-skills-input" placeholder="Enter your other skills here..." readonly></textarea>
+        </div>
+
+        <!-- Upload Cv -->
+        <button id="upload-cv-btn">Upload CV</button>
+    </div>
+</div>
+
+<!-- Bottom Navigation Bar -->
+<div class="bottom-bar">
+    <button class="bottom-bar-btn" id="home_page-btn">Home Page</button>
+    <button class="bottom-bar-btn" id="my-internships-btn">MyInternships</button>
+    <button class="bottom-bar-btn" id="search-btn">Search</button>
+    <button class="bottom-bar-btn" id="logout-btn">Logout</button>
+</div>
 </body>
+
 </html>

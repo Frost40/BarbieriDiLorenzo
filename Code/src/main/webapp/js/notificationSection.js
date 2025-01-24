@@ -38,7 +38,7 @@ function NotificationSection(user, pageOrchestrator) {
                         break;
 
                     default:
-                        pageOrchestrator.showPage("login");
+                        pageOrchestrator.showPage("home page");
                         break;
                 }
             }

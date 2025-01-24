@@ -10,7 +10,6 @@ function MyInternshipsPage(user, pageOrchestrator) {
     this.open = function () {
         // Construct query string
         var url;
-
         makeCall("GET", url, null, function (x) {
             if (x.readyState === XMLHttpRequest.DONE) {
                 var message = x.responseText;
@@ -38,7 +37,7 @@ function MyInternshipsPage(user, pageOrchestrator) {
                         break;
 
                     default:
-                        pageOrchestrator.showPage("login");
+                        pageOrchestrator.showPage("home page");
                         break;
                 }
             }
