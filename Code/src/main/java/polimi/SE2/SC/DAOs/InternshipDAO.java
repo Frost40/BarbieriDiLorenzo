@@ -171,8 +171,39 @@ public class InternshipDAO {
         return internships;
     }
 
-    public void uploadNewInternship(String name, String description) throws SQLException {
+    /**
+     * Method used to insert a new internship into the database
+     * 
+     * @param name Name of the newly added internship
+     * @param description Description for the new internship
+     * @param companyId Identifier of the company who uploaded the internship
+     * @throws SQLException
+     */
+    public void uploadNewInternship(String name, String description, int companyId) throws SQLException {
+        String performedAction = " inserting a new internship into the database ";
+        String query = "INSERT into Internship (name, description, companyId) VALUES (?, ?, ?)";
+        PreparedStatement preparedStatement = null;
 
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, name);
+            preparedStatement.setString(2, description);
+            preparedStatement.setInt(2, companyId);
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
     }
 
     /**

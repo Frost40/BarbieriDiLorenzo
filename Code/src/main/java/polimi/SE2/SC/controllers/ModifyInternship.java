@@ -84,7 +84,7 @@ public class ModifyInternship extends HttpServlet {
             return;
         }
 
-        // Parsing the cv ID string back into an integer
+        // Parsing the internship ID string back into an integer
         int internshipId;
         Optional<Integer> parsedId = parsingChecker(request, response, internshipIdString);
         if (parsedId.isPresent())			internshipId = parsedId.get();

@@ -21,7 +21,7 @@ public class MessageDAO {
 
     public ArrayList<Message> getNotReadMessages(int receiverId, boolean isStudent) throws SQLException {
         ArrayList<Message> messages = new ArrayList<>();
-        String performedAction = " extracting all feedbacks that have not been read by the user ";
+        String performedAction = " extracting all messages that have not been read by the user ";
         String query;
         if (isStudent) {
             query = "SELECT * FROM Message WHERE receiverId = ? AND fromInternship = TRUE AND `read` = FALSE";
@@ -226,12 +226,12 @@ public class MessageDAO {
     /**
      * Method used to retrieve the entirety of the chat between a student and an internship
      *
-     * @param userId The student
-     * @param internshipId The internship
+     * @param account1 The first account identifier (does not matter if is a student id or a internship id)
+     * @param account2 The second account identifier (does not matter if is a student id or a internship id)
      * @return List of messages exchanged between student and internship
      * @throws SQLException
      */
-    public ArrayList<Message> getAllChatMessages(int userId, int internshipId) throws SQLException {
+    public ArrayList<Message> getAllChatMessages(int account1, int account2) throws SQLException {
         ArrayList<Message> messages = new ArrayList<>();
         String performedAction = " extracting all messages of the chat between userId and internshipId ";
         String query =  "SELECT * FROM Message " +
@@ -242,10 +242,10 @@ public class MessageDAO {
 
         try {
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, userId);
-            preparedStatement.setInt(2, internshipId);
-            preparedStatement.setInt(3, internshipId);
-            preparedStatement.setInt(4, userId);
+            preparedStatement.setInt(1, account1);
+            preparedStatement.setInt(2, account2);
+            preparedStatement.setInt(3, account2);
+            preparedStatement.setInt(4, account1);
 
             resultSet = preparedStatement.executeQuery();
 
