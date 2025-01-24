@@ -19,6 +19,14 @@ public class MessageDAO {
         this.connection = connection;
     }
 
+    /**
+     * Method used to retrieve from the database all messages not read by the given user
+     *
+     * @param receiverId Identifier for the user of which we want to extract the messages
+     * @param isStudent Boolean variable use to distinguish between the student and the company type of user
+     * @return Array list containing the list of unread messages
+     * @throws SQLException
+     */
     public ArrayList<Message> getNotReadMessages(int receiverId, boolean isStudent) throws SQLException {
         ArrayList<Message> messages = new ArrayList<>();
         String performedAction = " extracting all messages that have not been read by the user ";
@@ -75,19 +83,24 @@ public class MessageDAO {
         return messages;
     }
 
-    public HashMap<Internship, ArrayList<Message>> getAllChatsForStudent(int studentId) throws SQLException {
-        HashMap<Internship, ArrayList<Message>> allChats = new HashMap<>();
-        String performedAction = " extracting all chats the student has open ";
-        String query =  "SELECT Message.*, " +
-                        "       Internship.id AS internshipId, " +
-                        "       Internship.name AS internshipName, " +
-                        "       Internship.description AS internshipDescription, " +
-                        "       Internship.companyId AS internshipCompanyId " +
-                        "FROM Message " +
-                        "JOIN Internship ON (Message.senderId = Internship.id AND Message.fromInternship = true) " +
-                        "               OR (Message.receiverId = Internship.id AND Message.fromInternship = false) " +
-                        "WHERE (Message.receiverId = ? AND Message.fromInternship = true) " +
-                        "   OR (Message.senderId = ? AND Message.fromInternship = false)";
+    /**
+     * Method used to retrieve the list of internships with which the student has started a chat
+     *
+     * @param studentId Identifier for the student account
+     * @return Array list containing the internships
+     * @throws SQLException
+     */
+    public ArrayList<Internship> getAllChatsForStudent(int studentId) throws SQLException {
+        ArrayList<Internship> internships = new ArrayList<>();
+        String performedAction = " extracting all internships the student has open chats with ";
+        String query = "SELECT DISTINCT " +
+                "    Internship.*, " +
+                "    Internship.id AS internshipId " +
+                "FROM Message " +
+                "JOIN Internship ON (Message.senderId = Internship.id AND Message.fromInternship = true) " +
+                "               OR (Message.receiverId = Internship.id AND Message.fromInternship = false) " +
+                "WHERE (Message.receiverId = ? AND Message.fromInternship = true) " +
+                "   OR (Message.senderId = ? AND Message.fromInternship = false)";
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
 
@@ -102,22 +115,12 @@ public class MessageDAO {
                 // Retrieve Internship Data using aliases
                 Internship internship = new Internship();
                 internship.setId(resultSet.getInt("internshipId")); // Alias used here
-                internship.setName(resultSet.getString("internshipName")); // Alias used here
-                internship.setDescription(resultSet.getString("internshipDescription")); // Alias used here
-                internship.setRating(resultSet.getInt("rating"));
-                internship.setCompanyId(resultSet.getInt("internshipCompanyId")); // Alias used here
+                internship.setName(resultSet.getString("name"));
+                internship.setDescription(resultSet.getString("description"));
+                internship.setRating(resultSet.getDouble("rating"));
+                internship.setCompanyId(resultSet.getInt("companyId"));
 
-                // Retrieve Message Data
-                Message message = new Message();
-                message.setId(resultSet.getInt("id")); // No alias required since 'id' is unique in Message
-                message.setMessage(resultSet.getString("message"));
-                message.setRead(resultSet.getBoolean("read"));
-                message.setFromInternship(resultSet.getBoolean("fromInternship"));
-                message.setSenderId(resultSet.getInt("senderId"));
-                message.setReceiverId(resultSet.getInt("receiverId"));
-
-                // Add the message to the corresponding internship in the HashMap
-                allChats.computeIfAbsent(internship, k -> new ArrayList<>()).add(message);
+                internships.add(internship);
             }
 
         } catch (SQLException e) {
@@ -139,24 +142,35 @@ public class MessageDAO {
                 throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
             }
         }
-        return allChats;
+        return internships;
     }
 
-    public HashMap<Internship, HashMap<Student, ArrayList<Message>>> getAllChatsForCompany(int companyId) throws SQLException {
-        HashMap<Internship, HashMap<Student, ArrayList<Message>>> allChats = new HashMap<>();
+    /**
+     * Method used to retrieve all the internships of the company that have no empty 
+     * chats and, for each one, the list of students with which the chats are
+     * 
+     * @param companyId Identifier for the company eho posses the internships 
+     * @return HashMap that for each internship associates the list of students it has non-empty chats with
+     * @throws SQLException
+     */
+    public HashMap<Internship, ArrayList<Student>> getAllChatsForCompany(int companyId) throws SQLException {
+        HashMap<Internship, ArrayList<Student>> allChats = new HashMap<>();
         String performedAction = " extracting all chats the company has open ";
-        String query =  "SELECT Message.*, " +
-                        "       Internship.id AS internshipId, " +
-                        "       Internship.name AS internshipName, " +
-                        "       Student.id AS studentId, " +
-                        "       Student.name AS studentName " +
-                        "FROM Message " +
-                        "JOIN Internship ON (Message.senderId = Internship.id AND Message.fromInternship = true) " +
-                        "               OR (Message.receiverId = Internship.id AND Message.fromInternship = false) " +
-                        "JOIN Student " +
-                        "    ON (Message.senderId = Student.id AND Message.fromInternship = false) " +
-                        "    OR (Message.receiverId = Student.id AND Message.fromInternship = true) " +
-                        "WHERE Internship.companyId = ?";
+        String query = "SELECT DISTINCT" +
+                "    Internship.*, " +
+                "    Student.*, " +
+                "    Internship.id AS internshipId, " +
+                "    Internship.name AS internshipName, " +
+                "    Student.id AS studentId, " +
+                "    Student.name AS studentName " +
+                "FROM Message " +
+                "JOIN Internship " +
+                "    ON (Message.senderId = Internship.id AND Message.fromInternship = true) " +
+                "    OR (Message.receiverId = Internship.id AND Message.fromInternship = false) " +
+                "JOIN Student " +
+                "    ON (Message.senderId = Student.id AND Message.fromInternship = false) " +
+                "    OR (Message.receiverId = Student.id AND Message.fromInternship = true) " +
+                "WHERE Internship.companyId = ?";
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
 
@@ -167,7 +181,7 @@ public class MessageDAO {
             resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                // Extract Internship
+                // Extract Internship (all columns)
                 Internship internship = new Internship();
                 internship.setId(resultSet.getInt("internshipId"));
                 internship.setName(resultSet.getString("internshipName"));
@@ -175,59 +189,51 @@ public class MessageDAO {
                 internship.setRating(resultSet.getInt("rating"));
                 internship.setCompanyId(resultSet.getInt("companyId"));
 
-                // Extract Student
+                // Extract Student (all columns)
                 Student student = new Student();
                 student.setId(resultSet.getInt("studentId"));
-                student.setEmail(resultSet.getString("email"));
-                student.setPassword(resultSet.getString("password"));
                 student.setName(resultSet.getString("studentName"));
                 student.setSurname(resultSet.getString("surname"));
+                student.setEmail(resultSet.getString("email"));
+                student.setPassword(resultSet.getString("password"));
                 student.setNationality(resultSet.getString("nationality"));
                 student.setCityOfBirth(resultSet.getString("cityOfBirth"));
 
-                // Extract Message
-                Message message = new Message();
-                message.setId(resultSet.getInt("id")); // No alias required since 'id' is unique in Message
-                message.setMessage(resultSet.getString("message"));
-                message.setRead(resultSet.getBoolean("read"));
-                message.setFromInternship(resultSet.getBoolean("fromInternship"));
-                message.setSenderId(resultSet.getInt("senderId"));
-                message.setReceiverId(resultSet.getInt("receiverId"));
-
-                // Organize data in the nested HashMap
+                // Organize data in the HashMap
                 allChats
-                        .computeIfAbsent(internship, k -> new HashMap<>()) // Get or create HashMap<Student, ArrayList<Message>> for this Internship
-                        .computeIfAbsent(student, k -> new ArrayList<>()) // Get or create ArrayList<Message> for this Student
-                        .add(message); // Add the Message to the list
+                        .computeIfAbsent(internship, k -> new ArrayList<>()) // Get or create List<Student> for this Internship
+                        .add(student); // Add the Student to the list
             }
 
         } catch (SQLException e) {
             throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
 
         } finally {
-
-            try {
-                resultSet.close();
-
-            } catch (Exception e) {
-                throw new SQLException("Error closing the result set when" + performedAction + "[ " + e.getMessage() + " ]");
+            if (resultSet != null) {
+                try {
+                    resultSet.close();
+                } catch (Exception e) {
+                    throw new SQLException("Error closing the result set when" + performedAction + "[ " + e.getMessage() + " ]");
+                }
             }
 
-            try {
-                preparedStatement.close();
-
-            } catch (Exception e) {
-                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            if (preparedStatement != null) {
+                try {
+                    preparedStatement.close();
+                } catch (Exception e) {
+                    throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+                }
             }
         }
+
         return allChats;
     }
 
     /**
      * Method used to retrieve the entirety of the chat between a student and an internship
      *
-     * @param account1 The first account identifier (does not matter if is a student id or a internship id)
-     * @param account2 The second account identifier (does not matter if is a student id or a internship id)
+     * @param account1 The first account identifier (does not matter if is a student id or an internship id)
+     * @param account2 The second account identifier (does not matter if is a student id or an internship id)
      * @return List of messages exchanged between student and internship
      * @throws SQLException
      */
@@ -296,15 +302,14 @@ public class MessageDAO {
      */
     public void insertMessage(String message, boolean fromInternship, int senderId, int receiverId) throws SQLException {
         String performedAction = " adding a new message into the database ";
-        String query = "INSERT Into Message (message, `read`, fromInternship, senderId, receiverId) VALUES (?,?,?,?,?)";
+        String query = "INSERT Into Message (message, `read`, fromInternship, senderId, receiverId) VALUES (?,FALSE,?,?,?)";
         PreparedStatement preparedStatement = null;
 
         try {
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, message);
-            preparedStatement.setBoolean(2, false);
-            preparedStatement.setBoolean(3, fromInternship);
-            preparedStatement.setInt(4, senderId);
+            preparedStatement.setBoolean(2, fromInternship);
+            preparedStatement.setInt(3, senderId);
             preparedStatement.setInt(4, receiverId);
 
             preparedStatement.executeUpdate();

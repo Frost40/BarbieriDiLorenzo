@@ -91,6 +91,7 @@ public class OpenChatWindow extends HttpServlet {
             if (parsedId.isPresent()) myAccountId = parsedId.get();
             else return;
 
+            // Checking that the current company user posses the internship he is trying to use
             InternshipDAO internshipDAO = new InternshipDAO(connection);
             ArrayList<Internship> companyInternships;
             try {
