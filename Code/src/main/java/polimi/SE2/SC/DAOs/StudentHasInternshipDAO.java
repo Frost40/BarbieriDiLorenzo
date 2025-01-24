@@ -42,10 +42,10 @@ public class StudentHasInternshipDAO {
         return studentHasInternships;
     }
 
-    public ArrayList<StudentHasInternship> getOngoingInternships(int id) throws SQLException {
-        ArrayList<StudentHasInternship> studentHasInternships = null;
+    public StudentHasInternship getOngoingInternship (int id) throws SQLException {
+        StudentHasInternship studentHasInternship = null;
 
-        return studentHasInternships;
+        return studentHasInternship;
     }
 
     public void addApplication(int internshipId, int studentId) throws SQLException {

@@ -52,14 +52,13 @@ public class MessagesManager extends HttpServlet {
         this.connection = ConnectionHandler.getConnection(servletContext);
     }
 
-    // TODO: Decide about creating ad hoc class (populationMessagesPage) to send to the client
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("currentUser");
 
         boolean isStudent = user instanceof Student;
-        HashMap<Internship, ArrayList<Message>> allChatsForStudent = null;
-        HashMap<Internship, HashMap<Student, ArrayList<Message>>> allChatsForCompany = null;
+        ArrayList<Internship> allChatsForStudent = null;
+        HashMap<Internship, ArrayList<Student>> allChatsForCompany = null;
 
         MessageDAO messageDAO = new MessageDAO(connection);
         try {

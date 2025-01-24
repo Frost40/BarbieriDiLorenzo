@@ -3,7 +3,6 @@ package polimi.SE2.SC.beans;
 public abstract class Communication {
     private int id;
     private String text;
-    private boolean read;
     private int studentHasInternshipId;
 
     public int getId() {
@@ -20,14 +19,6 @@ public abstract class Communication {
 
     public void setText(String text) {
         this.text = text;
-    }
-
-    public boolean isRead() {
-        return read;
-    }
-
-    public void setRead(boolean read) {
-        this.read = read;
     }
 
     public int getStudentHasInternshipId() {

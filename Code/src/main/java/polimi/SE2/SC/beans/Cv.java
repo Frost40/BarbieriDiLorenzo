@@ -1,10 +1,11 @@
 package polimi.SE2.SC.beans;
 
 import java.util.ArrayList;
+import java.util.Base64;
 
 public class Cv {
     private int id;
-    private String filePath;
+    private String file;
     private ArrayList<String> experiences;
     private ArrayList<String> programmingSkills;
     private ArrayList<String> otherSkills;
@@ -18,12 +19,12 @@ public class Cv {
         this.id = id;
     }
 
-    public String getFilePath() {
-        return filePath;
+    public String getFile() {
+        return file;
     }
 
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
+    public void setFile(byte[] file) {
+        this.file = file != null ? Base64.getEncoder().encodeToString(file) : null;
     }
 
     public ArrayList<String> getExperiences() {
