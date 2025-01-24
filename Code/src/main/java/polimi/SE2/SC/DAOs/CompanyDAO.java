@@ -77,14 +77,67 @@ public class CompanyDAO {
         return company;
     }
 
+    /**
+     * Method used to retrieve a company using its unique id
+     *
+     * @param id Company identifier
+     * @return Company associated with the given email
+     * @throws SQLException
+     */
     public Company getCompanyById(int id) throws SQLException {
         Company company = null;
+        String performedAction = " finding a company type user using the unique identifier ";
+        String query = "SELECT * FROM Company WHERE id = ?";
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
 
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, id);
+
+            resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                company = new Company();
+
+                company.setId(resultSet.getInt("id"));
+                company.setPassword(resultSet.getString("password"));
+                company.setEmail(resultSet.getString("email"));
+                company.setName(resultSet.getString("name"));
+                company.setMainOffice(resultSet.getString("mainOffice"));
+
+                // Retrieve offices as a string and split it
+                String officesString = resultSet.getString("offices");
+                if (officesString != null && !officesString.isEmpty()) {
+                    company.setOffices(splitStringByComma(officesString));
+                } else {
+                    company.setOffices(new ArrayList<>()); // Assign an empty list if null or empty
+                }            }
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                resultSet.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the result set when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
         return company;
     }
 
     /**
-     * Method used to retrive a company using its unique email
+     * Method used to retrieve a company using its unique email
      * 
      * @param email Company email
      * @return Company associated with the given email

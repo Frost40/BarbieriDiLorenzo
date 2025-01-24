@@ -60,12 +60,67 @@ public class StudentDAO {
         return student;
     }
 
+    /**
+     * Method used to retrieve a student using its unique identifier
+     *
+     * @param id Student identifier
+     * @return Company associated with the given email
+     * @throws SQLException
+     */
     public Student getStudentById(int id) throws SQLException {
         Student student = null;
+        String performedAction = " finding a user with his unique identifier ";
+        String query = "SELECT * FROM Student WHERE id = ?";
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
 
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, id);
+
+            resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                student = new Student();
+
+                student.setId(resultSet.getInt("id"));
+                student.setPassword(resultSet.getString("password"));
+                student.setEmail(resultSet.getString("email"));
+                student.setName(resultSet.getString("name"));
+                student.setSurname(resultSet.getString("surname"));
+                student.setNationality(resultSet.getString("nationality"));
+                student.setCityOfBirth(resultSet.getString("cityOfBirth"));
+            }
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                resultSet.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the result set when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
         return student;
     }
 
+    /**
+     * Method used to retrieve a student using its unique email
+     *
+     * @param email Student email
+     * @return Company associated with the given email
+     * @throws SQLException
+     */
     public Student getStudentByEmail(String email) throws SQLException {
         Student student = null;
         String performedAction = " finding a user by email ";

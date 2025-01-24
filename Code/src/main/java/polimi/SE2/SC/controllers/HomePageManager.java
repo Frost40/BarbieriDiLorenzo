@@ -58,7 +58,9 @@ public class HomePageManager extends HttpServlet {
         InternshipDAO internshipDAO = null;
         boolean isStudent = user instanceof Student;
 
+        Student student = null;
         Cv cv = null;
+        Company company = null;
         ArrayList<Internship> internships = null;
 
         if (isStudent) {
@@ -72,11 +74,29 @@ public class HomePageManager extends HttpServlet {
                 return;
             }
 
+            StudentDAO studentDAO = new StudentDAO(connection);
+            try {
+                student = studentDAO.getStudentById(user.getId());
+            } catch (SQLException e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().println(e.getMessage());
+                return;
+            }
+
         } else {
             // Handle company-specific logic
             internshipDAO = new InternshipDAO(connection);
             try {
                 internships = internshipDAO.getCompanyInternships(user.getId());
+            } catch (SQLException e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().println(e.getMessage());
+                return;
+            }
+
+            CompanyDAO companyDAO = new CompanyDAO(connection);
+            try {
+                company = companyDAO.getCompanyById(user.getId());
             } catch (SQLException e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().println(e.getMessage());
@@ -123,8 +143,10 @@ public class HomePageManager extends HttpServlet {
         Map<String, Object> jsonObject = new HashMap<>();
         if (isStudent) {
             jsonObject.put("cv", cv);
+            jsonObject.put("student", student);
         } else {
             jsonObject.put("internships", internships);
+            jsonObject.put("company", company);
         }
         jsonObject.put("unreadMessages", unreadMessages);
         jsonObject.put("unreadComplaints", unreadComplaints);
