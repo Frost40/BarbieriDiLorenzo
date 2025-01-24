@@ -2,6 +2,7 @@ package polimi.SE2.SC.DAOs;
 
 import polimi.SE2.SC.beans.Questionnaire;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class QuestionnaireDAO {
         return internshipsWithQuestionnaires;
     }
 
-    public void uploadQuestionnaire(String filePath) throws SQLException {
+    public void uploadQuestionnaire(InputStream file) throws SQLException {
 
     }
 

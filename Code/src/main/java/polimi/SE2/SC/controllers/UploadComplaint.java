@@ -137,7 +137,7 @@ public class UploadComplaint extends HttpServlet {
         // Creating the new complaint in the database
         ComplaintDAO complaintDAO = new ComplaintDAO(connection);
         try {
-            complaintDAO.uploadComplaint(complaint, ongoingInternshipId);
+            complaintDAO.uploadComplaint(complaint, ongoingInternshipId, isStudent);
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().println(e.getMessage());

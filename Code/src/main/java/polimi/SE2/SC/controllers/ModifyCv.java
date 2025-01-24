@@ -124,48 +124,20 @@ public class ModifyCv extends HttpServlet {
             return;
         }
 
-        // Starting the process to save the file in server storage
+        // Validate and retrieve the file input
         String contentType = filePart.getContentType();
-        String fileExtension = "";
-
-        // Checking the file format
-        switch (contentType) {
-            case "application/pdf" -> fileExtension = ".pdf";
-            case "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ->
-                    fileExtension = ".docx"; // Handle both .doc and .docx
-            case "text/plain" -> fileExtension = ".txt";
-            default -> {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.getWriter().println("File's format not permitted!");
-                return;
-            }
-        }
-
-        // Ensure saving path is a folder
-        if (!cvStorage.endsWith(File.separator)) {
-            cvStorage += File.separator;
-        }
-
-        String fileName = user.getId() + fileExtension;
-
-        //InputStream fileContent = filePart.getInputStream();
-        String outputFilePath = cvStorage + fileName;
-        File file = new File(outputFilePath);
-
-        try (InputStream fileContent = filePart.getInputStream()) {
-            // Use REPLACE_EXISTING to overwrite the file if it already exists
-            Files.copy(fileContent, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("File saved correctly!");
-
-        } catch (IOException e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().println(e.getMessage());
+        if (!contentType.equals("application/pdf") &&
+                !contentType.equals("application/msword") &&
+                !contentType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document") &&
+                !contentType.equals("text/plain")) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().println("File format not permitted!");
             return;
         }
 
         // Saving updated info in the DB
-        try {
-            cvDAO.updateCv(cvId, experiences, programmingSkills, otherSkills);
+        try (InputStream fileContent = filePart.getInputStream()) {
+            cvDAO.updateCv(cvId, fileContent, experiences, programmingSkills, otherSkills);
 
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

@@ -1,10 +1,6 @@
 package polimi.SE2.SC.controllers;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import polimi.SE2.SC.utils.ConnectionHandler;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -13,19 +9,17 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import polimi.SE2.SC.utils.ConnectionHandler;
-
-@WebServlet("/AnalyticsPageManager")
+@WebServlet("/EndInternship")
 @MultipartConfig
-public class AnalyticsPageManager extends HttpServlet {
+public class EndInternship extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
 
-    public AnalyticsPageManager() {
+    public EndInternship() {
         super();
     }
 

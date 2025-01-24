@@ -68,25 +68,25 @@ public class UploadNewCv extends HttpServlet{
 
         if (experiences == null || experiences.length() <= 0 || experiences.length() > 255) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("Invalid experiences set (a valid one has more than one character and less than 255)!");
+            response.getWriter().println("Invalid experiences set!");
             return;
         }
 
         if (programmingSkills == null || programmingSkills.length() <= 0 || programmingSkills.length() > 255) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("Invalid set of programming skills (a valid one has more than one character and less than 255)!");
+            response.getWriter().println("Invalid set of programming skills!");
             return;
         }
 
         if (otherSkills == null || otherSkills.length() <= 0 || otherSkills.length() > 255) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("Invalid set of generic skills (a valid one has more than one character and less than 255)!");
+            response.getWriter().println("Invalid set of generic skills!");
             return;
         }
 
         if (user instanceof Company) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().println("No cv is associated to a company");
+            response.getWriter().println("No CV is associated to a company");
             return;
         }
 
@@ -100,58 +100,28 @@ public class UploadNewCv extends HttpServlet{
             return;
         }
 
-        // Checking if the student already has a CV saved
+        // Check if the student already has a CV saved
         if (cv != null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().println("You already have a CV saved");
             return;
         }
 
-        // Starting the process to save the file in server storage
+        // Validate and retrieve the file input
         String contentType = filePart.getContentType();
-        String fileExtension = "";
-
-        // Checking the file format
-        switch (contentType) {
-            case "application/pdf" -> fileExtension = ".pdf";
-            case "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ->
-                    fileExtension = ".docx"; // Handle both .doc and .docx
-            case "text/plain" -> fileExtension = ".txt";
-            default -> {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.getWriter().println("File's format not permitted!");
-                return;
-            }
-        }
-
-        // Ensure saving path is a folder
-        if (!cvStorage.endsWith(File.separator)) {
-            cvStorage += File.separator;
-        }
-
-        String fileName = user.getId() + fileExtension;
-
-        //InputStream fileContent = filePart.getInputStream();
-        String outputFilePath = cvStorage + fileName;
-        File file = new File(outputFilePath);
-
-        try (InputStream fileContent = filePart.getInputStream()) {
-            // Use REPLACE_EXISTING to overwrite the file if it already exists
-            Files.copy(fileContent, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("File saved correctly!");
-
-        } catch (IOException e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().println(e.getMessage());
+        if (!contentType.equals("application/pdf") &&
+                !contentType.equals("application/msword") &&
+                !contentType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document") &&
+                !contentType.equals("text/plain")) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().println("File format not permitted!");
             return;
         }
 
-        // Saving updated info in the DB
-        String path = "http://localhost:8080/cvStorage/" + fileName;
-        try {
-            cvDAO.uploadNewCv(path, experiences, programmingSkills, otherSkills, user.getId());
-
-        } catch (SQLException e) {
+        try (InputStream fileContent = filePart.getInputStream()) {
+            // Save the CV file as a binary object directly in the database
+            cvDAO.uploadNewCv(fileContent, experiences, programmingSkills, otherSkills, user.getId());
+        } catch (IOException | SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().println(e.getMessage());
             return;

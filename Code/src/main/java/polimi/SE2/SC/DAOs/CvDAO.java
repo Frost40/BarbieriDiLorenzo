@@ -3,6 +3,7 @@ package polimi.SE2.SC.DAOs;
 import polimi.SE2.SC.beans.Complaint;
 import polimi.SE2.SC.beans.Cv;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -42,7 +43,7 @@ public class CvDAO {
                 cv = new Cv();
 
                 cv.setId(resultSet.getInt("id"));
-                cv.setFilePath(resultSet.getString("filePath"));
+                cv.setFile(resultSet.getBytes("file"));
                 cv.setStudentId(resultSet.getInt("studentId"));
 
                 // Retrieve other data as a string and splitting it based on the comma
@@ -97,21 +98,21 @@ public class CvDAO {
     /**
      * Method used to upload a new CV into the database
      *
-     * @param filePath The path in which the CV is contained in the server
+     * @param file The path in which the CV is contained in the server
      * @param experiences Set of experiences relative to the CV
      * @param programmingSkills Set of programming skills relative to the CV
      * @param otherSkills Set of other general skills relative to the CV
      * @param studentId The id of the student who uploaded the CV
      * @throws SQLException
      */
-    public void uploadNewCv(String filePath, String experiences, String programmingSkills, String otherSkills, int studentId) throws SQLException {
+    public void uploadNewCv(InputStream file, String experiences, String programmingSkills, String otherSkills, int studentId) throws SQLException {
         String performedAction = " adding the new CV into the DB ";
-        String query = "INSERT into Cv (filePath, experiences, programmingSkills, otherSkills, studentId) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT into Cv (file, experiences, programmingSkills, otherSkills, studentId) VALUES (?, ?, ?, ?, ?)";
         PreparedStatement preparedStatement = null;
 
         try {
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, filePath);
+            preparedStatement.setBlob(1, file);
             preparedStatement.setString(2, experiences);
             preparedStatement.setString(3, programmingSkills);
             preparedStatement.setString(4, otherSkills);
@@ -137,24 +138,26 @@ public class CvDAO {
      * Method used to update the experiences, programming skills and other general skills in an existing CV
      * 
      * @param id Cv to update
+     * @param file File containing the actual cv
      * @param experiences New set of experiences to be added
      * @param programmingSkills New set of programmingSkills to be added
      * @param otherSkills New set of otherSkills to be added
      * @throws SQLException
      */
-    public void updateCv(int id, String experiences, String programmingSkills, String otherSkills) throws SQLException {
+    public void updateCv(int id, InputStream file, String experiences, String programmingSkills, String otherSkills) throws SQLException {
         String performedAction = " overwriting data in an already existing CV ";
         String query = "UPDATE Cv " +
-                "SET experiences = ?, programmingSkills = ?, otherSkills = ? " +
+                "SET file = ?, experiences = ?, programmingSkills = ?, otherSkills = ? " +
                 "WHERE id = ?";
         PreparedStatement preparedStatement = null;
 
         try {
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, experiences);
-            preparedStatement.setString(2, programmingSkills);
-            preparedStatement.setString(3, otherSkills);
-            preparedStatement.setInt(4, id);
+            preparedStatement.setBlob(1, file);
+            preparedStatement.setString(2, experiences);
+            preparedStatement.setString(3, programmingSkills);
+            preparedStatement.setString(4, otherSkills);
+            preparedStatement.setInt(5, id);
 
             preparedStatement.executeUpdate();
 

@@ -41,7 +41,8 @@ public class ComplaintDAO {
 
                 complaint.setId(resultSet.getInt("id"));
                 complaint.setText(resultSet.getString("text"));
-                complaint.setRead(resultSet.getBoolean("read"));
+                complaint.setReadByStudent(resultSet.getBoolean("readByStudent"));
+                complaint.setReadByInternship(resultSet.getBoolean("readByInternship"));
                 complaint.setClosedByStudent(resultSet.getBoolean("closedByStudent"));
                 complaint.setClosedByCompany(resultSet.getBoolean("closedByCompany"));
                 complaint.setStudentHasInternshipId(resultSet.getInt("studentHasInternshipId"));
@@ -101,7 +102,8 @@ public class ComplaintDAO {
 
                 complaint.setId(resultSet.getInt("id"));
                 complaint.setText(resultSet.getString("text"));
-                complaint.setRead(resultSet.getBoolean("read"));
+                complaint.setReadByStudent(resultSet.getBoolean("readByStudent"));
+                complaint.setReadByInternship(resultSet.getBoolean("readByInternship"));
                 complaint.setClosedByStudent(resultSet.getBoolean("closedByStudent"));
                 complaint.setClosedByCompany(resultSet.getBoolean("closedByCompany"));
                 complaint.setStudentHasInternshipId(resultSet.getInt("studentHasInternshipId"));
@@ -148,13 +150,13 @@ public class ComplaintDAO {
             query = "SELECT c.*, shi.id AS studentInternshipId " +
                     "FROM Complaint c " +
                     "JOIN StudentHasInternship shi ON c.studentHasInternshipId = shi.id " +
-                    "WHERE shi.studentId = ? AND c.read = FALSE;";
+                    "WHERE shi.studentId = ? AND c.readByStudent = FALSE;";
         } else {
             query = "SELECT c.*, shi.id AS studentInternshipId, i.id AS internshipId, i.companyId " +
                     "FROM Complaint c " +
                     "JOIN StudentHasInternship shi ON c.studentHasInternshipId = shi.id " +
                     "JOIN Internship i ON shi.internshipId = i.id " +
-                    "WHERE i.companyId = ? AND c.read = FALSE;";
+                    "WHERE i.companyId = ? AND c.readByInternship = FALSE;";
         }
 
         PreparedStatement preparedStatement = null;
@@ -171,7 +173,8 @@ public class ComplaintDAO {
 
                 complaint.setId(resultSet.getInt("id"));
                 complaint.setText(resultSet.getString("text"));
-                complaint.setRead(resultSet.getBoolean("read"));
+                complaint.setReadByStudent(resultSet.getBoolean("readByStudent"));
+                complaint.setReadByInternship(resultSet.getBoolean("readByInternship"));
                 complaint.setClosedByStudent(resultSet.getBoolean("closedByStudent"));
                 complaint.setClosedByCompany(resultSet.getBoolean("closedByCompany"));
                 complaint.setStudentHasInternshipId(resultSet.getInt("studentHasInternshipId"));
@@ -218,13 +221,13 @@ public class ComplaintDAO {
             query = "SELECT c.*, shi.id AS studentInternshipId " +
                     "FROM Complaint c " +
                     "JOIN StudentHasInternship shi ON c.studentHasInternshipId = shi.id " +
-                    "WHERE shi.studentId = ?;";
+                    "WHERE shi.studentId = ?";
         } else {
             query = "SELECT c.*, shi.id AS studentInternshipId, i.id AS internshipId, i.companyId " +
                     "FROM Complaint c " +
                     "JOIN StudentHasInternship shi ON c.studentHasInternshipId = shi.id " +
                     "JOIN Internship i ON shi.internshipId = i.id " +
-                    "WHERE i.companyId = ?;";
+                    "WHERE i.companyId = ?";
         }
 
         PreparedStatement preparedStatement = null;
@@ -241,7 +244,8 @@ public class ComplaintDAO {
 
                 complaint.setId(resultSet.getInt("id"));
                 complaint.setText(resultSet.getString("text"));
-                complaint.setRead(resultSet.getBoolean("read"));
+                complaint.setReadByStudent(resultSet.getBoolean("readByStudent"));
+                complaint.setReadByInternship(resultSet.getBoolean("readByInternship"));
                 complaint.setClosedByStudent(resultSet.getBoolean("closedByStudent"));
                 complaint.setClosedByCompany(resultSet.getBoolean("closedByCompany"));
                 complaint.setStudentHasInternshipId(resultSet.getInt("studentHasInternshipId"));
@@ -273,14 +277,21 @@ public class ComplaintDAO {
 
     /**
      * Method used to upload a new complaint into the database
+     * It automatically set the 'readByStudent' and 'readByInternship' to TRUE or FALSE depending on the user type who did the upload
      *
      * @param text Message text describing the problem the user wants to complaint about
      * @param studentHasInternshipId Identifier for the ongoing internship the complaint is related to
+     * @param uploadedByStudent Boolean variable used to inject two different queries into the database depending on which type of user did the upload
      * @throws SQLException
      */
-    public void uploadComplaint(String text, int studentHasInternshipId) throws SQLException {
+    public void uploadComplaint(String text, int studentHasInternshipId, boolean uploadedByStudent) throws SQLException {
         String performedAction = " inserting a new complaint into the DB ";
-        String query = "INSERT into Complaint (text, `read`, closedByStudent, closedByCompany, studentHasInternshipId) VALUES (?, FALSE, FALSE, FALSE, ?)";
+        String query;
+        if (uploadedByStudent) {
+            query = "INSERT into Complaint (text, readByStudent, readByInternship, closedByStudent, closedByCompany, studentHasInternshipId) VALUES (?, TRUE, FALSE, FALSE, FALSE, ?)";
+        } else {
+            query = "INSERT into Complaint (text, readByStudent, readByInternship, closedByStudent, closedByCompany, studentHasInternshipId) VALUES (?, FALSE, TRUE, FALSE, FALSE, ?)";
+        }
         PreparedStatement preparedStatement = null;
 
         try {
