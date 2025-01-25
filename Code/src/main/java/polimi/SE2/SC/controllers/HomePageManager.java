@@ -62,6 +62,7 @@ public class HomePageManager extends HttpServlet {
         Cv cv = null;
         Company company = null;
         ArrayList<Internship> internships = null;
+        ArrayList<Feedback> unreadFeedbacks = null;
 
         if (isStudent) {
             // Handle student-specific logic
@@ -102,6 +103,15 @@ public class HomePageManager extends HttpServlet {
                 response.getWriter().println(e.getMessage());
                 return;
             }
+
+            FeedbackDAO feedbackDAO = new FeedbackDAO(connection);
+            try {
+                unreadFeedbacks = feedbackDAO.getNotReadFeedbacks(user.getId());
+            } catch (SQLException e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().println(e.getMessage());
+                return;
+            }
         }
 
         MessageDAO messageDAO = new MessageDAO(connection);
@@ -124,16 +134,6 @@ public class HomePageManager extends HttpServlet {
             return;
         }
 
-        FeedbackDAO feedbackDAO = new FeedbackDAO(connection);
-        ArrayList<Feedback> unreadFeedbacks = null;
-        try {
-            unreadFeedbacks = feedbackDAO.getNotReadFeedbacks(user.getId());
-        } catch (SQLException e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().println(e.getMessage());
-            return;
-        }
-
         // JSON serialization
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
@@ -147,10 +147,10 @@ public class HomePageManager extends HttpServlet {
         } else {
             jsonObject.put("internships", internships);
             jsonObject.put("company", company);
+            jsonObject.put("unreadFeedbacks", unreadFeedbacks);
         }
         jsonObject.put("unreadMessages", unreadMessages);
         jsonObject.put("unreadComplaints", unreadComplaints);
-        jsonObject.put("unreadFeedbacks", unreadFeedbacks);
 
         String json = gson.toJson(jsonObject);
         response.getWriter().write(json);
