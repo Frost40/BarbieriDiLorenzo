@@ -90,7 +90,7 @@ public class EndInternship extends HttpServlet {
             return;
         }
 
-        // Checking that the company in the current session is  actually the owner of the given internship
+        // Checking that the company in the current session is actually the owner of the given internship
         InternshipDAO internshipDAO = new InternshipDAO(connection);
         ArrayList<Internship> companyInternships = null;
         try {
@@ -124,6 +124,7 @@ public class EndInternship extends HttpServlet {
             return;
         }
 
+        // Servlet ended successfully
         response.setStatus(HttpServletResponse.SC_OK);
     }
 }

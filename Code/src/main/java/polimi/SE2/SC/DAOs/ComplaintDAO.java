@@ -2,6 +2,7 @@ package polimi.SE2.SC.DAOs;
 
 import polimi.SE2.SC.beans.Complaint;
 import polimi.SE2.SC.beans.Feedback;
+import polimi.SE2.SC.beans.Student;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -361,7 +362,36 @@ public class ComplaintDAO {
         }
     }
 
+    /**
+     * Method used to reject the closure of a given complaint
+     *
+     * @param complaintId Identifier for the complaint
+     * @throws SQLException
+     */
     public void rejectClosure(int complaintId) throws SQLException {
+        String performedAction = " rejecting the complaint closure ";
+        String query = "UPDATE Complaint " +
+                    "SET closedByCompany = FALSE and closedByStudent = FALSE " +
+                    "WHERE id = ?";
+        PreparedStatement preparedStatement = null;
 
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, complaintId);
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
     }
 }
