@@ -24,6 +24,7 @@ import com.google.gson.GsonBuilder;
 import polimi.SE2.SC.DAOs.CvDAO;
 import polimi.SE2.SC.beans.Company;
 import polimi.SE2.SC.beans.Cv;
+import polimi.SE2.SC.beans.Student;
 import polimi.SE2.SC.beans.User;
 import polimi.SE2.SC.utils.ConnectionHandler;
 
@@ -70,6 +71,9 @@ public class ModifyCv extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("currentUser");
 
+        int cvId;
+        boolean isStudent = user instanceof Student;
+
         if (experiences == null || experiences.length() <= 0 || experiences.length() > 255) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().println("Invalid experiences set (a valid one has more than one character and less than 255)!");
@@ -88,14 +92,20 @@ public class ModifyCv extends HttpServlet {
             return;
         }
 
-        if (user instanceof Company) {
+        // Checking if the given cv id is valid
+        if(cvIdString == null || cvIdString.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().println("The id for the cv is null!");
+            return;
+        }
+
+        if (!isStudent) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().println("No cv is associated to a company");
             return;
         }
 
         // Parsing the cv ID string back into an integer
-        int cvId;
         Optional<Integer> parsedId = parsingChecker(request, response, cvIdString);
         if (parsedId.isPresent())			cvId = parsedId.get();
         else	return;
