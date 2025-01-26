@@ -128,6 +128,37 @@ public class OpenMyInternshipInformationSpace extends HttpServlet {
 
         // Depending on the status of student-internship status the data to send the client will be different
         switch (studentHasInternship.getApplicationStatus()) {
+            case "evaluation" -> {
+                // In case the user is the company the view will display student info to help evaluate the application
+                if (!isStudent) {
+                    // Retrieving student information
+                    StudentDAO studentDAO = new StudentDAO(connection);
+                    Student student = null;
+                    try {
+                        student = studentDAO.getStudentById(studentHasInternship.getStudentId());
+                    } catch (SQLException e) {
+                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        response.getWriter().println(e.getMessage());
+                        return;
+                    }
+
+                    // Retrieving student cv
+                    CvDAO cvDAO = new CvDAO(connection);
+                    Cv cv = null;
+                    try {
+                        cv = cvDAO.getStudentCv(studentHasInternship.getStudentId());
+                    } catch (SQLException e) {
+                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        response.getWriter().println(e.getMessage());
+                        return;
+                    }
+
+                    // Adding data to the Json Object
+                    jsonObject.put("student", student);
+                    jsonObject.put("cv", cv);
+                    break;
+                }
+            }
             case "selectionProcess" -> {
                 // Retrieving all questionnaires
                 QuestionnaireDAO questionnaireDAO = new QuestionnaireDAO(connection);
@@ -172,6 +203,34 @@ public class OpenMyInternshipInformationSpace extends HttpServlet {
                 break;
             }
             case "ended" -> {
+                break;
+            }
+            case "rejected" -> {
+                // Retrieving all questionnaires
+                QuestionnaireDAO questionnaireDAO = new QuestionnaireDAO(connection);
+                ArrayList<Questionnaire> questionnaires = null;
+                try {
+                    questionnaires = questionnaireDAO.getOngoingInternshipQuestionnaires(studentHasInternshipId);
+                } catch (SQLException e) {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.getWriter().println(e.getMessage());
+                    return;
+                }
+
+                // Retrieving all interview schedule
+                InterviewScheduleDAO interviewScheduleDAO = new InterviewScheduleDAO(connection);
+                ArrayList<InterviewSchedule> interviewSchedules = null;
+                try {
+                    interviewSchedules = interviewScheduleDAO.getOngoingInternshipsInterviewSchedules(studentHasInternshipId);
+                } catch (SQLException e) {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.getWriter().println(e.getMessage());
+                    return;
+                }
+
+                // Adding data to the Json Object
+                jsonObject.put("questionnaires", questionnaires);
+                jsonObject.put("interviewSchedules", interviewSchedules);
                 break;
             }
         }

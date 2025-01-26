@@ -220,8 +220,40 @@ public class StudentHasInternshipDAO {
         return studentHasInternship;
     }
 
+    /**
+     * Method used to add a student application into the database
+     *
+     * @param internshipId Identifier for the internship
+     * @param studentId Identifier for the student
+     * @throws SQLException
+     */
     public void addApplication(int internshipId, int studentId) throws SQLException {
+        String performedAction = " inserting a new application into the DB ";
+        String query = "INSERT into StudentHasInternship (startDate, endDate, companyAccepted, applicationStatus, studentId, internshipId) VALUES (NULL, NULL, FALSE, ?, ?, ?)";
 
+        PreparedStatement preparedStatement = null;
+
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, "evaluation");
+            preparedStatement.setInt(2, studentId);
+            preparedStatement.setInt(3, internshipId);
+
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
     }
 
     public void updateApplicationStatus(int id, String status) throws SQLException {

@@ -116,7 +116,7 @@ public class EndInternship extends HttpServlet {
             return;
         }
 
-        if (studentHasInternship.getApplicationStatus().equals("ongoing") || studentHasInternship.getApplicationStatus().equals("selectionProcess")) {
+        if (studentHasInternship.getApplicationStatus().equals("ongoing") && studentHasInternship.getStartDate() != null) {
             // Proceeding to end the internship period
             try {
                 studentHasInternshipDAO.endInternshipExperience(studentHasInternshipId);
@@ -126,7 +126,7 @@ public class EndInternship extends HttpServlet {
                 return;
             }
         } else {
-            // The internship period is already closed
+            // The internship period is not started yet
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().println("Your not in the correct period to start the internship");
             return;
