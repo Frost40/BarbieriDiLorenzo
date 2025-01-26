@@ -222,3 +222,39 @@ textarea:focus {
 #upload-cv-btn:hover {
     background-color: var(--normal-gossamer);
 }
+/* Complaint Buttons */
+.complaint-button {
+    background-color: var(--creamy-white);
+    color: var(--black);
+    margin: 5px 0;
+    padding: 8px 10px;
+    border-radius: 5px;
+    border: none;
+    width: calc(100% - 20px);
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.complaint-button:hover {
+    background-color: var(--normal-gossamer);
+    color: var(--creamy-white);
+}
+.complaint-modal-popup {
+    /* Example: Change the font family and size */
+    font-family: 'Arial', sans-serif;
+    font-size: 1rem;
+}
+
+.complaint-modal-popup .swal2-title {
+    color: var(--dark-gossamer);
+}
+
+.complaint-modal-popup .swal2-content {
+    color: var(--black);
+}
+.complaint-modal-popup .swal2-html-container {
+    max-height: 300px;
+    overflow-y: auto;
+}

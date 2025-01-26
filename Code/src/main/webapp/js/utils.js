@@ -66,16 +66,17 @@ function showSuccessAlert(message) {
 /**
  * Displays an informational alert using SweetAlert2.
  *
+ * @param title
  * @param {string} message - The message to display in the alert.
  *
  * @description
  * This function triggers an informational alert with a blue info icon,
- * a title of "Not authorized!", and the provided message.
+ * a title, and the provided message.
  * The user can dismiss the alert by clicking the "OK" button.
  */
-function showInfoAlert(message) {
+function showInfoAlert(title, message) {
     Swal.fire({
-        title: 'Not authorized!',
+        title: title,
         text: message,
         icon: 'info',
         confirmButtonText: 'OK'

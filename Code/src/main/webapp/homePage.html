@@ -25,15 +25,22 @@
     </div>
 
     <!-- Notifications Dropdown -->
-    <button class="dropdown-btn">Notifications
+    <button id="notifications-dropdown-btn" class="dropdown-btn">Notifications
         <i class="fa fa-caret-down"></i>
     </button>
     <div id="dynamic-notifications" class="dropdown-container">
         <!-- Complaints -->
-        <button class="dropdown-btn">Complaints
+        <button id="complaints-dropdown-btn" class="dropdown-btn">Complaints
             <i class="fa fa-caret-down"></i>
         </button>
-        <div id="complaints-dropdown" class="dropdown-container">
+        <div id="dynamic-complaints" class="dropdown-container">
+            <!-- Dynamic complaints options -->
+        </div>
+        <!-- Recommendations -->
+        <button id="recommendations-dropdown-btn" class="dropdown-btn">Recommendations
+            <i class="fa fa-caret-down"></i>
+        </button>
+        <div id="dynamic_recommendations" class="dropdown-container">
             <!-- Dynamic complaints options -->
         </div>
     </div>
@@ -66,15 +73,29 @@
             <h3>Other Skills</h3>
             <textarea id="other-skills-input" placeholder="Enter your other skills here..." readonly></textarea>
         </div>
+        <!-- CV File Upload Section -->
+        <div id="cv-file-container" class="cv-section">
+            <h3>Upload CV</h3>
 
-        <!-- Upload Cv -->
-        <button id="upload-cv-btn">Upload CV</button>
+            <!-- Existing File Information -->
+            <div id="existing-file-info">
+                <!-- This will be populated by populateCv() -->
+            </div>
+
+            <!-- Hidden File Input -->
+            <input type="file" id="cv-file-input" accept=".pdf,.doc,.docx,.txt" style="display: none;" />
+
+            <!-- Choose File Button -->
+            <button id="upload-cv-btn" disabled>Choose File</button>
+
+            <!-- Display Selected File Name -->
+            <span id="selected-file-name"></span>
+        </div>
     </div>
 </div>
 
 <!-- Bottom Navigation Bar -->
 <div class="bottom-bar">
-    <button class="bottom-bar-btn" id="home_page-btn">Home Page</button>
     <button class="bottom-bar-btn" id="my-internships-btn">MyInternships</button>
     <button class="bottom-bar-btn" id="search-btn">Search</button>
     <button class="bottom-bar-btn" id="logout-btn">Logout</button>
