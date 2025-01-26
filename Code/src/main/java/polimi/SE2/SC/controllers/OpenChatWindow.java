@@ -51,9 +51,7 @@ public class OpenChatWindow extends HttpServlet {
         this.connection = ConnectionHandler.getConnection(servletContext);
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {}
-
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String otherAccountIdString = request.getParameter("otherAccountId"); // The one the user wants to chat with
         String myAccountIdString; // Variable expected only if the user is a company
 
@@ -144,5 +142,7 @@ public class OpenChatWindow extends HttpServlet {
         String json = gson.toJson(jsonObject);
         response.getWriter().write(json);
     }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {}
 
 }
