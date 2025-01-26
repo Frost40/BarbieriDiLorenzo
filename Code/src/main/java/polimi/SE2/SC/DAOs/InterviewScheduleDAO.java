@@ -1,5 +1,6 @@
 package polimi.SE2.SC.DAOs;
 
+import polimi.SE2.SC.beans.Complaint;
 import polimi.SE2.SC.beans.InterviewSchedule;
 import polimi.SE2.SC.beans.Questionnaire;
 
@@ -16,6 +17,58 @@ public class InterviewScheduleDAO {
 
     public InterviewScheduleDAO(Connection connection) {
         this.connection = connection;
+    }
+
+    /**
+     * Method used to extract a specific interview schedule given its id
+     *
+     * @param id Interview schedule id
+     * @return The retrieved interview schedule
+     * @throws SQLException
+     */
+    public InterviewSchedule getInterviewSchedule(int id) throws SQLException{
+        InterviewSchedule interviewSchedule = null;
+        String performedAction = " extracting a interview schedule using its unique id ";
+        String query = "SELECT * FROM InterviewSchedule where id = ?";
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, id);
+
+            resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                interviewSchedule = new InterviewSchedule();
+
+                interviewSchedule.setId(resultSet.getInt("id"));
+                interviewSchedule.setDate(resultSet.getDate("date"));
+                interviewSchedule.setEvaluation(resultSet.getBoolean("evaluation"));
+                interviewSchedule.setHasBeenRejected(resultSet.getBoolean("hasBeenRejected"));
+                interviewSchedule.setStudentHasInternshipId(resultSet.getInt("studentHasInternshipId"));
+            }
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                resultSet.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the result set when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
+        return interviewSchedule;
     }
 
     /**
@@ -80,7 +133,38 @@ public class InterviewScheduleDAO {
 
     }
 
+    /**
+     * Method used to set the company decision for the given interview associated to the interviewId
+     * 
+     * @param interviewId Identifier for the interview
+     * @param decision Company decision to upload
+     * @throws SQLException
+     */
     public void setCompanyDecision(int interviewId, boolean decision) throws SQLException {
+        String performedAction = " setting the company decision for the given interview ";
+        String query = "UPDATE InterviewSchedule " +
+                    "SET evaluation = ? " +
+                    "WHERE id = ?";
+        PreparedStatement preparedStatement = null;
 
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setBoolean(1, decision);
+            preparedStatement.setInt(2, interviewId);
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
     }
 }
