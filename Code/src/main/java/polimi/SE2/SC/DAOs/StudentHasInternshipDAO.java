@@ -237,7 +237,7 @@ public class StudentHasInternshipDAO {
     public void endInternshipExperience(int id) throws SQLException {
         String performedAction = " setting the end date for the internship experience ";
         String query = "UPDATE StudentHasInternship " +
-                    "SET endDate = CURDATE() " +
+                    "SET endDate = CURDATE() AND applicationStatus = ? " +
                     "WHERE id = ?";
 
         PreparedStatement preparedStatement = null;
@@ -245,6 +245,42 @@ public class StudentHasInternshipDAO {
         try {
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, id);
+            preparedStatement.setString(2, "ended");
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
+    }
+
+    /**
+     * Method used to update the given internship period (studentHasInternship) with the current date as start date
+     *
+     * @param id Identifier for the internship period experience
+     * @throws SQLException
+     */
+    public void startInternshipExperience(int id) throws SQLException {
+        String performedAction = " setting the start date for the internship experience ";
+        String query = "UPDATE StudentHasInternship " +
+                "SET startDate = CURDATE() AND applicationStatus = ? " +
+                "WHERE id = ?";
+
+        PreparedStatement preparedStatement = null;
+
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, id);
+            preparedStatement.setString(2, "ongoing");
 
             preparedStatement.executeUpdate();
 

@@ -84,9 +84,17 @@ public class EndInternship extends HttpServlet {
             return;
         }
 
+        // Checking if the given student-internship association exists
+        if (studentHasInternship == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().println("No student-internship association found for the given id");
+            return;
+        }
+
+        // Making sure the user trying to end the internship period is the company
         if (isStudent) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().println("Only the company can decide to start the internship period");
+            response.getWriter().println("Only the company can decide to end your internship experience");
             return;
         }
 
@@ -108,7 +116,7 @@ public class EndInternship extends HttpServlet {
             return;
         }
 
-        if (studentHasInternship.getApplicationStatus().equals("ongoing") && studentHasInternship.getStartDate() != null) {
+        if (studentHasInternship.getApplicationStatus().equals("ongoing") || studentHasInternship.getApplicationStatus().equals("selectionProcess")) {
             // Proceeding to end the internship period
             try {
                 studentHasInternshipDAO.endInternshipExperience(studentHasInternshipId);
@@ -118,9 +126,9 @@ public class EndInternship extends HttpServlet {
                 return;
             }
         } else {
-            // The internship period has not started yet
+            // The internship period is already closed
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().println("Closure blocked: the internship is not started yet");
+            response.getWriter().println("Your not in the correct period to start the internship");
             return;
         }
 
