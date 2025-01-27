@@ -256,8 +256,47 @@ public class StudentHasInternshipDAO {
         }
     }
 
-    public void updateApplicationStatus(int id, String status) throws SQLException {
+    /**
+     * Method used to update the company decision regarding a specific application request from a student
+     * In case of a positive evaluation, the application state advances to 'selectionProcess'
+     *
+     * @param id Identifier for the student application request
+     * @param status Boolean variable: TRUE if the application is accepted, FALSE otherwise
+     * @throws SQLException
+     */
+    public void updateApplicationStatus(int id, boolean status) throws SQLException {
+        String performedAction = " setting the end date for the internship experience ";
+        String query = "UPDATE StudentHasInternship " +
+                "SET companyAccepted = ? AND applicationStatus = ? " +
+                "WHERE id = ?";
+        String applicationStatus;
+        if (status) {
+            applicationStatus = "selectionProcess";
+        } else applicationStatus = "rejected";
 
+        PreparedStatement preparedStatement = null;
+
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setBoolean(1, status);
+            preparedStatement.setString(2, applicationStatus);
+            preparedStatement.setInt(3, id);
+
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
     }
 
     /**
@@ -276,8 +315,9 @@ public class StudentHasInternshipDAO {
 
         try {
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, id);
-            preparedStatement.setString(2, "ended");
+            preparedStatement.setString(1, "ended");
+            preparedStatement.setInt(2, id);
+
 
             preparedStatement.executeUpdate();
 
@@ -311,8 +351,8 @@ public class StudentHasInternshipDAO {
 
         try {
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, id);
-            preparedStatement.setString(2, "ongoing");
+            preparedStatement.setString(1, "ongoing");
+            preparedStatement.setInt(2, id);
 
             preparedStatement.executeUpdate();
 
