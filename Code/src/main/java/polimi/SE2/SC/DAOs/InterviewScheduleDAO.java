@@ -128,7 +128,7 @@ public class InterviewScheduleDAO {
      */
     public void scheduleInterview(Timestamp date, int studentHasInternshipId) throws SQLException {
         String performedAction = " inserting a new scheduled interview into the database ";
-        String query = "INSERT into InterviewSchedule (date, evaluation, hasBeenRejected, studenthasInternshipId) VALUES (?, NULL, NULL, ?)";
+        String query = "INSERT into InterviewSchedule (date, evaluation, hasBeenRejected, studenthasInternshipId) VALUES (?, NULL, FALSE, ?)";
         PreparedStatement preparedStatement = null;
 
         try {
@@ -152,8 +152,37 @@ public class InterviewScheduleDAO {
         }
     }
 
-    public void cancelInterview(int id) throws SQLException {
+    /**
+     * Method used to reject, as a student, an interview date proposed by a company
+     * 
+     * @param id Identifier for the Interview scheduled to reject
+     * @throws SQLException
+     */
+    public void rejectInterviewDate(int id) throws SQLException {
+        String performedAction = " setting the student decision to reject the interview date ";
+        String query = "UPDATE InterviewSchedule " +
+                "SET hasBeenRejected = TRUE " +
+                "WHERE id = ?";
+        PreparedStatement preparedStatement = null;
 
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, id);
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
     }
 
     /**
