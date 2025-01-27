@@ -125,10 +125,23 @@ public class ManageStudentApplications extends HttpServlet {
         }
 
         // Checking if the time period to manage an application request is correct
-        if (!studentHasInternship.getApplicationStatus().equals("evaluation")) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().println("This is not the correct time to manage the application status");
-            return;
+        String applicationStatus = studentHasInternship.getApplicationStatus();
+
+        // If the status is not "evaluation," check further conditions
+        if (!applicationStatus.equals("evaluation")) {
+            if (applicationStatus.equals("selectionProcess")) {
+                // If the status is "selectionProcess" and evaluationBoolean is true, reject the request
+                if (evaluationBoolean) {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().println("From the selection process, you can only start the internship period or reject an application.");
+                    return;
+                }
+            } else {
+                // If the status is neither "evaluation" nor "selectionProcess," reject the request
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().println("This is not the correct time to manage the application status.");
+                return;
+            }
         }
 
         // Uploading the company decision into the database

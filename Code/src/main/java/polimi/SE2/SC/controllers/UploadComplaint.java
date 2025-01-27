@@ -101,10 +101,10 @@ public class UploadComplaint extends HttpServlet {
             return;
         }
 
-        // Checking if the given ongoing internship is actually started
-        if (ongoingInternship.getStartDate() == null) {
+        // Checking if the given ongoing internship is in the correct time period to upload a questionnaire
+        if (!ongoingInternship.getApplicationStatus().equals("ongoing")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().println("You are authorized to issue a complaint only after the internship period has started");
+            response.getWriter().println("You are not authorized to upload a complaint in the current time period");
             return;
         }
 
