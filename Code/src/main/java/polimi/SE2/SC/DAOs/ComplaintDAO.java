@@ -71,12 +71,6 @@ public class ComplaintDAO {
         return complaint;
     }
 
-    public ArrayList<Complaint> getOngoingInternshipsComplaints(ArrayList<Integer> internshipsIds) throws SQLException {
-        ArrayList<Complaint> complaints = null;
-
-        return complaints;
-    }
-
     /**
      * Method used to retrieve from the database all complaints that are still
      * open for a giving ongoing internship (studentHasInternship connection)
@@ -316,8 +310,45 @@ public class ComplaintDAO {
         }
     }
 
-    public void hasBeenRead(int complaintId) throws SQLException {
+    /**
+     * Method used to update the database setting the complaint to already read
+     *
+     * @param id Identifier for the complaint
+     * @throws SQLException
+     */
+    public void hasBeenRead(int id, boolean isStudent) throws SQLException {
+        String performedAction = " saving in the database the fact that the complaint has been read ";
+        String query;
 
+        if (isStudent) {
+            query = "UPDATE Complaint " +
+                    "SET readByStudent = TRUE " +
+                    "WHERE id = ?";
+        } else {
+            query = "UPDATE Complaint " +
+                    "SET readByInternship = TRUE " +
+                    "WHERE id = ?";
+        }
+        PreparedStatement preparedStatement = null;
+
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, id);
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
     }
 
     /**

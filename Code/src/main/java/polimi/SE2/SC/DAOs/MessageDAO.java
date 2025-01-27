@@ -1,9 +1,6 @@
 package polimi.SE2.SC.DAOs;
 
-import polimi.SE2.SC.beans.Complaint;
-import polimi.SE2.SC.beans.Internship;
-import polimi.SE2.SC.beans.Message;
-import polimi.SE2.SC.beans.Student;
+import polimi.SE2.SC.beans.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,6 +14,59 @@ public class MessageDAO {
 
     public MessageDAO(Connection connection) {
         this.connection = connection;
+    }
+
+    /**
+     * Method used to extract a specific message given its id
+     *
+     * @param id Message id
+     * @return The associated message
+     * @throws SQLException
+     */
+    public Message getMessage(int id) throws SQLException {
+        Message message = null;
+        String performedAction = " extracting a message using its unique id ";
+        String query = "SELECT * FROM Message where id = ?";
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, id);
+
+            resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                message = new Message();
+
+                message.setId(resultSet.getInt("id"));
+                message.setMessage(resultSet.getString("message"));
+                message.setRead(resultSet.getBoolean("read"));
+                message.setFromInternship(resultSet.getBoolean("fromInternship"));
+                message.setSenderId(resultSet.getInt("senderId"));
+                message.setReceiverId(resultSet.getInt("receiverId"));
+            }
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                resultSet.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the result set when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
+        return message;
     }
 
     /**
@@ -328,8 +378,37 @@ public class MessageDAO {
         }
     }
 
-    public void hasBeenRead(int messageId) throws SQLException {
+    /**
+     * Method used to update the database setting the message to already read
+     *
+     * @param id Identifier for the message
+     * @throws SQLException
+     */
+    public void hasBeenRead(int id) throws SQLException {
+        String performedAction = " saving in the database the fact that the message has been read ";
+        String query = "UPDATE Message " +
+                "SET `read` = TRUE " +
+                "WHERE id = ?";
+        PreparedStatement preparedStatement = null;
 
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, id);
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
     }
 
     /**
