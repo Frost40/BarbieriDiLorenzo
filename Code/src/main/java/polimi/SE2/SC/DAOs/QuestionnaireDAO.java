@@ -157,6 +157,39 @@ public class QuestionnaireDAO {
     }
 
     /**
+     * Method used to save into the database a completed version, submitted by the student, of a given questionnaire
+     *
+     * @param id Identifier for the questionnaire
+     * @param file The file representing the completed questionnaire
+     * @throws SQLException
+     */
+    public void completeQuestionnaire(int id, InputStream file) throws SQLException {
+        String performedAction = " updating a questionnaire with the student answers ";
+        String query = "UPDATE Questionnaire SET file = ? WHERE id = ?";
+        PreparedStatement preparedStatement = null;
+
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setBlob(1, file);
+            preparedStatement.setInt(2, id);
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
+    }
+
+    /**
      * Method used to set the company decision for the given questionnaire associated to the questionnaireId
      *
      * @param questionnaireId Identifier for the questionnaire

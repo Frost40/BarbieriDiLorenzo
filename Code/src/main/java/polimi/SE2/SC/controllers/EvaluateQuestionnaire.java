@@ -159,7 +159,7 @@ public class EvaluateQuestionnaire extends HttpServlet {
 
         if (!studentHasInternship.getApplicationStatus().equals("selectionProcess")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().println("This is not the correct time to evaluate an interview");
+            response.getWriter().println("This is not the correct time to evaluate an questionnaire");
             return;
         }
 

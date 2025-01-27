@@ -1,7 +1,6 @@
 package polimi.SE2.SC.controllers;
 
 import polimi.SE2.SC.DAOs.InternshipDAO;
-import polimi.SE2.SC.DAOs.InterviewScheduleDAO;
 import polimi.SE2.SC.DAOs.StudentHasInternshipDAO;
 import polimi.SE2.SC.beans.*;
 import polimi.SE2.SC.utils.ConnectionHandler;
@@ -23,13 +22,13 @@ import java.util.Optional;
 
 import static polimi.SE2.SC.utils.UtilityFunctions.parsingChecker;
 
-@WebServlet("/ManageStudentApplications")
+@WebServlet("/ManageStudentApplication")
 @MultipartConfig
-public class ManageStudentApplications extends HttpServlet {
+public class ManageStudentApplication extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
 
-    public ManageStudentApplications() {
+    public ManageStudentApplication() {
         super();
     }
 
