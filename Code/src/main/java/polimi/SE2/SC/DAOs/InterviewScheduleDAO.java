@@ -1,16 +1,10 @@
 package polimi.SE2.SC.DAOs;
 
-import polimi.SE2.SC.beans.Complaint;
 import polimi.SE2.SC.beans.InterviewSchedule;
-import polimi.SE2.SC.beans.Questionnaire;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 
 public class InterviewScheduleDAO {
     private Connection connection;
@@ -72,13 +66,13 @@ public class InterviewScheduleDAO {
     }
 
     /**
-     * Method used to retrieve all interview schedule dates for a given student-internship association
+     * Method used to retrieve all interview scheduled dates for a given student-internship association
      *
      * @param studentHasInternshipId Identifier for the given student-internship association
      * @return Array list containing all the interview scheduled
      * @throws SQLException
      */
-    public ArrayList<InterviewSchedule> getOngoingInternshipsInterviewSchedules(int studentHasInternshipId) throws SQLException {
+    public ArrayList<InterviewSchedule> getOngoingInternshipInterviewSchedules(int studentHasInternshipId) throws SQLException {
         ArrayList<InterviewSchedule> interviewSchedules = new ArrayList<>();
         String performedAction = " extracting all interview schedules relative to the given student-internship association ";
         String query = "SELECT * FROM InterviewSchedule WHERE studentHasInternshipId = ?";
@@ -125,8 +119,37 @@ public class InterviewScheduleDAO {
         return interviewSchedules;
     }
 
-    public void scheduleInterview(Date date) throws SQLException {
+    /**
+     * Method used to schedule a new interview for a given student-internship association
+     *
+     * @param date Date and time for the scheduled interview
+     * @param studentHasInternshipId Identifier for the student-internship association
+     * @throws SQLException
+     */
+    public void scheduleInterview(Timestamp date, int studentHasInternshipId) throws SQLException {
+        String performedAction = " inserting a new scheduled interview into the database ";
+        String query = "INSERT into InterviewSchedule (date, evaluation, hasBeenRejected, studenthasInternshipId) VALUES (?, NULL, NULL, ?)";
+        PreparedStatement preparedStatement = null;
 
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setTimestamp(1, date);
+            preparedStatement.setInt(2, studentHasInternshipId);
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
     }
 
     public void cancelInterview(int id) throws SQLException {

@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
@@ -175,7 +174,7 @@ public class OpenMyInternshipInformationSpace extends HttpServlet {
                 InterviewScheduleDAO interviewScheduleDAO = new InterviewScheduleDAO(connection);
                 ArrayList<InterviewSchedule> interviewSchedules = null;
                 try {
-                    interviewSchedules = interviewScheduleDAO.getOngoingInternshipsInterviewSchedules(studentHasInternshipId);
+                    interviewSchedules = interviewScheduleDAO.getOngoingInternshipInterviewSchedules(studentHasInternshipId);
                 } catch (SQLException e) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     response.getWriter().println(e.getMessage());
@@ -221,7 +220,7 @@ public class OpenMyInternshipInformationSpace extends HttpServlet {
                 InterviewScheduleDAO interviewScheduleDAO = new InterviewScheduleDAO(connection);
                 ArrayList<InterviewSchedule> interviewSchedules = null;
                 try {
-                    interviewSchedules = interviewScheduleDAO.getOngoingInternshipsInterviewSchedules(studentHasInternshipId);
+                    interviewSchedules = interviewScheduleDAO.getOngoingInternshipInterviewSchedules(studentHasInternshipId);
                 } catch (SQLException e) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     response.getWriter().println(e.getMessage());
