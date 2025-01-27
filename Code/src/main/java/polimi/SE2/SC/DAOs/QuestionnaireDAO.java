@@ -123,8 +123,37 @@ public class QuestionnaireDAO {
         return questionnaires;
     }
 
-    public void uploadQuestionnaire(InputStream file) throws SQLException {
+    /**
+     * Method used to upload a new questionnaire for a given student-internship association into the database
+     *
+     * @param file The file representing the questionnaire to upload in the database
+     * @param studentHasInternshipId Identifier for the student-internship association
+     * @throws SQLException
+     */
+    public void uploadQuestionnaire(InputStream file, int studentHasInternshipId) throws SQLException {
+        String performedAction = " inserting a new questionnaire into the database ";
+        String query = "INSERT into Questionnaire (file, evaluation, studentHasInternshipId) VALUES (?, NULL, ?)";
+        PreparedStatement preparedStatement = null;
 
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setBlob(1, file);
+            preparedStatement.setInt(2, studentHasInternshipId);
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
     }
 
     /**
@@ -160,9 +189,5 @@ public class QuestionnaireDAO {
                 throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
             }
         }
-    }
-
-    public void deleteQuestionnaire(int questionnaireId) throws SQLException {
-
     }
 }

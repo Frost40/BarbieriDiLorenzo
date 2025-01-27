@@ -108,14 +108,15 @@ public class UploadComplaint extends HttpServlet {
             return;
         }
 
-        // Checking if the current user in session is actually associated to the given ongoing internship
         if (isStudent) {
+            // Checking if the current user in session is actually associated to the given ongoing internship
             if (ongoingInternship.getStudentId() != user.getId()) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().println("The operation was block because you are not the student associated to the given ongoing internship");
                 return;
             }
         } else {
+            // Checking that the company in the current session is the owner of the given internship
             InternshipDAO internshipDAO = new InternshipDAO(connection);
             ArrayList<Internship> companyInternships = null;
             try {
