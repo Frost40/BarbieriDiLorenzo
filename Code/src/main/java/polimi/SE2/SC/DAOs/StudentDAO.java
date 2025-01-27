@@ -12,6 +12,14 @@ public class StudentDAO {
         this.connection = connection;
     }
 
+    /**
+     * Method used to retrieve a student from the database knowing his email and password
+     *
+     * @param email Student email address
+     * @param password Student password for the account
+     * @return The extracted student
+     * @throws SQLException
+     */
     public Student findStudentWithCredentials(String email, String password) throws SQLException {
         Student student = null;
         String performedAction = " finding a student by email and password ";
@@ -169,12 +177,18 @@ public class StudentDAO {
         return student;
     }
 
-    public ArrayList<Student> getAllStudents() throws SQLException {
-        ArrayList<Student> students = null;
-
-        return students;
-    }
-
+    /**
+     * Method used to register a new student into the S&C application
+     * 
+     * @param email Email address
+     * @param password Password for the account
+     * @param name Student name
+     * @param surname Student surname
+     * @param nationality Student nationality
+     * @param cityOfBrith City where the student was born
+     * @return Student identifier
+     * @throws SQLException
+     */
     public int registerStudent(String email, String password, String name, String surname, String nationality, String cityOfBrith) throws SQLException {
         int generatedId = 0;
         String performedAction = " creating a new company in the database ";

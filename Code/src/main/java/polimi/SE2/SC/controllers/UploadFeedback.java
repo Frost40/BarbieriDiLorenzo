@@ -109,7 +109,7 @@ public class UploadFeedback extends HttpServlet {
         StudentHasInternshipDAO studentHasInternshipDAO = new StudentHasInternshipDAO(connection);
         StudentHasInternship ongoingInternship = null;
         try {
-            ongoingInternship = studentHasInternshipDAO.getOngoingInternship(ongoingInternshipId);
+            ongoingInternship = studentHasInternshipDAO.getStudentHasInternship(ongoingInternshipId);
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().println(e.getMessage());
@@ -122,8 +122,8 @@ public class UploadFeedback extends HttpServlet {
             return;
         }
 
-        // Checking if the given ongoing internship is actually ended
-        if (ongoingInternship.getEndDate() == null) {
+        // Checking if the given ongoing internship is in the correct time period to upload a questionnaire
+        if (!ongoingInternship.getApplicationStatus().equals("ongoing")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().println("You are authorized to write a feedback only after the internship period has ended");
             return;

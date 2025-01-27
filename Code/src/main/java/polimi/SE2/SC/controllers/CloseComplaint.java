@@ -69,9 +69,8 @@ public class CloseComplaint extends HttpServlet {
         if (parsedId.isPresent())			complaintId = parsedId.get();
         else	return;
 
-        ComplaintDAO complaintDAO = new ComplaintDAO(connection);
-
         // Checking whether the given id refers to an existing complaint
+        ComplaintDAO complaintDAO = new ComplaintDAO(connection);
         Complaint complaint = null;
         try {
             complaint = complaintDAO.getComplaint(complaintId);

@@ -88,7 +88,7 @@ public class UploadComplaint extends HttpServlet {
         StudentHasInternshipDAO studentHasInternshipDAO = new StudentHasInternshipDAO(connection);
         StudentHasInternship ongoingInternship = null;
         try {
-            ongoingInternship = studentHasInternshipDAO.getOngoingInternship(ongoingInternshipId);
+            ongoingInternship = studentHasInternshipDAO.getStudentHasInternship(ongoingInternshipId);
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().println(e.getMessage());
@@ -101,21 +101,22 @@ public class UploadComplaint extends HttpServlet {
             return;
         }
 
-        // Checking if the given ongoing internship is actually started
-        if (ongoingInternship.getStartDate() == null) {
+        // Checking if the given ongoing internship is in the correct time period to upload a questionnaire
+        if (!ongoingInternship.getApplicationStatus().equals("ongoing")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().println("You are authorized to issue a complaint only after the internship period has started");
+            response.getWriter().println("You are not authorized to upload a complaint in the current time period");
             return;
         }
 
-        // Checking if the current user in session is actually associated to the given ongoing internship
         if (isStudent) {
+            // Checking if the current user in session is actually associated to the given ongoing internship
             if (ongoingInternship.getStudentId() != user.getId()) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().println("The operation was block because you are not the student associated to the given ongoing internship");
                 return;
             }
         } else {
+            // Checking that the company in the current session is the owner of the given internship
             InternshipDAO internshipDAO = new InternshipDAO(connection);
             ArrayList<Internship> companyInternships = null;
             try {

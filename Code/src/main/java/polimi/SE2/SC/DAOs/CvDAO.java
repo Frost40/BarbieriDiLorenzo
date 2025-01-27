@@ -89,12 +89,6 @@ public class CvDAO {
         return cv;
     }
 
-    public ArrayList<Cv> getAllCvs() throws SQLException {
-        ArrayList<Cv> cvs = null;
-
-        return cvs;
-    }
-
     /**
      * Method used to upload a new CV into the database
      *
