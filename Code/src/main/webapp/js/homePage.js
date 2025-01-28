@@ -8,6 +8,7 @@ function HomePage(user, pageOrchestrator) {
     var Complaints;
     var Feedbacks;
     var user_class;
+    let homePageDiv = document.getElementById('home-page-div')
     // **Sidebar Variables** //
     var username = document.getElementById("username");
     var email = document.getElementById("email");
@@ -169,7 +170,7 @@ function HomePage(user, pageOrchestrator) {
     }
     // Bottom navigation bar event listeners
     myInternshipsBtn.addEventListener("click", () => {
-        pageOrchestrator.showPage('my internships page', 'placeholder1', 'placeholder2', 'placeholder3');
+        this.pageOrchestrator.showPage('my internships page', 'placeholder1', 'placeholder2', 'placeholder3');
     });
     searchBtn.addEventListener("click", () => {
         pageOrchestrator.showPage('search page', 'placeholder1', 'placeholder2', 'placeholder3');
@@ -511,6 +512,7 @@ function HomePage(user, pageOrchestrator) {
 
 
     this.open = function () {
+        homePageDiv.style.display = "";
         // Construct query string
         var url = "HomePageManager";
 
@@ -546,11 +548,12 @@ function HomePage(user, pageOrchestrator) {
                 }
             }
         });
-    }
+    };
 
     // Methods called internally from the js class
 
     // Function to hide the page
     this.hide = function() {
+        homePageDiv.style.display = 'none';
     };
 }

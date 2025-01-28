@@ -1,18 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     var user = JSON.parse(sessionStorage.getItem('user'));
+
     if (!user) {
-        window.location.href = "mainPage.html"; // Redirect to login if no user is present
+        window.location.href = "mainPage.html"; // reindirizza alla pagina di login se l'utente non è loggato
     } else {
         var pageOrchestrator = new PageOrchestrator(user);
-
-        // Check if the user came from the login page
-        if (sessionStorage.getItem('cameFromLogin') === 'true') {
-            sessionStorage.removeItem('cameFromLogin'); // Clear the flag after use
-            window.location.href = "homePage.html"; // Redirect to home page
-        } else {
-            // Use showPage for other pages
-            pageOrchestrator.showPage('home page');
-        }
+        pageOrchestrator.showPage('home page'); // mostra la sezione homePage all'inizio
     }
 });
 
@@ -23,7 +16,7 @@ function PageOrchestrator(user){
 
     // Initialize all the pages
     let homePage = new HomePage(user, this);
-    let myInternshipsPage = new MyInternshipsPage(this);
+    let myInternshipsPage = new MyInternshipsPage(user, this);
     let searchPage = new SearchPage(user, this);
     let messagesPage = new MessagesPage(user, this);
     let notificationSection = new NotificationSection(user, this);
@@ -64,7 +57,7 @@ function PageOrchestrator(user){
 
             case 'my internships page':
                 this.hideActualPage();
-                myInternshipsPage.open(info1);
+                myInternshipsPage.open();
                 actualPage = myInternshipsPage;
                 break;
 

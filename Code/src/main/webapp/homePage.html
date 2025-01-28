@@ -5,100 +5,144 @@
     <title>Title</title>
     <link rel="stylesheet" type="text/css" media="all" href="CSS/global.css" />
     <link rel="stylesheet" type="text/css" href="CSS/homePage.css" />
+    <link rel="stylesheet" type="text/css" href="CSS/myInternshipsPage.css" />
     <link rel="stylesheet" type="text/css" href="CSS/notificationSection.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="js/utils.js" defer></script>
     <script src="js/homePage.js" defer></script>
-    <script src="js/myInternshipsPage.js" defer></script>
     <script src="js/searchPage.js" defer></script>
+    <script src="js/myInternshipsPage.js" defer></script>
     <script src="js/messagesPage.js" defer></script>
     <script src="js/notificationSection.js" defer></script>
     <script src="js/pageOrchestrator.js" defer></script>
 </head>
 <body>
-<!-- Sidebar -->
-<div class="sidenav">
-    <!-- User Info -->
-    <div class="user-info">
-        <p id="username">Username</p>
-        <p id="email">Email</p>
-    </div>
+<div id="home-page-div">
+    <!-- Sidebar -->
+    <div class="sidenav">
+        <!-- User Info -->
+        <div class="user-info">
+            <p id="username">Username</p>
+            <p id="email">Email</p>
+        </div>
 
-    <!-- Notifications Dropdown -->
-    <button id="notifications-dropdown-btn" class="dropdown-btn">Notifications
-        <i class="fa fa-caret-down"></i>
-    </button>
-    <div id="dynamic-notifications" class="dropdown-container">
-        <!-- Complaints -->
-        <button id="complaints-dropdown-btn" class="dropdown-btn">Complaints
+        <!-- Notifications Dropdown -->
+        <button id="notifications-dropdown-btn" class="dropdown-btn">Notifications
             <i class="fa fa-caret-down"></i>
         </button>
-        <div id="dynamic-complaints" class="dropdown-container">
-            <!-- Dynamic complaints options -->
+        <div id="dynamic-notifications" class="dropdown-container">
+            <!-- Complaints -->
+            <button id="complaints-dropdown-btn" class="dropdown-btn">Complaints
+                <i class="fa fa-caret-down"></i>
+            </button>
+            <div id="dynamic-complaints" class="dropdown-container">
+                <!-- Dynamic complaints options -->
+            </div>
+            <!-- Recommendations -->
+            <button id="recommendations-dropdown-btn" class="dropdown-btn">Recommendations
+                <i class="fa fa-caret-down"></i>
+            </button>
+            <div id="dynamic_recommendations" class="dropdown-container">
+                <!-- Dynamic complaints options -->
+            </div>
         </div>
-        <!-- Recommendations -->
-        <button id="recommendations-dropdown-btn" class="dropdown-btn">Recommendations
-            <i class="fa fa-caret-down"></i>
-        </button>
-        <div id="dynamic_recommendations" class="dropdown-container">
-            <!-- Dynamic complaints options -->
-        </div>
+
+        <!-- Messages Button -->
+        <button class="messages-btn">Messages</button>
+
+        <!-- New Create/Modify CV Button -->
+        <button id="cv-action-btn">Create New CV</button>
     </div>
 
-    <!-- Messages Button -->
-    <button class="messages-btn">Messages</button>
-
-    <!-- New Create/Modify CV Button -->
-    <button id="cv-action-btn">Create New CV</button>
-</div>
-
-<!-- Main Content -->
-<div class="main-content">
-    <h2>My CV</h2>
-    <div id="cv-container">
-        <!-- Experiences Section -->
-        <div id="experiences-container" class="cv-section">
-            <h3>Experiences</h3>
-            <textarea id="experiences-input" placeholder="Enter your experiences here..." readonly></textarea>
-        </div>
-
-        <!-- Programming Skills Section -->
-        <div id="programming-skills-container" class="cv-section">
-            <h3>Programming Skills</h3>
-            <textarea id="programming-skills-input" placeholder="Enter your programming skills here..." readonly></textarea>
-        </div>
-
-        <!-- Other Skills Section -->
-        <div id="other-skills-container" class="cv-section">
-            <h3>Other Skills</h3>
-            <textarea id="other-skills-input" placeholder="Enter your other skills here..." readonly></textarea>
-        </div>
-        <!-- CV File Upload Section -->
-        <div id="cv-file-container" class="cv-section">
-            <h3>Upload CV</h3>
-
-            <!-- Existing File Information -->
-            <div id="existing-file-info">
-                <!-- This will be populated by populateCv() -->
+    <!-- Main Content -->
+    <div class="main-content">
+        <h2>My CV</h2>
+        <div id="cv-container">
+            <!-- Experiences Section -->
+            <div id="experiences-container" class="cv-section">
+                <h3>Experiences</h3>
+                <textarea id="experiences-input" placeholder="Enter your experiences here..." readonly></textarea>
             </div>
 
-            <!-- Hidden File Input -->
-            <input type="file" id="cv-file-input" accept=".pdf,.doc,.docx,.txt" style="display: none;" />
+            <!-- Programming Skills Section -->
+            <div id="programming-skills-container" class="cv-section">
+                <h3>Programming Skills</h3>
+                <textarea id="programming-skills-input" placeholder="Enter your programming skills here..." readonly></textarea>
+            </div>
 
-            <!-- Choose File Button -->
-            <button id="upload-cv-btn" disabled>Choose File</button>
+            <!-- Other Skills Section -->
+            <div id="other-skills-container" class="cv-section">
+                <h3>Other Skills</h3>
+                <textarea id="other-skills-input" placeholder="Enter your other skills here..." readonly></textarea>
+            </div>
+            <!-- CV File Upload Section -->
+            <div id="cv-file-container" class="cv-section">
+                <h3>Upload CV</h3>
 
-            <!-- Display Selected File Name -->
-            <span id="selected-file-name"></span>
+                <!-- Existing File Information -->
+                <div id="existing-file-info">
+                    <!-- This will be populated by populateCv() -->
+                </div>
+
+                <!-- Hidden File Input -->
+                <input type="file" id="cv-file-input" accept=".pdf,.doc,.docx,.txt" style="display: none;" />
+
+                <!-- Choose File Button -->
+                <button id="upload-cv-btn" disabled>Choose File</button>
+
+                <!-- Display Selected File Name -->
+                <span id="selected-file-name"></span>
+            </div>
         </div>
     </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-bar">
+        <button class="bottom-bar-btn" id="my-internships-btn">MyInternships</button>
+        <button class="bottom-bar-btn" id="search-btn">Search</button>
+        <button class="bottom-bar-btn" id="logout-btn">Logout</button>
+    </div>
+
 </div>
 
-<!-- Bottom Navigation Bar -->
-<div class="bottom-bar">
-    <button class="bottom-bar-btn" id="my-internships-btn">MyInternships</button>
-    <button class="bottom-bar-btn" id="search-btn">Search</button>
-    <button class="bottom-bar-btn" id="logout-btn">Logout</button>
+<div id="my-internship-page-div" style="display:none;">
+    <div class="header-div">
+        <h1 class="header-title">My Internship Page</h1>
+    </div>
+
+    <div class="container">
+        <div class="internship-list-column" id="internship-list-column">
+
+        </div>
+        <div class="student-list-column" id="student-list-column">
+
+        </div>
+        <div class="information-space" id="information-space">
+            <div class="internship-description" id="internship-description">
+
+            </div>
+            <div class="other-data">
+                <div class="feedbacks" id="feedbacks">
+
+                </div>
+                <div class="period-dependent-data">
+                    <div class="questionnaires-list" id="questionnaires-list">
+
+                    </div>
+                    <div class="scheduled-interviews" id="scheduled-interviews">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-bar">
+        <button class="bottom-bar-btn" id="home-page-btn">HomePage</button>
+        <button class="bottom-bar-btn" id="search-page-btn">Search</button>
+        <button class="bottom-bar-btn" id="log-out-btn">Logout</button>
+    </div>
 </div>
 </body>
 
