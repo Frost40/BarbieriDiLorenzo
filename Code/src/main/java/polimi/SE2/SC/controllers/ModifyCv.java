@@ -36,7 +36,6 @@ import static polimi.SE2.SC.utils.UtilityFunctions.splitStringByComma;
 public class ModifyCv extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
-    private String cvStorage;
 
     public ModifyCv() {
         super();
@@ -56,7 +55,6 @@ public class ModifyCv extends HttpServlet {
     public void init() throws ServletException {
         ServletContext servletContext = getServletContext();
         this.connection = ConnectionHandler.getConnection(servletContext);
-        cvStorage = getServletContext().getInitParameter("database");
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {}
