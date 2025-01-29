@@ -2,7 +2,7 @@ function HomePage(user, pageOrchestrator) {
     this.pageOrchestrator = pageOrchestrator;
 
     // **Variables to store db data** //
-    var cv;
+    let cv;
     var internships;
     var Messages;
     var Complaints;
@@ -19,6 +19,7 @@ function HomePage(user, pageOrchestrator) {
     var RecommendationDropdownButton = document.getElementById("recommendations-dropdown-btn");
     var RecommendationsContainer = document.getElementById("dynamic-recommendations");
     // **My Cv Variables** //
+    var saveCvForm = document.getElementById('saveCvForm');
     var cvActionBtn = document.getElementById("cv-action-btn");
     var  experiencesInput = document.getElementById("experiences-input");
     var  programmingSkillsInput = document.getElementById("programming-skills-input");
@@ -358,19 +359,17 @@ function HomePage(user, pageOrchestrator) {
             return;
         }
 
-        // Create FormData object
-        const formData = new FormData();
-        formData.append("experiences", experiences);
-        formData.append("programmingSkills", programmingSkills);
-        formData.append("otherSkills", otherSkills);
-        formData.append("cv", selectedFile);
-
-        // Determine which servlet to call
-        let servletUrl = "UploadNewCv";
+        // Append CV ID if modifying an existing CV
         if (hasCv && currentCvId) {
-            // If modifying, include the CV ID
-            formData.append("cvId", currentCvId);
-            servletUrl = "ModifyCv";
+            // Create a hidden input for cvId if it doesn't exist
+            let cvIdInput = saveCvForm.querySelector('input[name="cvId"]');
+            if (!cvIdInput) {
+                cvIdInput = document.createElement('input');
+                cvIdInput.type = 'hidden';
+                cvIdInput.name = 'cvId';
+                saveCvForm.appendChild(cvIdInput);
+            }
+            cvIdInput.value = currentCvId;
         }
 
         // Show loading indicator
@@ -382,65 +381,75 @@ function HomePage(user, pageOrchestrator) {
             }
         });
 
-        // Send POST request to the appropriate servlet
-        fetch(servletUrl, {
-            method: "POST",
-            body: formData
-        })
-            .then(response => {
-                if (response.ok) {
-                    if (servletUrl === "ModifyCv") {
-                        return response.json(); // ModifyCv returns JSON
-                    } else {
-                        return response.text(); // UploadNewCv returns text
-                    }
-                } else {
-                    return response.text().then(text => { throw new Error(text) });
+        // Determine which servlet to call
+        let servletUrl = "UploadNewCv";
+        if (hasCv) {
+            servletUrl = "ModifyCv";
+        }
+
+        // Make the AJAX call using makeCall
+        makeCall("POST", servletUrl, saveCvForm, function (x) {
+            if (x.readyState === XMLHttpRequest.DONE) {
+                Swal.close(); // Close the loading indicator
+
+                var message = x.responseText;
+                switch (x.status) {
+                    case 200:
+                        if (servletUrl === "UploadNewCv") {
+                            showSuccessAlert("Success", "Your CV has been created successfully.");
+                            hasCv = true;
+                            // Optionally, retrieve and set the new CV ID from the server response
+                            // Example:
+                            // const responseData = JSON.parse(x.responseText);
+                            // currentCvId = responseData.cvId;
+                        } else if (servletUrl === "ModifyCv") {
+                            showSuccessAlert("Success", "Your CV has been modified successfully.");
+                            // Optionally, process the returned data if necessary
+                            // Example:
+                            // let data = JSON.parse(x.responseText);
+                            // if (data.modifiedCv) { ... }
+                            try {
+                                let data = JSON.parse(x.responseText);
+                                if (data.modifiedCv) {
+                                    // Update CV data and ID based on server response
+                                    // Example:
+                                    // cv = data.modifiedCv;
+                                    // currentCvId = cv.id;
+                                }
+                            } catch (e) {
+                                // Handle JSON parse error if response is not JSON
+                                console.error("Failed to parse server response as JSON.", e);
+                            }
+                        }
+
+                        // Update UI to read-only mode
+                        experiencesInput.readOnly = true;
+                        programmingSkillsInput.readOnly = true;
+                        otherSkillsInput.readOnly = true;
+
+                        // Disable file input and upload button
+                        cvFileInput.disabled = true;
+                        uploadCvBtn.disabled = true;
+                        selectedFileName.textContent = '';
+                        selectedFile = null;
+
+                        // Disable the Save button until a new file is selected
+                        saveCvBtn.disabled = true;
+
+                        break;
+
+                    case 400: // Bad Request
+                    case 401: // Unauthorized
+                    case 500: // Server Error
+                        showErrorAlert("Error", message);
+                        break;
+
+                    default:
+                        showErrorAlert("Error", "An unexpected error occurred.");
+                        break;
                 }
-            })
-            .then(data => {
-                // Hide loading indicator by closing the current SweetAlert
-                Swal.close();
-
-                if (servletUrl === "UploadNewCv") {
-                    showSuccessAlert("Success", "Your CV has been created successfully.");
-                    // After creating a new CV, update the flags
-                    hasCv = true;
-                    // Optionally, refresh the CV data from the server to get the new CV ID
-                    // You can call this.open() here if necessary
-                } else if (servletUrl === "ModifyCv") {
-                    showSuccessAlert("Success", "Your CV has been modified successfully.");
-                    // Optionally, you can process the returned JSON data if needed
-                    // For example, update `cv` and `currentCvId` if they might have changed
-                    // Assuming the server returns the modified CV
-                    if (data.modifiedCv) {
-                        cv = data.modifiedCv;
-                        currentCvId = cv.id; // Update CV ID if necessary
-                    }
-                }
-
-                // Update UI to read-only mode
-                isEditing = false;
-                cvActionBtn.textContent = hasCv ? 'Modify CV' : 'Create New CV';
-                experiencesInput.readOnly = true;
-                programmingSkillsInput.readOnly = true;
-                otherSkillsInput.readOnly = true;
-
-                // Disable file input and upload button
-                cvFileInput.disabled = true;
-                uploadCvBtn.disabled = true;
-                selectedFileName.textContent = '';
-                selectedFile = null;
-
-                // Optionally, refresh the CV data from the server
-                // Uncomment the line below if you want to refresh the data without reloading the page
-                // this.open();
-            })
-            .catch(error => {
-                // Hide loading indicator by closing the current SweetAlert
-                Swal.close();
-                showErrorAlert("Error", error.message);
-            });
+            }
+        });
     }
     // Helper functions for alerts
     function showErrorAlert(title, message) {
@@ -467,8 +476,6 @@ function HomePage(user, pageOrchestrator) {
         Messages = jsonObject.unreadMessages || [];
         Complaints = jsonObject.unreadComplaints || [];
         var isStudent = false;
-        let hasCv = false;
-
         // **Determine User Type and Assign Specific Variables**
         if (jsonObject.hasOwnProperty('student')) {
             user_class = jsonObject.student;
@@ -504,6 +511,7 @@ function HomePage(user, pageOrchestrator) {
         if (isStudent) {
             if (hasCv) {
                 cvActionBtn.textContent = 'Modify CV';
+                currentCvId = cv.id;
             } else {
                 cvActionBtn.textContent = 'Create New CV';
             }
@@ -515,6 +523,7 @@ function HomePage(user, pageOrchestrator) {
         homePageDiv.style.display = "";
         // Construct query string
         var url = "HomePageManager";
+        console.log(hasCv);
 
         makeCall("GET", url, null, function (x) {
             if (x.readyState === XMLHttpRequest.DONE) {

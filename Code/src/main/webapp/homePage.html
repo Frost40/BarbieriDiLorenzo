@@ -57,24 +57,25 @@
     <!-- Main Content -->
     <div class="main-content">
         <h2>My CV</h2>
-        <div id="cv-container">
+        <form id="saveCvForm" enctype="multipart/form-data">
             <!-- Experiences Section -->
             <div id="experiences-container" class="cv-section">
                 <h3>Experiences</h3>
-                <textarea id="experiences-input" placeholder="Enter your experiences here..." readonly></textarea>
+                <textarea id="experiences-input" name="experiences" placeholder="Enter your experiences here..." readonly></textarea>
             </div>
 
             <!-- Programming Skills Section -->
             <div id="programming-skills-container" class="cv-section">
                 <h3>Programming Skills</h3>
-                <textarea id="programming-skills-input" placeholder="Enter your programming skills here..." readonly></textarea>
+                <textarea id="programming-skills-input" name="programmingSkills" placeholder="Enter your programming skills here..." readonly></textarea>
             </div>
 
             <!-- Other Skills Section -->
             <div id="other-skills-container" class="cv-section">
                 <h3>Other Skills</h3>
-                <textarea id="other-skills-input" placeholder="Enter your other skills here..." readonly></textarea>
+                <textarea id="other-skills-input" name="otherSkills" placeholder="Enter your other skills here..." readonly></textarea>
             </div>
+
             <!-- CV File Upload Section -->
             <div id="cv-file-container" class="cv-section">
                 <h3>Upload CV</h3>
@@ -85,15 +86,15 @@
                 </div>
 
                 <!-- Hidden File Input -->
-                <input type="file" id="cv-file-input" accept=".pdf,.doc,.docx,.txt" style="display: none;" />
+                <input type="file" id="cv-file-input" name="cv" accept=".pdf,.doc,.docx,.txt" style="display: none;" required />
 
                 <!-- Choose File Button -->
-                <button id="upload-cv-btn" disabled>Choose File</button>
+                <button type="button" id="upload-cv-btn">Choose File</button>
 
                 <!-- Display Selected File Name -->
                 <span id="selected-file-name"></span>
             </div>
-        </div>
+        </form>
     </div>
 
     <!-- Bottom Navigation Bar -->
