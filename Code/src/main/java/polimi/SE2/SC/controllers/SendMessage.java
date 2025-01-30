@@ -203,7 +203,7 @@ public class SendMessage extends HttpServlet {
             }
 
             try {
-                messageDAO.setChatToRead(sender.getId(), internshipReceiver.getId());
+                messageDAO.setChatToRead(sender.getId(), internshipReceiver.getId(), true);
             } catch (SQLException e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().println(e.getMessage());
@@ -220,7 +220,7 @@ public class SendMessage extends HttpServlet {
             }
 
             try {
-                messageDAO.setChatToRead(studentReceiver.getId(), senderId);
+                messageDAO.setChatToRead(studentReceiver.getId(), senderId, false);
             } catch (SQLException e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().println(e.getMessage());

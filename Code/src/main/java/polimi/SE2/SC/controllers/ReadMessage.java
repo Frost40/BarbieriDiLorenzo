@@ -120,7 +120,7 @@ public class ReadMessage extends HttpServlet {
 
         // Setting the message to read
         try {
-            messageDAO.hasBeenRead(messageId);
+            messageDAO.hasBeenRead(messageId, isStudent);
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().println(e.getMessage());
