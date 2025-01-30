@@ -31,7 +31,11 @@ function HomePage(user, pageOrchestrator) {
     const readOnlyTextareas = [experiencesInput, programmingSkillsInput, otherSkillsInput];
     // **Internship Variables** //
     var saveInternshipBtn = document.getElementById('save-internship-btn');
-
+    // **Badge Elements** //
+    var notificationsBadge = document.getElementById("notifications-badge");
+    var complaintsBadge = document.getElementById("complaints-badge");
+    var feedbackBadge = document.getElementById("feedback-badge");
+    var messagesBadge = document.getElementById("messages-badge");
     // **Bottom Navigation Variables** //
     var homePageBtn = document.getElementById("home_page-btn");
     var myInternshipsBtn = document.getElementById("my-internships-btn");
@@ -189,6 +193,41 @@ function HomePage(user, pageOrchestrator) {
     });
 
     //** Series of functions utilized to populate the UI **//
+    function updateBadgeCounts() {
+        // Update Complaints Badge
+        updateBadge(complaintsBadge, Complaints.length);
+
+        // Update Feedback Badge (only for companies)
+        if (userType === 'company') {
+            updateBadge(feedbackBadge, Feedbacks.length);
+        }
+
+        // Update Messages Badge
+        console.log(Messages);
+        updateBadge(messagesBadge, Messages.length);
+
+        // Update Notifications Badge (sum of Complaints and Feedbacks for companies, Complaints for students)
+        if (userType === 'company') {
+            const totalNotifications = Complaints.length + Feedbacks.length;
+            updateBadge(notificationsBadge, totalNotifications);
+        } else if (userType === 'student') {
+            updateBadge(notificationsBadge, Complaints.length);
+        }
+    }
+    /**
+     * Updates the badge element with the given count.
+     * @param {HTMLElement} badgeElement - The badge element to update.
+     * @param {number} count - The number to display.
+     */
+    function updateBadge(badgeElement, count) {
+        if (count > 0) {
+            badgeElement.textContent = count;
+            badgeElement.classList.add('show');
+        } else {
+            badgeElement.classList.remove('show');
+            badgeElement.textContent = '0';
+        }
+    }
 
     function populateUserInfo(user_class) {
         username.textContent = user_class.name;
@@ -360,7 +399,11 @@ function HomePage(user, pageOrchestrator) {
                 noComplaintsMsg.id = "no-complaints-msg"; // Assign an ID for future reference if needed
 
                 ComplaintsContainer.appendChild(noComplaintsMsg);
+
             }
+        // Update Complaints Badge
+        updateBadge(complaintsBadge, Complaints.length);
+        updateBadge(notificationsBadge, Complaints.length + (Feedbacks ? Feedbacks.length : 0));
     }
     /**
      * Displays the full details of a complaint using SweetAlert2.
@@ -648,6 +691,8 @@ function HomePage(user, pageOrchestrator) {
         populateMessages();
         // **Initialize the Homepage Layout Based on User Type**
         initializeHomePage();
+        // **Update Badge Counts**
+        updateBadgeCounts();
     }
 
 

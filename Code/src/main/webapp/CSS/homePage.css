@@ -292,3 +292,20 @@ textarea:focus {
 .modify-internship-btn:hover {
     background-color: var(--light-gossamer);
 }
+/* Badge Styling */
+.badge {
+    position: relative;
+    top: -10px;
+    right: 10px;
+    background-color: #0004ff;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 50%;
+    font-size: 12px;
+    display: none; /* Hidden by default */
+}
+
+/* Show badge when it has a value */
+.badge.show {
+    display: inline-block;
+}

@@ -29,11 +29,13 @@
 
         <!-- Notifications Dropdown -->
         <button id="notifications-dropdown-btn" class="dropdown-btn">Notifications
+            <span class="badge" id="notifications-badge">0</span>
             <i class="fa fa-caret-down"></i>
         </button>
         <div id="dynamic-notifications" class="dropdown-container">
             <!-- Complaints -->
             <button id="complaints-dropdown-btn" class="dropdown-btn">Complaints
+                <span class="badge" id="complaints-badge">0</span>
                 <i class="fa fa-caret-down"></i>
             </button>
             <div id="dynamic-complaints" class="dropdown-container">
@@ -41,6 +43,7 @@
             </div>
             <!-- Feedback -->
             <button id="feedback-dropdown-btn" class="dropdown-btn" style="display: none;">Feedback
+                <span class="badge" id="feedback-badge">0</span>
                 <i class="fa fa-caret-down"></i>
             </button>
             <div id="dynamic-feedback" class="dropdown-container" style="display: none;">
@@ -48,6 +51,7 @@
             </div>
             <!-- Recommendations -->
             <button id="recommendations-dropdown-btn" class="dropdown-btn">Recommendations
+                <span class="badge" id="recommendations-badge">0</span>
                 <i class="fa fa-caret-down"></i>
             </button>
             <div id="dynamic_recommendations" class="dropdown-container">
@@ -56,7 +60,9 @@
         </div>
 
         <!-- Messages Button -->
-        <button class="messages-btn">Messages</button>
+        <button class="messages-btn">Messages
+            <span class="badge" id="messages-badge">0</span>
+        </button>
 
         <!-- Create/Modify CV Button (Visible to Students Only) -->
         <button id="cv-action-btn" class="cv-action-btn">Create New CV</button>

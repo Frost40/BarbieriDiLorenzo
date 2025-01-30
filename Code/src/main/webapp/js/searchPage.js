@@ -1,9 +1,9 @@
 function SearchPage(user, pageOrchestrator) {
     this.pageOrchestrator = pageOrchestrator;
 
-    // Getting references of the HTML elements
+    // Variable Initialization
     let searchPageDiv = document.getElementById('search-page-div');
-    let internships = []; // Initialize the internships array
+    let internships = [];
 
     // Function to sanitize HTML to prevent XSS
     function sanitizeHTML(str) {
@@ -39,16 +39,15 @@ function SearchPage(user, pageOrchestrator) {
         document.querySelectorAll('.message-btn').forEach(button => {
             button.addEventListener('click', function() {
                 const internshipId = this.getAttribute('data-id');
-                // Implement message functionality
-                alert(`Message Internship ID: ${internshipId}`);
+                console.log(internshipId);
+                openMessageModal(internshipId);
             });
         });
 
         document.querySelectorAll('.apply-btn').forEach(button => {
             button.addEventListener('click', function() {
                 const internshipId = this.getAttribute('data-id');
-                // Implement apply functionality
-                alert(`Apply to Internship ID: ${internshipId}`);
+                applyToInternship(internshipId);
             });
         });
     }
@@ -84,16 +83,116 @@ function SearchPage(user, pageOrchestrator) {
         document.getElementById('search-input').value = '';
         populateSearchResults(internships);
     });
+    // Functions to send message (modal page + send)
+    function openMessageModal(internshipId) {
+        Swal.fire({
+            title: 'Send a Message',
+            input: 'textarea',
+            inputLabel: 'Your Message',
+            inputPlaceholder: 'Type your message here...',
+            inputAttributes: {
+                'aria-label': 'Type your message here'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Send',
+            preConfirm: (message) => {
+                if (!message || message.trim().length === 0) {
+                    Swal.showValidationMessage('Message cannot be empty!');
+                } else if (message.length > 255) {
+                    Swal.showValidationMessage('Message cannot exceed 255 characters!');
+                }
+                return message;
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const message = result.value.trim();
+                console.log(internshipId);
+                sendMessage(internshipId, message);
+            }
+        });
+    }
+
+    // Function to send the message to the server using a temporary form
+    function sendMessage(internshipId, message) {
+        // Create a temporary form
+        const tempForm = document.createElement('form');
+        tempForm.style.display = 'none';
+        tempForm.method = 'POST';
+        tempForm.action = 'SendMessage';
+
+        // Create hidden input for message
+        const messageInput = document.createElement('input');
+        messageInput.type = 'hidden';
+        messageInput.name = 'message';
+        messageInput.value = message;
+        tempForm.appendChild(messageInput);
+        // Create hidden input for internshipId
+        const internshipInput = document.createElement('input');
+        internshipInput.type = 'hidden';
+        internshipInput.name = 'receiverId';
+        internshipInput.value = internshipId;
+        tempForm.appendChild(internshipInput);
+        console.log('Check'+ internshipInput.value);
+
+        // Append the form to the body
+        document.body.appendChild(tempForm);
+
+        // Show a loading indicator
+        Swal.fire({
+            title: 'Sending Message...',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading(),
+        });
+
+        // Make the POST call using makeCall with the temporary form
+        makeCall("POST", "SendMessage", tempForm, function(response) {
+            if (response.readyState === XMLHttpRequest.DONE) {
+                Swal.close(); // Close the loading indicator
+
+                if (response.status === 200) {
+                    showSuccessAlert("Message Sent!", "Your message has been successfully sent.");
+                } else {
+                   // showErrorAlert("Failed to Send", response.responseText || "An error occurred while sending your message.");
+                }
+
+                // Remove the temporary form
+                document.body.removeChild(tempForm);
+            }
+        });
+    }
+
+    // Function to apply to an internship
+    function applyToInternship(internshipId) {
+        // Create a temporary form to send the internshipId
+        const tempForm = document.createElement('form');
+        tempForm.style.display = 'none';
+        tempForm.method = 'POST';
+        tempForm.action = 'ApplyToInternship';
+
+        // Create a hidden input for internshipId
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'internshipId';
+        input.value = internshipId;
+        tempForm.appendChild(input);
+
+        document.body.appendChild(tempForm);
+
+        makeCall("POST", "ApplyToInternship", tempForm, function(response) {
+            if (response.readyState === XMLHttpRequest.DONE) {
+                if (response.status === 200) {
+                    showSuccessAlert("Applied!", "You have successfully applied to this internship.");
+                } else {
+                    showErrorAlert("Application Failed", response.responseText || "Failed to apply to internship.");
+                }
+                document.body.removeChild(tempForm);
+            }
+        });
+    }
 
     // Method to open the Search Page
     this.open = function () {
         searchPageDiv.style.display = "block";
-        // Hide other sections if necessary
-        // Example:
-        // document.getElementById('home-page-div').style.display = 'none';
-        // document.getElementById('my-internship-page-div').style.display = 'none';
-
-        // Fetch and display internships
         fetchInternships();
     }
 
