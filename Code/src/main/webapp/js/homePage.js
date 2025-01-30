@@ -8,6 +8,7 @@ function HomePage(user, pageOrchestrator) {
     var Complaints;
     var Feedbacks;
     var user_class;
+    var userType;
     let homePageDiv = document.getElementById('home-page-div')
     // **Sidebar Variables** //
     var username = document.getElementById("username");
@@ -28,6 +29,9 @@ function HomePage(user, pageOrchestrator) {
     var uploadCvBtn = document.getElementById("upload-cv-btn");
     var selectedFileName = document.getElementById("selected-file-name");
     const readOnlyTextareas = [experiencesInput, programmingSkillsInput, otherSkillsInput];
+    // **Internship Variables** //
+    var saveInternshipBtn = document.getElementById('save-internship-btn');
+
     // **Bottom Navigation Variables** //
     var homePageBtn = document.getElementById("home_page-btn");
     var myInternshipsBtn = document.getElementById("my-internships-btn");
@@ -76,6 +80,10 @@ function HomePage(user, pageOrchestrator) {
     });
     RecommendationDropdownButton.addEventListener("click", () => {
         showInfoAlert("Coming soon","This feature is not available yet.");
+    });
+    // Internship Save Button Event Lister
+    saveInternshipBtn.addEventListener('click',function(){
+        saveInternship();
     });
 
     // CV Action Button Event Listener
@@ -263,8 +271,42 @@ function HomePage(user, pageOrchestrator) {
     function populateFeedback() {
 
     }
+    // Function to populate the internships
     function populateInternships() {
+        const internshipsList = document.getElementById('existing-internships-list');
+        internshipsList.innerHTML = ''; // Clear previous entries
 
+        internships.forEach(internship => {
+            const entry = document.createElement('div');
+            entry.className = 'internship-entry';
+            entry.setAttribute('data-id', internship.id);
+
+            // Internship details
+            entry.innerHTML = `
+            <p><strong>Name:</strong> ${sanitizeHTML(internship.name)}</p>
+            <p><strong>Description:</strong> ${sanitizeHTML(internship.description)}</p>
+            <p><strong>Rating:</strong> ${internship.rating.toFixed(1)} ⭐</p>
+            <button type="button" class="modify-internship-btn" data-id="${internship.id}">Modify</button>
+        `;
+
+            internshipsList.appendChild(entry);
+        });
+
+        // Add event listeners for modify buttons
+        document.querySelectorAll('.modify-internship-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const internshipId = this.getAttribute('data-id');
+                const internship = internships.find(i => i.id == internshipId);
+                populateModifyInternship(internship);
+            });
+        });
+    }
+
+// Helper function to sanitize HTML
+    function sanitizeHTML(str) {
+        const temp = document.createElement('div');
+        temp.textContent = str;
+        return temp.innerHTML;
     }
     function populateComplaints() {
 
@@ -451,6 +493,41 @@ function HomePage(user, pageOrchestrator) {
             }
         });
     }
+
+    function saveInternship() {
+        // Get the form element
+        const form = document.getElementById('manageInternshipsForm');
+
+        // Collect and validate data
+        const internshipName = document.getElementById('internship-name-input').value.trim();
+        const internshipDescription = document.getElementById('internship-description-input').value.trim();
+
+        if (!internshipName || !internshipDescription) {
+            showErrorAlert("Validation Error", "All internship fields must be filled out.");
+            return;
+        }
+
+        // Show a loading indicator
+        Swal.fire({
+            title: 'Saving Internship...',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading(),
+        });
+        // Send the form data using makeCall
+        makeCall("POST", "UploadNewInternship", form, function (response) {
+            if (response.readyState === XMLHttpRequest.DONE) {
+                Swal.close(); // Close the loading indicator
+
+                if (response.status === 200) {
+                    showSuccessAlert("Success", "Internship created successfully.");
+                    populateInternships(); // Refresh the list of internships
+                    form.reset(); // Clear form inputs
+                } else {
+                    showErrorAlert("Error", response.responseText || "An unexpected error occurred.");
+                }
+            }
+        });
+    }
     // Helper functions for alerts
     function showErrorAlert(title, message) {
         Swal.fire({
@@ -469,6 +546,32 @@ function HomePage(user, pageOrchestrator) {
             confirmButtonText: 'OK'
         });
     }
+    // Function to initialize the homepage based on user type
+    function initializeHomePage() {
+        if (userType === 'company') {
+            // Show company-specific sidebar elements
+            document.getElementById('feedback-dropdown-btn').style.display = 'block';
+            document.getElementById('dynamic-feedback').style.display = 'block';
+
+            // Hide student-specific sidebar elements
+            document.getElementById('cv-action-btn').style.display = 'none';
+
+            // Show company main content and hide student content
+            document.getElementById('company-content').style.display = 'block';
+            document.getElementById('student-content').style.display = 'none';
+        } else if (userType === 'student') {
+            // Hide company-specific sidebar elements
+            document.getElementById('feedback-dropdown-btn').style.display = 'none';
+            document.getElementById('dynamic-feedback').style.display = 'none';
+
+            // Show student-specific sidebar elements
+            document.getElementById('cv-action-btn').style.display = 'block';
+
+            // Show student main content and hide company content
+            document.getElementById('student-content').style.display = 'block';
+            document.getElementById('company-content').style.display = 'none';
+        }
+    }
     // Function to process data from db
     function processUserData(jsonObject) {
         // **Assign Common Variables**
@@ -478,6 +581,7 @@ function HomePage(user, pageOrchestrator) {
         var isStudent = false;
         // **Determine User Type and Assign Specific Variables**
         if (jsonObject.hasOwnProperty('student')) {
+            userType = 'student';
             user_class = jsonObject.student;
             cv = jsonObject.cv || null;
             isStudent = true;
@@ -487,6 +591,7 @@ function HomePage(user, pageOrchestrator) {
                 hasCv = true;
             }
         } else if (jsonObject.hasOwnProperty('company')) {
+            userType = 'company';
             user_class = jsonObject.company;
             Feedbacks = jsonObject.unreadFeedbacks || [];
             console.log('User is a Company:', user_class);
@@ -499,6 +604,13 @@ function HomePage(user, pageOrchestrator) {
         // **Populate UI with User Information**
         populateUserInfo(user_class);
         if (isStudent) {
+            // **Update the CV Action Button Based on CV Existence**
+            if (hasCv) {
+                cvActionBtn.textContent = 'Modify CV';
+                currentCvId = cv.id;
+            } else {
+                cvActionBtn.textContent = 'Create New CV';
+            }
             populateCv();
         } else {
             populateFeedback();
@@ -506,16 +618,8 @@ function HomePage(user, pageOrchestrator) {
         }
         populateComplaints();
         populateMessages();
-
-        // **Update the CV Action Button Based on CV Existence**
-        if (isStudent) {
-            if (hasCv) {
-                cvActionBtn.textContent = 'Modify CV';
-                currentCvId = cv.id;
-            } else {
-                cvActionBtn.textContent = 'Create New CV';
-            }
-        }
+        // **Initialize the Homepage Layout Based on User Type**
+        initializeHomePage();
     }
 
 

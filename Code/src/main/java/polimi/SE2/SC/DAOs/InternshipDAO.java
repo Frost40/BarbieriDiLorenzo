@@ -188,7 +188,7 @@ public class InternshipDAO {
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, description);
-            preparedStatement.setInt(2, companyId);
+            preparedStatement.setInt(3, companyId);
 
             preparedStatement.executeUpdate();
 
