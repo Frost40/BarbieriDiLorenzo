@@ -17,6 +17,8 @@ function HomePage(user, pageOrchestrator) {
     var notificationsContainer = document.getElementById("dynamic-notifications");
     var ComplaintsDropdownButton = document.getElementById("complaints-dropdown-btn");
     var ComplaintsContainer = document.getElementById("dynamic-complaints");
+    var FeedbackDropdownButton = document.getElementById("feedback-dropdown-btn");
+    var FeedbackContainer = document.getElementById("dynamic-feedback");
     var RecommendationDropdownButton = document.getElementById("recommendations-dropdown-btn");
     var RecommendationsContainer = document.getElementById("dynamic-recommendations");
     // **My Cv Variables** //
@@ -82,6 +84,29 @@ function HomePage(user, pageOrchestrator) {
             ComplaintsContainer.style.display = "block";
         }
     });
+
+    FeedbackDropdownButton.addEventListener("click", () => {
+
+        FeedbackDropdownButton.classList.toggle("active");
+        if (FeedbackContainer.style.display === "block") {
+
+            FeedbackContainer.style.display = "none";
+        } else {
+            if (FeedbackContainer.children.length === 0) {
+
+                const noFeedbackMsg = document.createElement('p');
+                noFeedbackMsg.textContent = "No current feedbacks.";
+                noFeedbackMsg.style.padding = "10px";
+                noFeedbackMsg.style.color = "#555"; // Optional: Styling the message
+                noFeedbackMsg.id = "no-feedbacks-msg"; // Assign an ID for future reference if needed
+
+                FeedbackContainer.appendChild(noFeedbackMsg);
+            }
+
+            FeedbackContainer.style.display = "block";
+        }
+    });
+
     RecommendationDropdownButton.addEventListener("click", () => {
         showInfoAlert("Coming soon","This feature is not available yet.");
     });
@@ -308,6 +333,45 @@ function HomePage(user, pageOrchestrator) {
         return lines.join('\n');
     }
     function populateFeedback() {
+        if (!FeedbackContainer) {
+            console.error('Feedback container element not found in the DOM.');
+            return;
+        }
+
+        // Clear existing feedbacks
+        FeedbackContainer.innerHTML = '';
+
+        if (Feedbacks && Feedbacks.length > 0) {
+            Feedbacks.forEach(feedback => {
+                // Create a button element
+                const button = document.createElement('button');
+                button.classList.add('feedback-button'); // Add a class for styling
+
+                // Extract the first 3-4 words from the feedback text
+                const words = feedback.text.split(' ');
+                const buttonText = words.slice(0, 4).join(' ') + (words.length > 4 ? '...' : '');
+                button.textContent = buttonText;
+
+                button.addEventListener('click', () => {
+                    showFeedbackDetails(feedback);
+                });
+
+                FeedbackContainer.appendChild(button);
+            });
+        } else {
+
+            const noFeedbackMsg = document.createElement('p');
+            noFeedbackMsg.textContent = "No current feedbacks.";
+            noFeedbackMsg.style.padding = "10px";
+            noFeedbackMsg.style.color = "#555"; // Optional: Styling the message
+            noFeedbackMsg.id = "no-feedback-msg"; // Assign an ID for future reference if needed
+
+            FeedbackContainer.appendChild(noFeedbackMsg);
+
+        }
+        // Update Complaints Badge
+        updateBadge(feedbackBadge, Feedbacks.length);
+        updateBadge(notificationsBadge, Complaints.length + (Feedbacks ? Feedbacks.length : 0));
 
     }
     // Function to populate the internships
@@ -427,12 +491,130 @@ function HomePage(user, pageOrchestrator) {
         Swal.fire({
             title: 'Complaint Details',
             html: modalContent,
-            icon: 'info',
             confirmButtonText: 'OK',
             customClass: {
                 popup: 'complaint-modal-popup' // Optional: For additional styling
             }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // User clicked OK, proceed to mark the complaint as read
+                markComplaintAsRead(complaint.id);
+            }
         });
+    }
+    function showFeedbackDetails(feedback) {
+
+        // Create the HTML content for the modal
+        const modalContent = `
+        <p><strong>Feedback ID:</strong> ${feedback.id}</p>
+        <p><strong>Feedback Text:</strong> ${feedback.text}</p>
+        <p><strong>Rating:</strong> ${feedback.rating} ⭐</p>
+         `;
+
+        // Display the modal using SweetAlert2
+        Swal.fire({
+            title: 'Feedback Details',
+            html: modalContent,
+            confirmButtonText: 'OK',
+            customClass: {
+                popup: 'feedback-modal-popup' // Optional: For additional styling
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // User clicked OK, proceed to mark the complaint as read
+                markFeedbackAsRead(feedback.id);
+            }
+        });
+    }
+    /**
+     * Marks a complaint as read by calling the ReadComplaint servlet.
+     * @param {number} complaintId - The ID of the complaint to mark as read.
+     */
+    function markComplaintAsRead(complaintId) {
+        // Create a hidden form element to send the complaintId
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'ReadComplaint'; // Ensure this path is correct
+
+        // Create an input for complaintId
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'complaintId';
+        input.value = complaintId;
+        form.appendChild(input);
+
+        // Optionally, append the form to the body if required by your server
+        document.body.appendChild(form);
+
+        // Callback function to handle the response
+        function callback(req) {
+            if (req.readyState === XMLHttpRequest.DONE) {
+                if (req.status === 200) {
+                    console.log('Complaint marked as read:', req.responseText);
+                    // Optionally, update the UI
+                    window.location.reload();
+
+                } else {
+                    console.error('Failed to mark complaint as read:', req.responseText);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'There was a problem marking the complaint as read.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            }
+        }
+
+        // Make the POST call using makeCall
+        makeCall('POST', 'ReadComplaint', form, callback);
+
+        // Clean up by removing the form from the DOM
+        document.body.removeChild(form);
+    }
+    /**
+     * Marks a complaint as read by calling the ReadComplaint servlet.
+     * @param {number} complaintId - The ID of the complaint to mark as read.
+     */
+    function markFeedbackAsRead(feedbackId) {
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'ReadFeedback';
+
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'feedbackId';
+        input.value = feedbackId;
+        form.appendChild(input);
+
+        document.body.appendChild(form);
+
+        // Callback function to handle the response
+        function callback(req) {
+            if (req.readyState === XMLHttpRequest.DONE) {
+                if (req.status === 200) {
+                    console.log('Feedback marked as read:', req.responseText);
+                    // Optionally, update the UI
+                    window.location.reload();
+
+                } else {
+                    console.error('Failed to mark feedback as read:', req.responseText);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'There was a problem marking the feedback as read.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            }
+        }
+
+        // Make the POST call using makeCall
+        makeCall('POST', 'ReadFeedback', form, callback);
+
+        // Clean up by removing the form from the DOM
+        document.body.removeChild(form);
     }
 
     function populateMessages() {
@@ -684,9 +866,58 @@ function HomePage(user, pageOrchestrator) {
             }
             populateCv();
         } else {
+            // **For Testing: Hardcode Feedbacks**
+            Feedbacks = [
+                {
+                    id: 201,
+                    text: "Great internship experience with clear communication.",
+                    read: false,
+                    rating: 5
+                },
+                {
+                    id: 202,
+                    text: "The project scope was well-defined and achievable.",
+                    read: false,
+                    rating: 4
+                },
+                {
+                    id: 203,
+                    text: "Would love to work with the team again.",
+                    read: true,
+                    rating: 5
+                }
+            ];
             populateFeedback();
             populateInternships();
         }
+        // **For Testing: Hardcode Complaints**
+        Complaints = [
+            {
+                id: 101,
+                text: "Issue with internship application process.",
+                readByStudent: false,
+                readByInternship: false,
+                closedByStudent: false,
+                closedByCompany: false
+            },
+            {
+                id: 102,
+                text: "Delayed responses from the company.",
+                readByStudent: false,
+                readByInternship: true,
+                closedByStudent: false,
+                closedByCompany: false
+            },
+            {
+                id: 103,
+                text: "Problem with the onboarding procedure.",
+                readByStudent: true,
+                readByInternship: false,
+                closedByStudent: true,
+                closedByCompany: false
+            }
+        ];
+
         populateComplaints();
         populateMessages();
         // **Initialize the Homepage Layout Based on User Type**
