@@ -421,19 +421,17 @@ public class MessageDAO {
     public void setChatToRead(int userId, int internshipId) throws SQLException {
         String performedAction = " setting all message in the chat between student and internship to read ";
         String query = "UPDATE Message " +
-                "SET `read` = ? " +
+                "SET `read` = TRUE " +
                 "WHERE (receiverId = ? AND senderId = ?) " +
                 "OR (receiverId = ? AND senderId = ?)";
         PreparedStatement preparedStatement = null;
-        ResultSet resultSet = null;
 
         try {
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setBoolean(1, true);
-            preparedStatement.setInt(2, userId);
+            preparedStatement.setInt(1, userId);
+            preparedStatement.setInt(2, internshipId);
             preparedStatement.setInt(3, internshipId);
-            preparedStatement.setInt(4, internshipId);
-            preparedStatement.setInt(5, userId);
+            preparedStatement.setInt(4, userId);
 
             preparedStatement.executeUpdate();
             
@@ -441,13 +439,6 @@ public class MessageDAO {
             throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
 
         } finally {
-
-            try {
-                resultSet.close();
-
-            } catch (Exception e) {
-                throw new SQLException("Error closing the result set when" + performedAction + "[ " + e.getMessage() + " ]");
-            }
 
             try {
                 preparedStatement.close();
