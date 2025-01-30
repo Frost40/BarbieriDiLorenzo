@@ -7,6 +7,7 @@
     <link rel="stylesheet" type="text/css" href="CSS/homePage.css" />
     <link rel="stylesheet" type="text/css" href="CSS/myInternshipsPage.css" />
     <link rel="stylesheet" type="text/css" href="CSS/notificationSection.css" />
+    <link rel="stylesheet" type="text/css" href="CSS/searchPage.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="js/utils.js" defer></script>
     <script src="js/homePage.js" defer></script>
@@ -28,82 +29,154 @@
 
         <!-- Notifications Dropdown -->
         <button id="notifications-dropdown-btn" class="dropdown-btn">Notifications
+            <span class="badge" id="notifications-badge">0</span>
             <i class="fa fa-caret-down"></i>
         </button>
         <div id="dynamic-notifications" class="dropdown-container">
             <!-- Complaints -->
             <button id="complaints-dropdown-btn" class="dropdown-btn">Complaints
+                <span class="badge" id="complaints-badge">0</span>
                 <i class="fa fa-caret-down"></i>
             </button>
             <div id="dynamic-complaints" class="dropdown-container">
                 <!-- Dynamic complaints options -->
             </div>
+            <!-- Feedback -->
+            <button id="feedback-dropdown-btn" class="dropdown-btn" style="display: none;">Feedback
+                <span class="badge" id="feedback-badge">0</span>
+                <i class="fa fa-caret-down"></i>
+            </button>
+            <div id="dynamic-feedback" class="dropdown-container" style="display: none;">
+            </div>
             <!-- Recommendations -->
             <button id="recommendations-dropdown-btn" class="dropdown-btn">Recommendations
+                <span class="badge" id="recommendations-badge">0</span>
                 <i class="fa fa-caret-down"></i>
             </button>
             <div id="dynamic_recommendations" class="dropdown-container">
-                <!-- Dynamic complaints options -->
+                <!-- Dynamic recommendations options -->
             </div>
         </div>
 
         <!-- Messages Button -->
-        <button class="messages-btn">Messages</button>
+        <button class="messages-btn">Messages
+            <span class="badge" id="messages-badge">0</span>
+        </button>
 
-        <!-- New Create/Modify CV Button -->
-        <button id="cv-action-btn">Create New CV</button>
+        <!-- Create/Modify CV Button (Visible to Students Only) -->
+        <button id="cv-action-btn" class="cv-action-btn">Create New CV</button>
+        <!-- Save Internship Button -->
+        <button type="button" id="save-internship-btn" class="btn centered-btn btn-gossamer btn-medium" >Save Internship</button>
+
     </div>
 
     <!-- Main Content -->
     <div class="main-content">
-        <h2>My CV</h2>
-        <div id="cv-container">
-            <!-- Experiences Section -->
-            <div id="experiences-container" class="cv-section">
-                <h3>Experiences</h3>
-                <textarea id="experiences-input" placeholder="Enter your experiences here..." readonly></textarea>
-            </div>
-
-            <!-- Programming Skills Section -->
-            <div id="programming-skills-container" class="cv-section">
-                <h3>Programming Skills</h3>
-                <textarea id="programming-skills-input" placeholder="Enter your programming skills here..." readonly></textarea>
-            </div>
-
-            <!-- Other Skills Section -->
-            <div id="other-skills-container" class="cv-section">
-                <h3>Other Skills</h3>
-                <textarea id="other-skills-input" placeholder="Enter your other skills here..." readonly></textarea>
-            </div>
-            <!-- CV File Upload Section -->
-            <div id="cv-file-container" class="cv-section">
-                <h3>Upload CV</h3>
-
-                <!-- Existing File Information -->
-                <div id="existing-file-info">
-                    <!-- This will be populated by populateCv() -->
+        <!-- Student Content: CV Form -->
+        <div id="student-content" class="content-section">
+            <h2>My CV</h2>
+            <form id="saveCvForm" enctype="multipart/form-data">
+                <!-- Experiences Section -->
+                <div id="experiences-container" class="cv-section">
+                    <h3>Experiences</h3>
+                    <textarea id="experiences-input" name="experiences" placeholder="Enter your experiences here..." readonly></textarea>
                 </div>
 
-                <!-- Hidden File Input -->
-                <input type="file" id="cv-file-input" accept=".pdf,.doc,.docx,.txt" style="display: none;" />
+                <!-- Programming Skills Section -->
+                <div id="programming-skills-container" class="cv-section">
+                    <h3>Programming Skills</h3>
+                    <textarea id="programming-skills-input" name="programmingSkills" placeholder="Enter your programming skills here..." readonly></textarea>
+                </div>
 
-                <!-- Choose File Button -->
-                <button id="upload-cv-btn" disabled>Choose File</button>
+                <!-- Other Skills Section -->
+                <div id="other-skills-container" class="cv-section">
+                    <h3>Other Skills</h3>
+                    <textarea id="other-skills-input" name="otherSkills" placeholder="Enter your other skills here..." readonly></textarea>
+                </div>
 
-                <!-- Display Selected File Name -->
-                <span id="selected-file-name"></span>
-            </div>
+                <!-- CV File Upload Section -->
+                <div id="cv-file-container" class="cv-section">
+                    <h3>Upload CV</h3>
+
+                    <!-- Existing File Information -->
+                    <div id="existing-file-info">
+                        <!-- This will be populated by populateCv() -->
+                    </div>
+
+                    <!-- Hidden File Input -->
+                    <input type="file" id="cv-file-input" name="cv" accept=".pdf,.doc,.docx,.txt" style="display: none;" required />
+
+                    <!-- Choose File Button -->
+                    <button type="button" id="upload-cv-btn">Choose File</button>
+
+                    <!-- Display Selected File Name -->
+                    <span id="selected-file-name"></span>
+                </div>
+            </form>
+        </div>
+
+        <!-- Company Content: Internships Form -->
+        <div id="company-content" class="content-section" style="display: none;">
+            <h2>Manage Internships</h2>
+            <form id="manageInternshipsForm" enctype="multipart/form-data">
+                <!-- Internship Name Section -->
+                <div id="internship-name-container" class="internship-section">
+                    <h3>Internship Name</h3>
+                    <input type="text" id="internship-name-input" name="name" placeholder="Enter internship name..." required />
+                </div>
+
+                <!-- Internship Description Section -->
+                <div id="internship-description-container" class="internship-section">
+                    <h3>Internship Description</h3>
+                    <textarea id="internship-description-input" name="description" placeholder="Enter internship description..." required></textarea>
+                </div>
+
+                <!-- Existing Internships (for modification) -->
+                <div id="existing-internships-container" class="internship-section">
+                    <h3>Existing Internships</h3>
+                    <div id="existing-internships-list">
+                        <!-- List of existing internships with options to modify -->
+                        <!-- Example Entry:
+                        <div class="internship-entry">
+                            <p>Internship Name</p>
+                            <p>Description</p>
+                            <button type="button" class="modify-internship-btn">Modify</button>
+                        </div>
+                        -->
+                    </div>
+                </div>
+
+                <!-- Hidden Internship ID for Modification -->
+                <input type="hidden" id="internship-id-input" name="internshipId" />
+            </form>
         </div>
     </div>
 
     <!-- Bottom Navigation Bar -->
     <div class="bottom-bar">
-        <button class="bottom-bar-btn" id="my-internships-btn">MyInternships</button>
+        <button class="bottom-bar-btn" id="my-internships-btn">My Internships</button>
         <button class="bottom-bar-btn" id="search-btn">Search</button>
         <button class="bottom-bar-btn" id="logout-btn">Logout</button>
     </div>
-
 </div>
+
+<!-- Search Page -->
+<div id="search-page-div" class="content-section" style="display: none;">
+    <h2>Search Internships</h2>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search by company or internship name..." />
+        <button type="button" id="search-internships-btn" class="btn search-btn">Search</button>
+        <button type="button" id="show-all-btn" class="btn show-all-btn">Show All</button>
+    </div>
+
+    <!-- Internships List -->
+    <div id="search-results" class="internships-list">
+        <!-- Dynamic Internship Entries Will Appear Here -->
+    </div>
+</div>
+
 
 <div id="my-internship-page-div" style="display:none;">
     <div class="header-div">

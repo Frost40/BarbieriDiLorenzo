@@ -258,3 +258,54 @@ textarea:focus {
 .bottom-bar-btn:hover {
     background-color: var(--light-gossamer);
 }
+/* Save Internship Button */
+#save-internship-btn {
+    background-color: var(--dark-gossamer);
+    color: var(--creamy-white);
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px; /* Adds spacing above the button */
+    width: 100%; /* Makes the button full-width */
+}
+
+#save-internship-btn:hover {
+    background-color: var(--normal-gossamer);
+}
+/* Modify Internship Button */
+.modify-internship-btn {
+    background-color: var(--normal-gossamer);
+    color: var(--creamy-white);
+    border: none;
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px; /* Adds spacing between buttons */
+    width: 100%; /* Makes the button full-width */
+}
+
+.modify-internship-btn:hover {
+    background-color: var(--light-gossamer);
+}
+/* Badge Styling */
+.badge {
+    position: relative;
+    top: -10px;
+    right: 10px;
+    background-color: #009dff;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 50%;
+    font-size: 12px;
+    display: none; /* Hidden by default */
+}
+
+/* Show badge when it has a value */
+.badge.show {
+    display: inline-block;
+}

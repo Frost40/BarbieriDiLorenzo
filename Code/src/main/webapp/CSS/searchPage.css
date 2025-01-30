@@ -1,0 +1,130 @@
+/* Search Bar */
+.search-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.search-bar input {
+    width: 60%;
+    padding: 10px;
+    border: 1px solid var(--normal-gossamer);
+    border-radius: 5px 0 0 5px;
+    font-size: 1rem;
+    outline: none;
+    background-color: var(--creamy-white);
+}
+
+.search-bar input:focus {
+    border-color: var(--dark-gossamer);
+    box-shadow: 0 0 4px var(--dark-gossamer);
+}
+
+.search-bar .search-btn,
+.search-bar .show-all-btn {
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+    border-radius: 0 5px 5px 0;
+    color: var(--creamy-white);
+}
+
+.search-bar .search-btn {
+    background-color: var(--dark-gossamer);
+}
+
+.search-bar .search-btn:hover {
+    background-color: var(--normal-gossamer);
+}
+
+.search-bar .show-all-btn {
+    margin-left: 10px;
+    background-color: var(--light-gossamer);
+    border-radius: 5px;
+}
+
+.search-bar .show-all-btn:hover {
+    background-color: var(--normal-gossamer);
+}
+
+/* Internships List */
+.internships-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+/* Internship Entry */
+.internship-entry {
+    background-color: var(--creamy-white);
+    border: 2px solid var(--normal-gossamer);
+    border-radius: 10px;
+    padding: 15px;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.internship-entry h3 {
+    color: var(--dark-gossamer);
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+.internship-entry p {
+    margin: 5px 0;
+    color: var(--black);
+    font-size: 0.95rem;
+}
+
+.internship-entry .company-name {
+    font-style: italic;
+    color: var(--dark-gossamer);
+}
+
+.internship-entry .rating {
+    color: gold;
+    font-size: 1rem;
+}
+
+/* Action Buttons */
+.internship-entry .action-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.internship-entry .action-buttons button {
+    flex: 1;
+    margin: 0 5px;
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+    color: var(--creamy-white);
+}
+
+.internship-entry .action-buttons .message-btn {
+    background-color: var(--normal-gossamer);
+}
+
+.internship-entry .action-buttons .message-btn:hover {
+    background-color: var(--light-gossamer);
+}
+
+.internship-entry .action-buttons .apply-btn {
+    background-color: var(--dark-gossamer);
+}
+
+.internship-entry .action-buttons .apply-btn:hover {
+    background-color: var(--normal-gossamer);
+}

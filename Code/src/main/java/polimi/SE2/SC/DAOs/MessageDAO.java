@@ -41,7 +41,8 @@ public class MessageDAO {
 
                 message.setId(resultSet.getInt("id"));
                 message.setMessage(resultSet.getString("message"));
-                message.setRead(resultSet.getBoolean("read"));
+                message.setReadByStudent(resultSet.getBoolean("readByStudent"));
+                message.setReadByInternship(resultSet.getBoolean("readByInternship"));
                 message.setFromInternship(resultSet.getBoolean("fromInternship"));
                 message.setSenderId(resultSet.getInt("senderId"));
                 message.setReceiverId(resultSet.getInt("receiverId"));
@@ -82,12 +83,12 @@ public class MessageDAO {
         String performedAction = " extracting all messages that have not been read by the user ";
         String query;
         if (isStudent) {
-            query = "SELECT * FROM Message WHERE receiverId = ? AND fromInternship = TRUE AND `read` = FALSE";
+            query = "SELECT * FROM Message WHERE receiverId = ? AND fromInternship = TRUE AND readByStudent = FALSE";
         } else {
             query = "SELECT Message.* " +
                     "FROM Message " +
                     "JOIN Internship ON Message.receiverId = Internship.id " +
-                    "WHERE Internship.companyId = ? AND fromInternship = FALSE AND Message.read = FALSE";
+                    "WHERE Internship.companyId = ? AND fromInternship = FALSE AND Message.readByInternship = FALSE";
         }
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
@@ -103,7 +104,8 @@ public class MessageDAO {
 
                 message.setId(resultSet.getInt("id"));
                 message.setMessage(resultSet.getString("message"));
-                message.setRead(resultSet.getBoolean("read"));
+                message.setReadByStudent(resultSet.getBoolean("readByStudent"));
+                message.setReadByInternship(resultSet.getBoolean("readByInternship"));
                 message.setFromInternship(resultSet.getBoolean("fromInternship"));
                 message.setSenderId(resultSet.getInt("senderId"));
                 message.setReceiverId(resultSet.getInt("receiverId"));
@@ -310,7 +312,8 @@ public class MessageDAO {
 
                 message.setId(resultSet.getInt("id"));
                 message.setMessage(resultSet.getString("message"));
-                message.setRead(resultSet.getBoolean("read"));
+                message.setReadByStudent(resultSet.getBoolean("readByStudent"));
+                message.setReadByInternship(resultSet.getBoolean("readByInternship"));
                 message.setFromInternship(resultSet.getBoolean("fromInternship"));
                 message.setSenderId(resultSet.getInt("senderId"));
                 message.setReceiverId(resultSet.getInt("receiverId"));
@@ -352,7 +355,12 @@ public class MessageDAO {
      */
     public void insertMessage(String message, boolean fromInternship, int senderId, int receiverId) throws SQLException {
         String performedAction = " adding a new message into the database ";
-        String query = "INSERT Into Message (message, `read`, fromInternship, senderId, receiverId) VALUES (?,FALSE,?,?,?)";
+        String query;
+        if (fromInternship) {
+            query = "INSERT Into Message (message, readByStudent, readByInternship, fromInternship, senderId, receiverId) VALUES (?, FALSE, TRUE, ?, ?, ?)";
+        } else {
+            query = "INSERT Into Message (message, readByStudent, readByInternship, fromInternship, senderId, receiverId) VALUES (?, TRUE, FALSE, ?, ?, ?)";
+        }
         PreparedStatement preparedStatement = null;
 
         try {
@@ -382,13 +390,21 @@ public class MessageDAO {
      * Method used to update the database setting the message to already read
      *
      * @param id Identifier for the message
+     * @param isStudent Boolean used to know whether the user who read the message was a student or a compnay
      * @throws SQLException
      */
-    public void hasBeenRead(int id) throws SQLException {
+    public void hasBeenRead(int id, boolean isStudent) throws SQLException {
         String performedAction = " saving in the database the fact that the message has been read ";
-        String query = "UPDATE Message " +
-                "SET `read` = TRUE " +
-                "WHERE id = ?";
+        String query;
+        if (isStudent) {
+            query = "UPDATE Message " +
+                    "SET readByStudent = TRUE " +
+                    "WHERE id = ?";
+        } else {
+            query = "UPDATE Message " +
+                    "SET readByInternship = TRUE " +
+                    "WHERE id = ?";
+        }
         PreparedStatement preparedStatement = null;
 
         try {
@@ -418,22 +434,28 @@ public class MessageDAO {
      * @param internshipId Internship identifier
      * @throws SQLException
      */
-    public void setChatToRead(int userId, int internshipId) throws SQLException {
+    public void setChatToRead(int userId, int internshipId, boolean isStudent) throws SQLException {
         String performedAction = " setting all message in the chat between student and internship to read ";
-        String query = "UPDATE Message " +
-                "SET `read` = ? " +
-                "WHERE (receiverId = ? AND senderId = ?) " +
-                "OR (receiverId = ? AND senderId = ?)";
+        String query;
+        if (isStudent) {
+            query = "UPDATE Message " +
+                    "SET readByStudent = TRUE " +
+                    "WHERE (receiverId = ? AND senderId = ?) " +
+                    "OR (receiverId = ? AND senderId = ?)";
+        } else {
+            query = "UPDATE Message " +
+                    "SET readByInternship = TRUE " +
+                    "WHERE (receiverId = ? AND senderId = ?) " +
+                    "OR (receiverId = ? AND senderId = ?)";
+        }
         PreparedStatement preparedStatement = null;
-        ResultSet resultSet = null;
 
         try {
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setBoolean(1, true);
-            preparedStatement.setInt(2, userId);
+            preparedStatement.setInt(1, userId);
+            preparedStatement.setInt(2, internshipId);
             preparedStatement.setInt(3, internshipId);
-            preparedStatement.setInt(4, internshipId);
-            preparedStatement.setInt(5, userId);
+            preparedStatement.setInt(4, userId);
 
             preparedStatement.executeUpdate();
             
@@ -441,13 +463,6 @@ public class MessageDAO {
             throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
 
         } finally {
-
-            try {
-                resultSet.close();
-
-            } catch (Exception e) {
-                throw new SQLException("Error closing the result set when" + performedAction + "[ " + e.getMessage() + " ]");
-            }
 
             try {
                 preparedStatement.close();

@@ -3,7 +3,9 @@ package polimi.SE2.SC.beans;
 public class Message {
     private int id;
     private String message;
-    private boolean read;
+    private boolean readByStudent;
+    private boolean readByInternship;
+
     private boolean fromInternship;
     private int senderId;
     private int receiverId;
@@ -24,12 +26,20 @@ public class Message {
         this.message = message;
     }
 
-    public boolean isRead() {
-        return read;
+    public boolean isReadByStudent() {
+        return readByStudent;
     }
 
-    public void setRead(boolean read) {
-        this.read = read;
+    public void setReadByStudent(boolean readByStudent) {
+        this.readByStudent = readByStudent;
+    }
+
+    public boolean isReadByInternship() {
+        return readByInternship;
+    }
+
+    public void setReadByInternship(boolean readByInternship) {
+        this.readByInternship = readByInternship;
     }
 
     public boolean isFromInternship() {

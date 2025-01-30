@@ -3,10 +3,7 @@ package polimi.SE2.SC.controllers;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -61,6 +58,7 @@ public class SendMessage extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String message = request.getParameter("message");
         String receiverIdString = request.getParameter("receiverId");
+        String senderIdString = null;
 
         HttpSession session = request.getSession();
         User sender    = (User)session.getAttribute("currentUser");
@@ -70,6 +68,7 @@ public class SendMessage extends HttpServlet {
         ArrayList<Message> chat = null;
         boolean isStudent = sender instanceof Student;
         int receiverId;
+        int senderId = 0;
 
         // Checking message validity
         if (message == null || message.length() > 255 ||  message.length() <= 0) {
@@ -92,9 +91,9 @@ public class SendMessage extends HttpServlet {
 
         // Accessing the database to retrieve info regarding the receiver user type
         MessageDAO messageDAO = new MessageDAO(connection);
+        InternshipDAO internshipDAO = new InternshipDAO(connection);
         if (isStudent) {
             // In case the sender is a student the receiver must be a valid internship
-            InternshipDAO internshipDAO = new InternshipDAO(connection);
             try {
                 internshipReceiver = internshipDAO.getInternshipById(receiverId);
             } catch (SQLException e) {
@@ -110,6 +109,54 @@ public class SendMessage extends HttpServlet {
             }
         } else {
             // In case the sender is an internship the receiver must be a valid student
+            senderIdString = request.getParameter("senderId");
+
+            // Checking if the given sender id is valid
+            if(senderIdString == null || senderIdString.isEmpty()) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().println("Null receiver id!");
+                return;
+            }
+
+            // Parsing process for sender id
+            parsedId = parsingChecker(request, response, senderIdString);
+            if (parsedId.isPresent())		receiverId = parsedId.get();
+            else		return;
+
+            // Extracting the internship used as a sender by the company]
+            Internship internshipSender = null;
+            try {
+                internshipSender = internshipDAO.getInternshipById(senderId);
+            } catch (SQLException e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().println(e.getMessage());
+                return;
+            }
+
+            // Making sure the internship who sent the message exists
+            if (internshipSender == null) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().println("The internship you are using to chat does not exists");
+                return;
+            }
+
+            ArrayList<Internship> companyInternships = null;
+            try {
+                companyInternships = internshipDAO.getCompanyInternships(sender.getId());
+            } catch (SQLException e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().println(e.getMessage());
+                return;
+            }
+
+            List<Integer> companyInternshipsIds = companyInternships.stream().map(Internship::getId).toList();
+            if (!companyInternshipsIds.contains(senderId)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().println("The operation was block because you are not the company responsible for the given internship");
+                return;
+            }
+
+            // Extracting the student receiver
             StudentDAO studentDAO = new StudentDAO(connection);
             try {
                 studentReceiver = studentDAO.getStudentById(receiverId);
@@ -119,6 +166,7 @@ public class SendMessage extends HttpServlet {
                 return;
             }
 
+            // Checking that an account for the given user exists
             if (studentReceiver == null) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().println("Either the account you are interacting with does not exists or you are not authorized to chat with it");
@@ -155,14 +203,16 @@ public class SendMessage extends HttpServlet {
             }
 
             try {
-                messageDAO.setChatToRead(sender.getId(), internshipReceiver.getId());
+                messageDAO.setChatToRead(sender.getId(), internshipReceiver.getId(), true);
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().println(e.getMessage());
+                return;
             }
         } else {
             // If a company is the current user: internship = sender and student = receiver
             try {
-                messageDAO.insertMessage(message, true, sender.getId(), studentReceiver.getId());
+                messageDAO.insertMessage(message, true, senderId, studentReceiver.getId());
             } catch (SQLException e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().println(e.getMessage());
@@ -170,9 +220,11 @@ public class SendMessage extends HttpServlet {
             }
 
             try {
-                messageDAO.setChatToRead(studentReceiver.getId(), sender.getId());
+                messageDAO.setChatToRead(studentReceiver.getId(), senderId, false);
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().println(e.getMessage());
+                return;
             }
         }
 
