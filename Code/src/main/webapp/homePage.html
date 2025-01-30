@@ -7,6 +7,7 @@
     <link rel="stylesheet" type="text/css" href="CSS/homePage.css" />
     <link rel="stylesheet" type="text/css" href="CSS/myInternshipsPage.css" />
     <link rel="stylesheet" type="text/css" href="CSS/notificationSection.css" />
+    <link rel="stylesheet" type="text/css" href="CSS/searchPage.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="js/utils.js" defer></script>
     <script src="js/homePage.js" defer></script>
@@ -59,6 +60,8 @@
 
         <!-- Create/Modify CV Button (Visible to Students Only) -->
         <button id="cv-action-btn" class="cv-action-btn">Create New CV</button>
+        <!-- Save Internship Button -->
+        <button type="button" id="save-internship-btn" class="btn centered-btn btn-gossamer btn-medium" >Save Internship</button>
 
     </div>
 
@@ -141,9 +144,6 @@
                 <!-- Hidden Internship ID for Modification -->
                 <input type="hidden" id="internship-id-input" name="internshipId" />
             </form>
-
-            <!-- Save Internship Button -->
-            <button type="button" id="save-internship-btn" class="btn centered-btn btn-gossamer btn-medium" >Save Internship</button>
         </div>
     </div>
 
@@ -154,6 +154,24 @@
         <button class="bottom-bar-btn" id="logout-btn">Logout</button>
     </div>
 </div>
+
+<!-- Search Page -->
+<div id="search-page-div" class="content-section" style="display: none;">
+    <h2>Search Internships</h2>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search by company or internship name..." />
+        <button type="button" id="search-internships-btn" class="btn search-btn">Search</button>
+        <button type="button" id="show-all-btn" class="btn show-all-btn">Show All</button>
+    </div>
+
+    <!-- Internships List -->
+    <div id="search-results" class="internships-list">
+        <!-- Dynamic Internship Entries Will Appear Here -->
+    </div>
+</div>
+
 
 <div id="my-internship-page-div" style="display:none;">
     <div class="header-div">

@@ -301,6 +301,20 @@ function HomePage(user, pageOrchestrator) {
             });
         });
     }
+    // Function to populate the internship form for modification
+    function populateModifyInternship(internship) {
+        // Populate form fields with internship data
+        document.getElementById('internship-name-input').value = internship.name;
+        document.getElementById('internship-description-input').value = internship.description;
+        document.getElementById('internship-id-input').value = internship.id; // Hidden field
+
+        // Optionally, change the Save button text to indicate modification
+        const saveButton = document.getElementById('save-internship-btn');
+        saveButton.textContent = "Modify Internship";
+
+        // Scroll to the form for better UX
+        document.getElementById('manageInternshipsForm').scrollIntoView({ behavior: 'smooth' });
+    }
 
 // Helper function to sanitize HTML
     function sanitizeHTML(str) {
@@ -501,27 +515,39 @@ function HomePage(user, pageOrchestrator) {
         // Collect and validate data
         const internshipName = document.getElementById('internship-name-input').value.trim();
         const internshipDescription = document.getElementById('internship-description-input').value.trim();
+        const internshipId = document.getElementById('internship-id-input').value; // Check for modification
 
         if (!internshipName || !internshipDescription) {
             showErrorAlert("Validation Error", "All internship fields must be filled out.");
             return;
         }
 
+        // Determine the servlet URL based on presence of internshipId
+        const servletUrl = internshipId ? "ModifyInternship" : "UploadNewInternship";
+
         // Show a loading indicator
         Swal.fire({
-            title: 'Saving Internship...',
+            title: internshipId ? 'Modifying Internship...' : 'Saving Internship...',
             allowOutsideClick: false,
             didOpen: () => Swal.showLoading(),
         });
+
         // Send the form data using makeCall
-        makeCall("POST", "UploadNewInternship", form, function (response) {
+        makeCall("POST", servletUrl, form, function (response) {
             if (response.readyState === XMLHttpRequest.DONE) {
                 Swal.close(); // Close the loading indicator
 
                 if (response.status === 200) {
-                    showSuccessAlert("Success", "Internship created successfully.");
+                    showSuccessAlert("Success", internshipId ? "Internship modified successfully." : "Internship created successfully.");
                     populateInternships(); // Refresh the list of internships
                     form.reset(); // Clear form inputs
+                    document.getElementById('internship-id-input').value = ''; // Clear the internship ID
+
+                    // Reset the Save button text if it was modified
+                    if (servletUrl === "ModifyInternship") {
+                        document.getElementById('save-internship-btn').textContent = "Save Internship";
+                    }
+                    window.location.reload();
                 } else {
                     showErrorAlert("Error", response.responseText || "An unexpected error occurred.");
                 }
@@ -555,6 +581,7 @@ function HomePage(user, pageOrchestrator) {
 
             // Hide student-specific sidebar elements
             document.getElementById('cv-action-btn').style.display = 'none';
+            document.getElementById('save-internship-btn').style.display = 'block';
 
             // Show company main content and hide student content
             document.getElementById('company-content').style.display = 'block';
@@ -566,6 +593,7 @@ function HomePage(user, pageOrchestrator) {
 
             // Show student-specific sidebar elements
             document.getElementById('cv-action-btn').style.display = 'block';
+            document.getElementById('save-internship-btn').style.display = 'none';
 
             // Show student main content and hide company content
             document.getElementById('student-content').style.display = 'block';
