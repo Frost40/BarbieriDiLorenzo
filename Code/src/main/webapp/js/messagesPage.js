@@ -280,7 +280,54 @@ function MessagesPage(user, pageOrchestrator) {
             }
         });
     }
+    function sendMessage() {
+        const text = messageInput.value.trim();
+        if (text === "" || !currentChatId) return; // Prevent sending empty messages
 
+        // Create a temporary form
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = "SendMessage"; // Ensure this matches the servlet URL
+
+        // Hidden input for message content
+        const messageInputField = document.createElement('input');
+        messageInputField.type = 'hidden';
+        messageInputField.name = 'message';
+        messageInputField.value = text;
+        form.appendChild(messageInputField);
+
+        // Hidden input for receiver ID (which is stored as currentChatId)
+        const receiverInput = document.createElement('input');
+        receiverInput.type = 'hidden';
+        receiverInput.name = 'receiverId';
+        receiverInput.value = currentChatId;
+        form.appendChild(receiverInput);
+
+        // Append form to the document body temporarily
+        document.body.appendChild(form);
+
+        // Callback function to handle the response
+        function callback(req) {
+            if (req.readyState === XMLHttpRequest.DONE) {
+                if (req.status === 200) {
+                    // Instead of parsing response, fetch the latest messages from the DB
+                    fetchMessages(currentChatId);
+
+                    // Clear the input field after sending the message
+                    messageInput.value = "";
+                } else {
+                    console.error("Failed to send message:", req.responseText);
+                    showErrorAlert("Error", "Failed to send message.");
+                }
+            }
+        }
+
+        // Make the POST call using makeCall
+        makeCall('POST', "SendMessage", form, callback);
+
+        // Clean up by removing the form from the DOM
+        document.body.removeChild(form);
+    }
 
     // **Utility Functions**
 
