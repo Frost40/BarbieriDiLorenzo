@@ -71,6 +71,12 @@ public class UploadQuestionnaire extends HttpServlet{
             return;
         }
 
+        if (filePart == null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().println("No questionnaire file has been uploaded!");
+            return;
+        }
+
         // Parsing process for receiver id
         Optional<Integer> parsedId = parsingChecker(request, response, studentHasInternshipIdString);
         if (parsedId.isPresent())		studentHasInternshipId = parsedId.get();
@@ -127,6 +133,7 @@ public class UploadQuestionnaire extends HttpServlet{
 
         // Validate and retrieve the file input
         String contentType = filePart.getContentType();
+        System.out.println(contentType);
         if (!contentType.equals("application/pdf") &&
                 !contentType.equals("application/msword") &&
                 !contentType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document") &&

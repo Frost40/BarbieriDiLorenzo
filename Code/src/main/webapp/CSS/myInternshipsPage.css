@@ -1,4 +1,12 @@
-/* Sidebar Styles */
+/* Main container */
+.container {
+    display: flex;
+    flex-direction: row;
+    height: calc(100vh - 150px); /* Adatta lo spazio rimanente sotto l'header */
+    gap: 10px;
+}
+
+/* Internship list column (fissa a sinistra) */
 .internship-list-column {
     width: 200px;
     background-color: var(--dark-gossamer);
@@ -6,43 +14,144 @@
     display: flex;
     flex-direction: column;
     padding: 15px;
-    min-height: calc(100vh - 100px - 50px); /* Subtract header height (90px) and bottom bar height (40px) */
+    min-height: calc(100vh - 100px - 50px);
     position: fixed;
-    top: 120px; /* Create space below the header (90px height + 10px margin) */
-    bottom: 50px; /* Create space above the bottom bar (40px height + 10px margin) */
+    top: 120px;
+    bottom: 50px;
     left: 10px;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Optional: Adds a shadow for distinction */
-    border-radius: 8px; /* Optional: Rounded corners for the sidebar */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
 }
 
-/* New Column Styles (Appears on the right of the sidebar) */
+/* Student list column (fissa accanto alla lista degli internship, ma puÃ² scomparire) */
 .student-list-column {
-    width: 200px;  /* Same width as the sidebar */
-    background-color: var(--light-gossamer);  /* Lighter shade for contrast */
-    color: var(--creamy-white);  /* Keep the same text color */
+    width: 200px;
+    background-color: var(--light-gossamer);
+    color: var(--creamy-white);
     display: flex;
     flex-direction: column;
     padding: 15px;
-    min-height: calc(100vh - 100px - 50px);  /* Ensure it fits between header and bottom bar */
+    min-height: calc(100vh - 100px - 50px);
     position: fixed;
-    top: 120px;  /* Align with the sidebar */
-    left: 240px;  /* Position it immediately to the right of the sidebar */
-    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);  /* Stronger shadow to distinguish it from the sidebar */
+    top: 120px;
+    bottom: 50px;
+    left: 240px;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
+}
+
+/* Information space: occupa solo lo spazio rimanente */
+.information-space {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    padding: 20px;
+    margin-left: 450px; /* 200px (internship) + 10px gap + 200px (student) + 10px gap */
+    width: calc(100% - 470px); /* Sottrae la larghezza fissa delle colonne e i gap */
+}
+
+/* Se la colonna student-list-column Ã¨ nascosta, l'information-space si adatta */
+.container:not(:has(.student-list-column)) .information-space {
+    margin-left: 230px; /* 200px (internship) + 10px gap */
+    width: calc(100% - 250px);
+}
+
+/* Internship description (DEVE STARE A DESTRA, OCCUPA TUTTA L'ALTEZZA) */
+#internship-description {
+    flex: 1;
+    max-width: 40%;
+    height: 100%;
+    padding: 15px;
+    border-radius: 8px;
+    background: #f9f9f9;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    align-self: stretch;
+    order: 2; /* Lo sposta a destra */
+}
+
+/* Left section: contiene feedbacks e other-data (ORA A SINISTRA) */
+.left-section {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 15px;
+    order: 1; /* Lo sposta a sinistra */
+}
+
+/* Feedbacks (in alto a sinistra) */
+#feedbacks {
+    padding: 40px;
+    border-radius: 8px;
+    background: #fff5e6;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Other data (sotto feedbacks, allineato a sinistra) */
+.other-data {
+    padding: 15px;
+    border-radius: 8px;
+    background: #e6f7ff;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    display: flex; /* Use flexbox to align child elements */
+    justify-content: space-between; /* Space between the divs */
+    flex-wrap: wrap; /* Allow wrapping to the next line if necessary */
+}
+
+.action-button {
+    margin-top: 10px; /* Spazio sopra i bottoni */
+    padding: 10px 15px; /* Padding interno */
+    border: none; /* Rimuovi il bordo */
+    border-radius: 5px; /* Angoli arrotondati */
+    cursor: pointer; /* Cambia il cursore al passaggio del mouse */
+}
+
+.accept {
+    background-color: #4CAF50; /* Verde per il bottone Accept */
+    color: white; /* Testo bianco */
+}
+
+.reject {
+    background-color: #f44336; /* Rosso per il bottone Reject */
+    color: white; /* Testo bianco */
+}
+
+
+.data-container {
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px; /* Padding inside the div */
+    margin: 10px; /* Margin around each div */
+    background-color: #f9f9f9; /* Light background color */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    flex: 1; /* Allow the divs to grow and fill the space */
+    min-width: 200px; /* Minimum width for each div */
+    max-width: 45%; /* Maximum width to prevent them from being too wide */
+}
+
+.data-container p {
+    margin: 5px 0; /* Margin between paragraphs */
+    font-size: 14px; /* Font size for the text */
+    color: #333; /* Dark text color */
+}
+.action-button {
+    margin: 5px; /* Margin around buttons */
+    padding: 5px 10px; /* Padding inside buttons */
+    cursor: pointer; /* Pointer cursor on hover */
 }
 
 /* Responsive Styles */
 @media (max-width: 768px) {
-    .internship-list-column {
-        width: 200px;
+    .container {
+        flex-direction: column;
+        align-items: center;
     }
-
-    .main-content {
-        margin-left: 220px;
+    .internship-list-column, .student-list-column {
+        position: relative;
+        width: 100%;
     }
-
-    .bottom-bar-btn {
-        font-size: 0.9rem;
-        padding: 8px 12px;
+    .information-space {
+        margin-left: 0;
+        width: 100%;
     }
 }

@@ -69,6 +69,7 @@ public class MyInternshipsManager extends HttpServlet {
                 allStudentHasInternshipForStudent = studentHasInternshipDAO.getAllStudentInternships(user.getId());
             } else {
                 allStudentHasInternshipForCompany = studentHasInternshipDAO.getCompanyOngoingInternships(user.getId());
+                printInternshipStructure(allStudentHasInternshipForCompany);
             }
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -120,4 +121,43 @@ public class MyInternshipsManager extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {}
+
+    public void printInternshipStructure(HashMap<Internship, HashMap<Student, StudentHasInternship>> internshipMap) {
+        // Iterate through the outer HashMap (Internship -> HashMap<Student, StudentHasInternship>)
+        for (Map.Entry<Internship, HashMap<Student, StudentHasInternship>> internshipEntry : internshipMap.entrySet()) {
+            Internship internship = internshipEntry.getKey();
+            HashMap<Student, StudentHasInternship> studentMap = internshipEntry.getValue();
+
+            // Print the Internship details
+            System.out.println("Internship: " + internship.getName() + " (ID: " + internship.getId() + ")");
+            System.out.println("Description: " + internship.getDescription());
+            System.out.println("Rating: " + internship.getRating());
+            System.out.println("Company ID: " + internship.getCompanyId());
+            System.out.println("Students and their associations:");
+
+            // Iterate through the inner HashMap (Student -> StudentHasInternship)
+            for (Map.Entry<Student, StudentHasInternship> studentEntry : studentMap.entrySet()) {
+                Student student = studentEntry.getKey();
+                StudentHasInternship studentHasInternship = studentEntry.getValue();
+
+                // Print the Student details
+                System.out.println("\tStudent: " + student.getName() + " " + student.getSurname() + " (ID: " + student.getId() + ")");
+                System.out.println("\tEmail: " + student.getEmail());
+                System.out.println("\tNationality: " + student.getNationality());
+                System.out.println("\tCity of Birth: " + student.getCityOfBirth());
+
+                // Print the StudentHasInternship details
+                System.out.println("\tAssociation Details:");
+                System.out.println("\t\tStart Date: " + studentHasInternship.getStartDate());
+                System.out.println("\t\tEnd Date: " + studentHasInternship.getEndDate());
+                System.out.println("\t\tCompany Accepted: " + studentHasInternship.isCompanyAccepted());
+                System.out.println("\t\tApplication Status: " + studentHasInternship.getApplicationStatus());
+                System.out.println("\t\tStudent ID: " + studentHasInternship.getStudentId());
+                System.out.println("\t\tInternship ID: " + studentHasInternship.getInternshipId());
+                System.out.println(); // Add a blank line for readability
+            }
+
+            System.out.println("--------------------------------------------------");
+        }
+    }
 }

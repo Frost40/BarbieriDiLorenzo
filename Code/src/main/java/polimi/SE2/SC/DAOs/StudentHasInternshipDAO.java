@@ -50,7 +50,7 @@ public class StudentHasInternshipDAO {
                 internship.setCompanyId(resultSet.getInt("i.companyId"));
 
                 StudentHasInternship studentHasInternship = new StudentHasInternship();
-                studentHasInternship.setId(resultSet.getInt("i.id"));
+                studentHasInternship.setId(resultSet.getInt("shi.id"));
                 studentHasInternship.setStartDate(resultSet.getTimestamp("shi.startDate"));
                 studentHasInternship.setEndDate(resultSet.getTimestamp("shi.endDate"));
                 studentHasInternship.setCompanyAccepted(resultSet.getBoolean("shi.companyAccepted"));
@@ -265,9 +265,10 @@ public class StudentHasInternshipDAO {
      * @throws SQLException
      */
     public void updateApplicationStatus(int id, boolean status) throws SQLException {
+        System.out.println(status);
         String performedAction = " setting the end date for the internship experience ";
         String query = "UPDATE StudentHasInternship " +
-                "SET companyAccepted = ? AND applicationStatus = ? " +
+                "SET companyAccepted = ?, applicationStatus = ? " +
                 "WHERE id = ?";
         String applicationStatus;
         if (status) {
@@ -275,6 +276,7 @@ public class StudentHasInternshipDAO {
         } else applicationStatus = "rejected";
 
         PreparedStatement preparedStatement = null;
+        System.out.println(applicationStatus);
 
         try {
             preparedStatement = connection.prepareStatement(query);

@@ -53,7 +53,7 @@ public class ManageStudentApplication extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String studentHasInternshipIdString = request.getParameter("studentHasInternshipId");
         String evaluation = request.getParameter("evaluation");
-
+        System.out.println(evaluation);
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("currentUser");
 

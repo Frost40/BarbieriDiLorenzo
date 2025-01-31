@@ -48,7 +48,7 @@ public class OpenMyInternshipInformationSpace extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String studentHasInternshipIdString = request.getParameter("ongoingInternshipId"); // The one the user wants to chat with
+        String studentHasInternshipIdString = request.getParameter("studentHasInternshipId"); // The one the user wants to chat with
 
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("currentUser");
