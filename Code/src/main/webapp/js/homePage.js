@@ -216,7 +216,12 @@ function HomePage(user, pageOrchestrator) {
         this.pageOrchestrator.showPage('my internships page', 'placeholder1', 'placeholder2', 'placeholder3');
     });
     searchBtn.addEventListener("click", () => {
-        pageOrchestrator.showPage('search page', 'placeholder1', 'placeholder2', 'placeholder3');
+        if(userType === 'student'){
+            pageOrchestrator.showPage('search page', 'placeholder1', 'placeholder2', 'placeholder3');
+        }
+        else {
+            showInfoAlert("Coming soon","This feature is not available yet.");
+        }
     });
     logoutBtn.addEventListener("click", () => {
         pageOrchestrator.showPage('main page', 'placeholder1', 'placeholder2', 'placeholder3');
@@ -816,6 +821,7 @@ function HomePage(user, pageOrchestrator) {
             // Show company main content and hide student content
             document.getElementById('company-content').style.display = 'block';
             document.getElementById('student-content').style.display = 'none';
+            document.getElementById('search-btn').innerText = 'Analytics Page';
         } else if (userType === 'student') {
             // Hide company-specific sidebar elements
             document.getElementById('feedback-dropdown-btn').style.display = 'none';
@@ -871,59 +877,10 @@ function HomePage(user, pageOrchestrator) {
             }
             populateCv();
         } else {
-            /*
-            // **For Testing: Hardcode Feedbacks**
-            Feedbacks = [
-                {
-                    id: 201,
-                    text: "Great internship experience with clear communication.",
-                    read: false,
-                    rating: 5
-                },
-                {
-                    id: 202,
-                    text: "The project scope was well-defined and achievable.",
-                    read: false,
-                    rating: 4
-                },
-                {
-                    id: 203,
-                    text: "Would love to work with the team again.",
-                    read: true,
-                    rating: 5
-                }
-            ]; */
+
             populateFeedback();
             populateInternships();
         }
-        /*
-        // **For Testing: Hardcode Complaints**
-        Complaints = [
-            {
-                id: 101,
-                text: "Issue with internship application process.",
-                readByStudent: false,
-                readByInternship: false,
-                closedByStudent: false,
-                closedByCompany: false
-            },
-            {
-                id: 102,
-                text: "Delayed responses from the company.",
-                readByStudent: false,
-                readByInternship: true,
-                closedByStudent: false,
-                closedByCompany: false
-            },
-            {
-                id: 103,
-                text: "Problem with the onboarding procedure.",
-                readByStudent: true,
-                readByInternship: false,
-                closedByStudent: true,
-                closedByCompany: false
-            }
-        ];*/
 
         populateComplaints();
         populateMessages();
