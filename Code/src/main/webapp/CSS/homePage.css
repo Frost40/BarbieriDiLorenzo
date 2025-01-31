@@ -309,3 +309,24 @@ textarea:focus {
 .badge.show {
     display: inline-block;
 }
+/* Back Button Styles */
+.back-btn {
+    background-color: transparent;
+    border: none;
+    color: var(--dark-gossamer);
+    font-size: 1rem;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.back-btn:hover {
+    color: var(--black);
+}
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid var(--light-gossamer);
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}

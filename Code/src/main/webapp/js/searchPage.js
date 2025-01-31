@@ -2,8 +2,22 @@ function SearchPage(user, pageOrchestrator) {
     this.pageOrchestrator = pageOrchestrator;
 
     // Variable Initialization
+    var homePageButton = document.getElementById('home-page-btn-search');
+    var myInternshipsPageButton = document.getElementById('my-internships-btn-search');
+    var logoutButton = document.getElementById('logout-btn-search');
     let searchPageDiv = document.getElementById('search-page-div');
     let internships = [];
+
+    // Bottom navigation bar event listeners
+    myInternshipsPageButton.addEventListener("click", () => {
+        this.pageOrchestrator.showPage('my internships page', 'placeholder1', 'placeholder2', 'placeholder3');
+    });
+    homePageButton.addEventListener("click", () => {
+        pageOrchestrator.showPage('home page', 'placeholder1', 'placeholder2', 'placeholder3');
+    });
+    logoutButton.addEventListener("click", () => {
+        pageOrchestrator.showPage('main page', 'placeholder1', 'placeholder2', 'placeholder3');
+    });
 
     // Function to sanitize HTML to prevent XSS
     function sanitizeHTML(str) {

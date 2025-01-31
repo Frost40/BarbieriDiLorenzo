@@ -21,6 +21,7 @@ function HomePage(user, pageOrchestrator) {
     var FeedbackContainer = document.getElementById("dynamic-feedback");
     var RecommendationDropdownButton = document.getElementById("recommendations-dropdown-btn");
     var RecommendationsContainer = document.getElementById("dynamic-recommendations");
+    var messageButton = document.getElementById("messagesButton");
     // **My Cv Variables** //
     var saveCvForm = document.getElementById('saveCvForm');
     var cvActionBtn = document.getElementById("cv-action-btn");
@@ -110,6 +111,10 @@ function HomePage(user, pageOrchestrator) {
     RecommendationDropdownButton.addEventListener("click", () => {
         showInfoAlert("Coming soon","This feature is not available yet.");
     });
+    messageButton.addEventListener("click", () => {
+        pageOrchestrator.showPage("messages page",userType);
+    });
+
     // Internship Save Button Event Lister
     saveInternshipBtn.addEventListener('click',function(){
         saveInternship();
@@ -866,6 +871,7 @@ function HomePage(user, pageOrchestrator) {
             }
             populateCv();
         } else {
+            /*
             // **For Testing: Hardcode Feedbacks**
             Feedbacks = [
                 {
@@ -886,10 +892,11 @@ function HomePage(user, pageOrchestrator) {
                     read: true,
                     rating: 5
                 }
-            ];
+            ]; */
             populateFeedback();
             populateInternships();
         }
+        /*
         // **For Testing: Hardcode Complaints**
         Complaints = [
             {
@@ -916,7 +923,7 @@ function HomePage(user, pageOrchestrator) {
                 closedByStudent: true,
                 closedByCompany: false
             }
-        ];
+        ];*/
 
         populateComplaints();
         populateMessages();

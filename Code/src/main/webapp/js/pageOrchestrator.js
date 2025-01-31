@@ -62,7 +62,9 @@ function PageOrchestrator(user){
                 break;
 
             case 'messages page':
-                messagesPage.open(info1, info2, info3);
+                // passing user type so know which chats to expect from db
+                let userType = info1;
+                messagesPage.open(userType, info2, info3);
                 break;
 
             case 'search page':
