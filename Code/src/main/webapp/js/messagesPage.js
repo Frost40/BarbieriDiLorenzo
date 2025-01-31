@@ -11,12 +11,13 @@ function MessagesPage(user, pageOrchestrator) {
     const messageInput = document.getElementById("message-input");
     const sendMessageBtn = document.getElementById("send-message-btn");
     const backToChatsBtn = document.getElementById("back-to-chats-btn");
-    var userClass;
+
     // **Data Variables**
     let allChatsForStudent = [];
     let allChatsForCompany = {};
     let currentChatId = null; // Currently open chat ID
-
+    var userClass;
+    var selectedInternshipId;
     // **Event Listeners**
 
     // Close Modal
@@ -84,6 +85,9 @@ function MessagesPage(user, pageOrchestrator) {
     function showChatWindow() {
         document.getElementById("chat-list-container").style.display = "none";
         chatWindowContainer.style.display = "block";
+        if(userClass === 'company'){
+            document.getElementById("student-list-container").style.display = "none";
+        }
     }
 
     /**
@@ -149,40 +153,100 @@ function MessagesPage(user, pageOrchestrator) {
                 chatList.innerHTML = "<p>No chats available.</p>";
             }
         } else {
-            // Handle Company: allChatsForCompany is an object mapping Internship IDs to Student arrays
-            const internships = Object.keys(allChatsForCompany);
-            if (internships.length > 0) {
-                internships.forEach(internshipId => {
-                    const students = allChatsForCompany[internshipId];
-                    students.forEach(student => {
-                        const chatEntry = document.createElement("div");
-                        chatEntry.classList.add("chat-entry");
-                        chatEntry.setAttribute("data-chat-id", student.id); // Assuming student.id is unique
+            // Handle Company: Display Each Internship Once with Associated Students
+            const internshipMap = new Map(); // Map to store internships and their students
 
-                        chatEntry.innerHTML = `
-                            <div>
-                                <strong>${sanitizeHTML(student.name)}</strong><br>
-                            </div>
-                        `;
+            allChatsForCompany.forEach(([internship, students]) => {
+                if (!internshipMap.has(internship.id)) {
+                    internshipMap.set(internship.id, { internship, students: [...students] });
+                } else {
+                    // Merge students for the same internship
+                    internshipMap.get(internship.id).students.push(...students);
+                }
+            });
 
-                        chatEntry.addEventListener("click", () => {
-                            openChat(student.id, student.name);
-                        });
+            // Now, create UI elements for unique internships
+            internshipMap.forEach(({internship, students}) => {
+                const internshipEntry = document.createElement("div");
+                internshipEntry.classList.add("chat-entry");
+                internshipEntry.setAttribute("data-internship-id", internship.id);
 
-                        chatList.appendChild(chatEntry);
-                    });
+                internshipEntry.innerHTML = `
+                <div>
+                    <strong>${sanitizeHTML(internship.name)}</strong><br>
+                </div>
+            `;
+
+                internshipEntry.addEventListener("click", () => {
+                    showStudentList(internship.id, students);
                 });
-            } else {
+
+                chatList.appendChild(internshipEntry);
+            });
+
+            if (internshipMap.size === 0) {
                 chatList.innerHTML = "<p>No chats available.</p>";
             }
         }
     }
     // **Open Selected Chat**
-    function openChat(chatId, interlocutorName) {
-        currentChatId = chatId;
+    function openChat(chatId, interlocutorName, internshipId = null) {
+        currentChatId = chatId;  // The receiver (student for internship, internship for student)
         chatInterlocutorName.textContent = interlocutorName;
+
+        // Set internship ID if the user is a company
+        if (userClass === "company" && internshipId) {
+            selectedInternshipId = internshipId; // Store the selected internship's ID
+        }
         showChatWindow();
-        fetchMessages(chatId);
+        fetchMessages(chatId, internshipId);
+    }
+    // **Opens the student list for the internship case
+    function showStudentList(internshipId, students) {
+        // Get reference to chat list container & student list container
+        const chatListContainer = document.getElementById("chat-list-container");
+        const studentListContainer = document.getElementById("student-list-container");
+
+        // Hide the internship list and show the student list
+        chatListContainer.style.display = "none";
+        studentListContainer.style.display = "block";
+
+        // Clear existing student entries
+        studentListContainer.innerHTML = "";
+
+        if (students.length > 0) {
+            students.forEach(student => {
+                const studentEntry = document.createElement("div");
+                studentEntry.classList.add("chat-entry");
+                studentEntry.setAttribute("data-student-id", student.id); // Set student ID
+
+                studentEntry.innerHTML = `
+                <div>
+                    <strong>${sanitizeHTML(student.name)}</strong><br>
+                </div>
+            `;
+
+                // When clicking a student, open the chat with them
+                studentEntry.addEventListener("click", () => {
+                    openChat(student.id, student.name, internshipId);
+                });
+
+                studentListContainer.appendChild(studentEntry);
+            });
+        } else {
+            studentListContainer.innerHTML = "<p>No students available.</p>";
+        }
+
+        // Add a back button to return to internships
+        const backButton = document.createElement("button");
+        backButton.classList.add("back-btn");
+        backButton.textContent = "← Back to Internships";
+        backButton.addEventListener("click", () => {
+            studentListContainer.style.display = "none";
+            chatListContainer.style.display = "block";
+        });
+
+        studentListContainer.appendChild(backButton);
     }
     /**
      * Populates the chat window with messages.
@@ -198,28 +262,35 @@ function MessagesPage(user, pageOrchestrator) {
                 const messageDiv = document.createElement("div");
                 messageDiv.classList.add("message");
 
-                // Determine if the message is sent or received
-                if (msg.fromInternship) {
-                    // Received message (from internship/company)
-                    messageDiv.classList.add("received");
-                } else {
-                    // Sent message (by student)
+                // Determine if the message is sent or received based on user type
+                const isInternship = userClass === 'company'; // Assuming `userClass` is set globally
+
+                if ((isInternship && msg.fromInternship) || (!isInternship && !msg.fromInternship)) {
+                    // Sent message (sent by the current user)
                     messageDiv.classList.add("sent");
+                } else {
+                    // Received message (sent by the other person)
+                    messageDiv.classList.add("received");
                 }
+
                 // Sanitize and set the message text
                 messageDiv.textContent = sanitizeHTML(msg.message);
                 // Append the message to the container
                 messagesContainer.appendChild(messageDiv);
             });
+
             // Scroll to the bottom to show the latest messages
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         } else {
             messagesContainer.innerHTML = "<p>No messages yet.</p>";
         }
     }
-    function fetchMessages(chatId) {
+    function fetchMessages(chatId, internshipId = null) {
         // Construct the URL with required parameters
-        const url = "OpenChatWindow?otherAccountId=" + chatId;
+        let url = "OpenChatWindow?otherAccountId=" + chatId;
+        if (internshipId) {
+            url += `&internshipId=${internshipId}`;
+        }
         // Make the GET request
         makeCall("GET", url, null, function (x) {
             if (x.readyState === XMLHttpRequest.DONE) {
@@ -247,37 +318,68 @@ function MessagesPage(user, pageOrchestrator) {
         if (!chat || chat.length === 0) return; // No messages to process
 
         chat.forEach(msg => {
-            // Check if the message is unread by the student
-            if (!msg.readByStudent) {
-                // Create a temporary form element
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = "MarkMessageAsRead"; // Update this if the servlet URL differs
+            if(userClass === 'student') {
+                // Check if the message is unread by the student
+                if (!msg.readByStudent) {
+                    // Create a temporary form element
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = "MarkMessageAsRead"; // Update this if the servlet URL differs
 
-                // Create an input element for the message ID
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'messageId';
-                input.value = msg.id;
-                form.appendChild(input);
+                    // Create an input element for the message ID
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'messageId';
+                    input.value = msg.id;
+                    form.appendChild(input);
 
-                // Append form to the document body temporarily
-                document.body.appendChild(form);
+                    // Append form to the document body temporarily
+                    document.body.appendChild(form);
 
-                // Send the form using makeCall
-                makeCall("POST", "ReadMessage", form, function (x) {
-                    if (x.readyState === XMLHttpRequest.DONE) {
-                        if (x.status === 200) {
-                            console.log(`Message ${msg.id} marked as read.`);
-                        } else {
-                            console.error(`Failed to mark message ${msg.id} as read:`, x.responseText);
+                    // Send the form using makeCall
+                    makeCall("POST", "ReadMessage", form, function (x) {
+                        if (x.readyState === XMLHttpRequest.DONE) {
+                            if (x.status === 200) {
+                                console.log(`Message ${msg.id} marked as read.`);
+                            } else {
+                                console.error(`Failed to mark message ${msg.id} as read:`, x.responseText);
+                            }
                         }
-                    }
-                });
+                    });
 
-                // Remove form after sending
-                document.body.removeChild(form);
+                    // Remove form after sending
+                    document.body.removeChild(form);
+                }
+            } else {
+                if (!msg.readByInternship) {
+                    // Create a temporary form element
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = "MarkMessageAsRead"; // Update this if the servlet URL differs
+
+                    // Create an input element for the message ID
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'messageId';
+                    input.value = msg.id;
+                    form.appendChild(input);
+
+                    // Append form to the document body temporarily
+                    document.body.appendChild(form);
+
+                    // Send the form using makeCall
+                    makeCall("POST", "ReadMessage", form, function (x) {
+                        if (x.readyState === XMLHttpRequest.DONE) {
+                            if (x.status === 200) {
+                                console.log(`Message ${msg.id} marked as read.`);
+                            } else {
+                                console.error(`Failed to mark message ${msg.id} as read:`, x.responseText);
+                            }
+                        }
+                    });
+                }
             }
+
         });
     }
     function sendMessage() {
@@ -303,6 +405,16 @@ function MessagesPage(user, pageOrchestrator) {
         receiverInput.value = currentChatId;
         form.appendChild(receiverInput);
 
+        // **If Internship is Sending, Add Sender ID (Internship ID)**
+        if (userClass === "company") {
+            const senderInput = document.createElement('input');
+            senderInput.type = 'hidden';
+            senderInput.name = 'senderId';
+            senderInput.value = selectedInternshipId; // Store selected internship ID when user picks an internship
+            console.log('sender Id:', senderInput.value);
+            form.appendChild(senderInput);
+        }
+
         // Append form to the document body temporarily
         document.body.appendChild(form);
 
@@ -311,7 +423,7 @@ function MessagesPage(user, pageOrchestrator) {
             if (req.readyState === XMLHttpRequest.DONE) {
                 if (req.status === 200) {
                     // Instead of parsing response, fetch the latest messages from the DB
-                    fetchMessages(currentChatId);
+                    fetchMessages(currentChatId,selectedInternshipId);
 
                     // Clear the input field after sending the message
                     messageInput.value = "";

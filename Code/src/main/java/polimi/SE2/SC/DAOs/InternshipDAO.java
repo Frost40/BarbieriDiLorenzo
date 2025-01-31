@@ -79,6 +79,7 @@ public class InternshipDAO {
      */
     public Internship getInternshipById(int id) throws SQLException {
         Internship internship = null;
+        System.out.println("Receiving this id" + id);
         String performedAction = " extracting a specific internship given its unique id ";
         String query = "SELECT * FROM Internship WHERE id = ?";
         PreparedStatement preparedStatement = null;
