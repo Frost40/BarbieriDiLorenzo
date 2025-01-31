@@ -23,12 +23,14 @@ function MessagesPage(user, pageOrchestrator) {
     // Close Modal
     closeBtn.addEventListener("click", () => {
         closeModal();
+        window.location.reload();
     });
 
     // Close Modal when clicking outside the modal content
     window.addEventListener("click", (event) => {
         if (event.target === modal) {
             closeModal();
+            window.location.reload();
         }
     });
 

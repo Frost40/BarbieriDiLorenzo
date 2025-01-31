@@ -616,10 +616,6 @@ function HomePage(user, pageOrchestrator) {
         document.body.removeChild(form);
     }
 
-    function populateMessages() {
-
-    }
-
     // Function to save CV
     function saveCv() {
         // Collect data from textareas
@@ -872,7 +868,6 @@ function HomePage(user, pageOrchestrator) {
         }
 
         populateComplaints();
-        populateMessages();
         // **Initialize the Homepage Layout Based on User Type**
         initializeHomePage();
         // **Update Badge Counts**

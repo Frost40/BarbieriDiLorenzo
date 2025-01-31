@@ -108,10 +108,26 @@
 /* Messages Container */
 .messages-container {
     flex: 1;
+    max-height: 220px;
     overflow-y: auto;
     padding: 10px;
     background: var(--light-gossamer);
     border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+}
+/* Ensure the most recent message is visible */
+.messages-container::-webkit-scrollbar {
+    width: 6px; /* Adjust scrollbar width */
+}
+
+.messages-container::-webkit-scrollbar-thumb {
+    background: var(--normal-gossamer);
+    border-radius: 10px;
+}
+
+.messages-container::-webkit-scrollbar-track {
+    background: var(--creamy-white);
 }
 
 /* Individual Message Styling */
