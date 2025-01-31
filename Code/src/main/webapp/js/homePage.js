@@ -126,12 +126,7 @@ function HomePage(user, pageOrchestrator) {
             // Switch to editing mode
             isEditing = true;
 
-            // Determine the action based on whether the user has a CV
-            if (hasCv) {
-                cvActionBtn.textContent = 'Save CV';
-            } else {
-                cvActionBtn.textContent = 'Save CV';
-            }
+            cvActionBtn.textContent = 'Save CV';
 
             // Make textareas editable
             experiencesInput.readOnly = false;
@@ -160,6 +155,10 @@ function HomePage(user, pageOrchestrator) {
     });
     // Upload CV Button Event Listener
     uploadCvBtn.addEventListener('click', function () {
+        if (!isEditing) {
+            showInfoAlert("Edit CV First", "Please click on 'Create New CV' or 'Modify CV' before uploading a file.");
+            return;
+        }
         cvFileInput.click();
     });
 
@@ -280,19 +279,9 @@ function HomePage(user, pageOrchestrator) {
             const existingFileInfo = document.getElementById("existing-file-info");
             if (existingFileInfo) {
                 if (cv.file) {
-                    // Determine the MIME type based on file extension (optional)
-                    const fileExtension = cv.fileName ? cv.fileName.split('.').pop().toLowerCase() : 'pdf';
-                    let mimeType = 'application/pdf'; // Default MIME type
-                    switch (fileExtension) {
-                        case 'doc':
-                        case 'docx':
-                            mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-                            break;
-                        case 'txt':
-                            mimeType = 'text/plain';
-                            break;
-                        // Add more cases if needed
-                    }
+                    // Determine the MIME type (default to PDF)
+                    let mimeType = 'application/pdf';
+                    // Optionally, set MIME type based on some logic or additional data
 
                     // Create a Blob from the Base64 string
                     const byteCharacters = atob(cv.file);
@@ -306,10 +295,10 @@ function HomePage(user, pageOrchestrator) {
                     // Create a URL for the Blob
                     const fileUrl = URL.createObjectURL(blob);
 
-                    // Set the inner HTML with a download link
+                    // Set the inner HTML with a download link using a default name
                     existingFileInfo.innerHTML = `
                     <p>Current CV: 
-                        <a href="${fileUrl}" download="${cv.fileName || 'CV'}">${cv.fileName || 'Download CV'}</a>
+                        <a href="${fileUrl}" download="Your_CV.pdf">Download CV</a>
                     </p>
                 `;
                 } else {
@@ -661,6 +650,9 @@ function HomePage(user, pageOrchestrator) {
                 saveCvForm.appendChild(cvIdInput);
             }
             cvIdInput.value = currentCvId;
+            cvActionBtn.innerText = 'Modify Cv';
+            isEditing = false;
+            window.location.reload();
         }
 
         // Show loading indicator
@@ -704,8 +696,8 @@ function HomePage(user, pageOrchestrator) {
                                 if (data.modifiedCv) {
                                     // Update CV data and ID based on server response
                                     // Example:
-                                    // cv = data.modifiedCv;
-                                    // currentCvId = cv.id;
+                                     cv = data.modifiedCv;
+                                     currentCvId = cv.id;
                                 }
                             } catch (e) {
                                 // Handle JSON parse error if response is not JSON
@@ -723,9 +715,6 @@ function HomePage(user, pageOrchestrator) {
                         uploadCvBtn.disabled = true;
                         selectedFileName.textContent = '';
                         selectedFile = null;
-
-                        // Disable the Save button until a new file is selected
-                        saveCvBtn.disabled = true;
 
                         break;
 
