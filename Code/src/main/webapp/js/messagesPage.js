@@ -18,6 +18,7 @@ function MessagesPage(user, pageOrchestrator) {
     let currentChatId = null; // Currently open chat ID
     var userClass;
     var selectedInternshipId;
+    var unreadMessages;
     // **Event Listeners**
 
     // Close Modal
@@ -57,9 +58,10 @@ function MessagesPage(user, pageOrchestrator) {
     /**
      * Opens the Messages Modal.
      */
-    this.open = function (userType) {
+    this.open = function (userType,messages) {
         modal.style.display = "block";
         userClass = userType;
+        unreadMessages = messages;
         getChats();
     };
 
@@ -139,10 +141,12 @@ function MessagesPage(user, pageOrchestrator) {
                     const chatEntry = document.createElement("div");
                     chatEntry.classList.add("chat-entry");
                     chatEntry.setAttribute("data-chat-id", chat.id); // For identification
+                    const unreadCount = unreadMessages.filter(msg => msg.senderId === chat.id).length;
 
                     chatEntry.innerHTML = `
                         <div>
                             <strong>${sanitizeHTML(chat.name)}</strong><br>
+                            ${unreadCount > 0 ? `<span class="chat-badge">${unreadCount}</span>` : ""}
                         </div>
                     `;
                     chatEntry.addEventListener("click", () => {
@@ -172,10 +176,13 @@ function MessagesPage(user, pageOrchestrator) {
                 const internshipEntry = document.createElement("div");
                 internshipEntry.classList.add("chat-entry");
                 internshipEntry.setAttribute("data-internship-id", internship.id);
-
+                const unreadCount = unreadMessages.filter(msg =>
+                    students.some(student => msg.senderId === student.id && msg.receiverId === internship.id)
+                ).length;
                 internshipEntry.innerHTML = `
                 <div>
                     <strong>${sanitizeHTML(internship.name)}</strong><br>
+                     ${unreadCount > 0 ? `<span class="chat-badge">${unreadCount}</span>` : ""}
                 </div>
             `;
 
@@ -200,6 +207,11 @@ function MessagesPage(user, pageOrchestrator) {
         if (userClass === "company" && internshipId) {
             selectedInternshipId = internshipId; // Store the selected internship's ID
         }
+        // Remove unread messages for this chat
+        unreadMessages = unreadMessages.filter(msg => msg.senderId !== chatId);
+
+        // Update UI badges
+        updateChatBadges();
         showChatWindow();
         fetchMessages(chatId, internshipId);
     }
@@ -221,10 +233,13 @@ function MessagesPage(user, pageOrchestrator) {
                 const studentEntry = document.createElement("div");
                 studentEntry.classList.add("chat-entry");
                 studentEntry.setAttribute("data-student-id", student.id); // Set student ID
-
+                const unreadCount = unreadMessages.filter(msg =>
+                    students.some(student => msg.senderId === student.id && msg.receiverId === internshipId)
+                ).length;
                 studentEntry.innerHTML = `
                 <div>
                     <strong>${sanitizeHTML(student.name)}</strong><br>
+                    ${unreadCount > 0 ? `<span class="chat-badge">${unreadCount}</span>` : ""}
                 </div>
             `;
 
@@ -382,6 +397,29 @@ function MessagesPage(user, pageOrchestrator) {
                 }
             }
 
+        });
+        // Remove unread messages for this chat after marking as read
+        unreadMessages = unreadMessages.filter(msg => msg.senderId !== currentChatId);
+        updateChatBadges();
+    }
+    function updateChatBadges() {
+        document.querySelectorAll(".chat-entry").forEach(entry => {
+            const chatId = entry.getAttribute("data-chat-id") || entry.getAttribute("data-student-id");
+            if (!chatId) return;
+
+            const unreadCount = unreadMessages.filter(msg => msg.senderId == chatId).length;
+            let badge = entry.querySelector(".chat-badge");
+
+            if (unreadCount > 0) {
+                if (!badge) {
+                    badge = document.createElement("span");
+                    badge.classList.add("chat-badge");
+                    entry.querySelector("div").appendChild(badge);
+                }
+                badge.textContent = unreadCount;
+            } else if (badge) {
+                badge.remove(); // Remove badge if no unread messages
+            }
         });
     }
     function sendMessage() {

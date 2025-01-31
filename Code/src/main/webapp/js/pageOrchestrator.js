@@ -64,7 +64,8 @@ function PageOrchestrator(user){
             case 'messages page':
                 // passing user type so know which chats to expect from db
                 let userType = info1;
-                messagesPage.open(userType, info2, info3);
+                let unreadMessages = info2;
+                messagesPage.open(userType, unreadMessages, info3);
                 break;
 
             case 'search page':

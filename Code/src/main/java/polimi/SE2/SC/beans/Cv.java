@@ -6,6 +6,7 @@ import java.util.Base64;
 public class Cv {
     private int id;
     private String file;
+    private String fileType;
     private ArrayList<String> experiences;
     private ArrayList<String> programmingSkills;
     private ArrayList<String> otherSkills;
@@ -25,6 +26,14 @@ public class Cv {
 
     public void setFile(byte[] file) {
         this.file = file != null ? Base64.getEncoder().encodeToString(file) : null;
+    }
+
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
     }
 
     public ArrayList<String> getExperiences() {

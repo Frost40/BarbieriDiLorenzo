@@ -112,7 +112,7 @@ function HomePage(user, pageOrchestrator) {
         showInfoAlert("Coming soon","This feature is not available yet.");
     });
     messageButton.addEventListener("click", () => {
-        pageOrchestrator.showPage("messages page",userType);
+        pageOrchestrator.showPage("messages page",userType,Messages);
     });
 
     // Internship Save Button Event Lister
@@ -270,18 +270,30 @@ function HomePage(user, pageOrchestrator) {
     function populateCv() {
         if (cv) {
             // **Populate Textareas with CV Data**
-            const maxItemsPerLine = 10; // Adjust this number as needed
+            const maxItemsPerLine = 10;
             experiencesInput.value = joinWithSpacesAndNewlines(cv.experiences, maxItemsPerLine);
             programmingSkillsInput.value = joinWithSpacesAndNewlines(cv.programmingSkills, maxItemsPerLine);
             otherSkillsInput.value = joinWithSpacesAndNewlines(cv.otherSkills, maxItemsPerLine);
 
             // **Populate Existing File Information**
             const existingFileInfo = document.getElementById("existing-file-info");
+
             if (existingFileInfo) {
-                if (cv.file) {
-                    // Determine the MIME type (default to PDF)
-                    let mimeType = 'application/pdf';
-                    // Optionally, set MIME type based on some logic or additional data
+                if (cv.file && cv.fileType) { // Ensure fileName exists
+                    // Extract file extension
+                    const fileExtension = cv.fileType;
+                    console.log('File extension: ' + fileExtension);
+                    // Map extensions to MIME types
+                    const mimeTypes = {
+                        'pdf': 'application/pdf',
+                        'doc': 'application/msword',
+                        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        'txt': 'text/plain',
+                        // Add more mappings as needed
+                    };
+
+                    // Determine MIME type, default to 'application/octet-stream'
+                    const mimeType = mimeTypes[fileExtension] || 'application/octet-stream';
 
                     // Create a Blob from the Base64 string
                     const byteCharacters = atob(cv.file);
@@ -295,10 +307,10 @@ function HomePage(user, pageOrchestrator) {
                     // Create a URL for the Blob
                     const fileUrl = URL.createObjectURL(blob);
 
-                    // Set the inner HTML with a download link using a default name
+                    // Set the inner HTML with a download link using the original file name
                     existingFileInfo.innerHTML = `
                     <p>Current CV: 
-                        <a href="${fileUrl}" download="Your_CV.pdf">Download CV</a>
+                        <a href="${fileUrl}" download="Your_Cv">Download CV</a>
                     </p>
                 `;
                 } else {
@@ -307,8 +319,7 @@ function HomePage(user, pageOrchestrator) {
             } else {
                 console.warn('Existing file info element not found.');
             }
-        }
-        else {
+        } else {
             console.warn("No CV data available to populate.");
             // Optionally, clear existing file info
             const existingFileInfo = document.getElementById("existing-file-info");
@@ -628,28 +639,31 @@ function HomePage(user, pageOrchestrator) {
             showErrorAlert("Validation Error", "All CV fields must be filled out.");
             return;
         }
-
+        console.log('Has cv value ' + hasCv);
         // Validate file selection
-        if (!selectedFile) {
-            showErrorAlert("Validation Error", "Please select a CV file to upload.");
-            return;
+        if(hasCv){
+            if (cv.file === null) {
+                showErrorAlert("Validation Error", "Please select a CV file to upload.");
+                return;
+            }
+        }else{
+            if(!selectedFile){
+                showErrorAlert("Validation Error", "Please select a CV file to upload.");
+                return;
+            }
         }
 
-        // Append CV ID if modifying an existing CV
-        if (hasCv && currentCvId) {
-            // Create a hidden input for cvId if it doesn't exist
-            let cvIdInput = saveCvForm.querySelector('input[name="cvId"]');
-            if (!cvIdInput) {
-                cvIdInput = document.createElement('input');
-                cvIdInput.type = 'hidden';
-                cvIdInput.name = 'cvId';
-                saveCvForm.appendChild(cvIdInput);
-            }
-            cvIdInput.value = currentCvId;
-            cvActionBtn.innerText = 'Modify Cv';
-            isEditing = false;
-            window.location.reload();
+        // Create a hidden input for cvId if it doesn't exist
+        let cvIdInput = saveCvForm.querySelector('input[name="cvId"]');
+        if (!cvIdInput) {
+            cvIdInput = document.createElement('input');
+            cvIdInput.type = 'hidden';
+            cvIdInput.name = 'cvId';
+            saveCvForm.appendChild(cvIdInput);
         }
+        cvIdInput.value = currentCvId;
+        cvActionBtn.innerText = 'Modify Cv';
+        isEditing = false;
 
         // Show loading indicator
         Swal.fire({
@@ -665,7 +679,6 @@ function HomePage(user, pageOrchestrator) {
         if (hasCv) {
             servletUrl = "ModifyCv";
         }
-
         // Make the AJAX call using makeCall
         makeCall("POST", servletUrl, saveCvForm, function (x) {
             if (x.readyState === XMLHttpRequest.DONE) {
@@ -675,32 +688,19 @@ function HomePage(user, pageOrchestrator) {
                 switch (x.status) {
                     case 200:
                         if (servletUrl === "UploadNewCv") {
-                            showSuccessAlert("Success", "Your CV has been created successfully.");
+                            showSuccessAlert("Success", "Your CV has been created successfully.").then(() => {
+                                window.location.reload();
+                            });
                             hasCv = true;
                             // Optionally, retrieve and set the new CV ID from the server response
                             // Example:
                             // const responseData = JSON.parse(x.responseText);
                             // currentCvId = responseData.cvId;
                         } else if (servletUrl === "ModifyCv") {
-                            showSuccessAlert("Success", "Your CV has been modified successfully.");
-                            // Optionally, process the returned data if necessary
-                            // Example:
-                            // let data = JSON.parse(x.responseText);
-                            // if (data.modifiedCv) { ... }
-                            try {
-                                let data = JSON.parse(x.responseText);
-                                if (data.modifiedCv) {
-                                    // Update CV data and ID based on server response
-                                    // Example:
-                                     cv = data.modifiedCv;
-                                     currentCvId = cv.id;
-                                }
-                            } catch (e) {
-                                // Handle JSON parse error if response is not JSON
-                                console.error("Failed to parse server response as JSON.", e);
-                            }
+                            showSuccessAlert("Success", "Your CV has been modified successfully.").then(() => {
+                                window.location.reload();
+                            });
                         }
-
                         // Update UI to read-only mode
                         experiencesInput.readOnly = true;
                         programmingSkillsInput.readOnly = true;
@@ -709,8 +709,6 @@ function HomePage(user, pageOrchestrator) {
                         // Disable file input and upload button
                         cvFileInput.disabled = true;
                         uploadCvBtn.disabled = true;
-                        selectedFileName.textContent = '';
-                        selectedFile = null;
 
                         break;
 
@@ -785,7 +783,7 @@ function HomePage(user, pageOrchestrator) {
     }
 
     function showSuccessAlert(title, message) {
-        Swal.fire({
+        return Swal.fire({
             title: title,
             text: message,
             icon: 'success',
@@ -833,6 +831,7 @@ function HomePage(user, pageOrchestrator) {
             userType = 'student';
             user_class = jsonObject.student;
             cv = jsonObject.cv || null;
+            console.log('This is the file type: '+ cv.fileType);
             isStudent = true;
             console.log('User is a Student:', user_class);
             console.log('CV:', cv);
