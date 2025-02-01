@@ -29,6 +29,15 @@ import static polimi.SE2.SC.utils.UtilityFunctions.parsingChecker;
 public class ReadFeedback extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
+    protected FeedbackDAO createFeedbackDAO() {
+        return new FeedbackDAO(connection);
+    }
+    protected StudentHasInternshipDAO createStudentHasInternshipDAO() {
+        return new StudentHasInternshipDAO(connection);
+    }
+    protected InternshipDAO createInternshipDAO() {
+        return new InternshipDAO(connection);
+    }
 
     public ReadFeedback() {
         super();
@@ -61,6 +70,14 @@ public class ReadFeedback extends HttpServlet {
         int feedbackId;
         boolean isStudent = user instanceof Student;
 
+
+        // Only companies receive feedbacks
+        if (isStudent) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().println("Only companies receive feedbacks");
+            return;
+        }
+
         // Checking if the given id is valid
         if(feedbackIdString == null || feedbackIdString.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -74,7 +91,7 @@ public class ReadFeedback extends HttpServlet {
         else	return;
 
         // Retrieving the feedback from the database
-        FeedbackDAO feedbackDAO = new FeedbackDAO(connection);
+        FeedbackDAO feedbackDAO = createFeedbackDAO();
         Feedback feedback = null;
         try {
             feedback = feedbackDAO.getFeedback(feedbackId);
@@ -86,13 +103,13 @@ public class ReadFeedback extends HttpServlet {
 
         // Checking that the feedback exists in the DB
         if (feedback == null) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().println("The feedback you are trying to close does not exists");
             return;
         }
 
         // Retrieving the studentHasInternship associated with the feedback
-        StudentHasInternshipDAO studentHasInternshipDAO = new StudentHasInternshipDAO(connection);
+        StudentHasInternshipDAO studentHasInternshipDAO = createStudentHasInternshipDAO();
         StudentHasInternship studentHasInternship = null;
         try {
             studentHasInternship = studentHasInternshipDAO.getStudentHasInternship(feedback.getStudentHasInternshipId());
@@ -102,15 +119,8 @@ public class ReadFeedback extends HttpServlet {
             return;
         }
 
-        // Only companies receive feedbacks
-        if (isStudent) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().println("Only companies receive feedbacks");
-            return;
-        }
-
         // Checking that the company in the current session is actually the owner of the internship associated to the feedback
-        InternshipDAO internshipDAO = new InternshipDAO(connection);
+        InternshipDAO internshipDAO = createInternshipDAO();
         ArrayList<Internship> companyInternships = null;
         try {
             companyInternships = internshipDAO.getCompanyInternships(user.getId());
