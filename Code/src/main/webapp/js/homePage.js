@@ -21,6 +21,7 @@ function HomePage(user, pageOrchestrator) {
     var FeedbackContainer = document.getElementById("dynamic-feedback");
     var RecommendationDropdownButton = document.getElementById("recommendations-dropdown-btn");
     var RecommendationsContainer = document.getElementById("dynamic-recommendations");
+    var messageButton = document.getElementById("messagesButton");
     // **My Cv Variables** //
     var saveCvForm = document.getElementById('saveCvForm');
     var cvActionBtn = document.getElementById("cv-action-btn");
@@ -110,6 +111,10 @@ function HomePage(user, pageOrchestrator) {
     RecommendationDropdownButton.addEventListener("click", () => {
         showInfoAlert("Coming soon","This feature is not available yet.");
     });
+    messageButton.addEventListener("click", () => {
+        pageOrchestrator.showPage("messages page",userType,Messages);
+    });
+
     // Internship Save Button Event Lister
     saveInternshipBtn.addEventListener('click',function(){
         saveInternship();
@@ -121,12 +126,7 @@ function HomePage(user, pageOrchestrator) {
             // Switch to editing mode
             isEditing = true;
 
-            // Determine the action based on whether the user has a CV
-            if (hasCv) {
-                cvActionBtn.textContent = 'Save CV';
-            } else {
-                cvActionBtn.textContent = 'Save CV';
-            }
+            cvActionBtn.textContent = 'Save CV';
 
             // Make textareas editable
             experiencesInput.readOnly = false;
@@ -155,6 +155,10 @@ function HomePage(user, pageOrchestrator) {
     });
     // Upload CV Button Event Listener
     uploadCvBtn.addEventListener('click', function () {
+        if (!isEditing) {
+            showInfoAlert("Edit CV First", "Please click on 'Create New CV' or 'Modify CV' before uploading a file.");
+            return;
+        }
         cvFileInput.click();
     });
 
@@ -211,7 +215,12 @@ function HomePage(user, pageOrchestrator) {
         this.pageOrchestrator.showPage('my internships page', 'placeholder1', 'placeholder2', 'placeholder3');
     });
     searchBtn.addEventListener("click", () => {
-        pageOrchestrator.showPage('search page', 'placeholder1', 'placeholder2', 'placeholder3');
+        if(userType === 'student'){
+            pageOrchestrator.showPage('search page', 'placeholder1', 'placeholder2', 'placeholder3');
+        }
+        else {
+            showInfoAlert("Coming soon","This feature is not available yet.");
+        }
     });
     logoutBtn.addEventListener("click", () => {
         pageOrchestrator.showPage('main page', 'placeholder1', 'placeholder2', 'placeholder3');
@@ -261,28 +270,30 @@ function HomePage(user, pageOrchestrator) {
     function populateCv() {
         if (cv) {
             // **Populate Textareas with CV Data**
-            const maxItemsPerLine = 10; // Adjust this number as needed
+            const maxItemsPerLine = 10;
             experiencesInput.value = joinWithSpacesAndNewlines(cv.experiences, maxItemsPerLine);
             programmingSkillsInput.value = joinWithSpacesAndNewlines(cv.programmingSkills, maxItemsPerLine);
             otherSkillsInput.value = joinWithSpacesAndNewlines(cv.otherSkills, maxItemsPerLine);
 
             // **Populate Existing File Information**
             const existingFileInfo = document.getElementById("existing-file-info");
+
             if (existingFileInfo) {
-                if (cv.file) {
-                    // Determine the MIME type based on file extension (optional)
-                    const fileExtension = cv.fileName ? cv.fileName.split('.').pop().toLowerCase() : 'pdf';
-                    let mimeType = 'application/pdf'; // Default MIME type
-                    switch (fileExtension) {
-                        case 'doc':
-                        case 'docx':
-                            mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-                            break;
-                        case 'txt':
-                            mimeType = 'text/plain';
-                            break;
-                        // Add more cases if needed
-                    }
+                if (cv.file && cv.fileType) { // Ensure fileName exists
+                    // Extract file extension
+                    const fileExtension = cv.fileType;
+                    console.log('File extension: ' + fileExtension);
+                    // Map extensions to MIME types
+                    const mimeTypes = {
+                        'pdf': 'application/pdf',
+                        'doc': 'application/msword',
+                        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        'txt': 'text/plain',
+                        // Add more mappings as needed
+                    };
+
+                    // Determine MIME type, default to 'application/octet-stream'
+                    const mimeType = mimeTypes[fileExtension] || 'application/octet-stream';
 
                     // Create a Blob from the Base64 string
                     const byteCharacters = atob(cv.file);
@@ -296,10 +307,10 @@ function HomePage(user, pageOrchestrator) {
                     // Create a URL for the Blob
                     const fileUrl = URL.createObjectURL(blob);
 
-                    // Set the inner HTML with a download link
+                    // Set the inner HTML with a download link using the original file name
                     existingFileInfo.innerHTML = `
                     <p>Current CV: 
-                        <a href="${fileUrl}" download="${cv.fileName || 'CV'}">${cv.fileName || 'Download CV'}</a>
+                        <a href="${fileUrl}" download="Your_Cv">Download CV</a>
                     </p>
                 `;
                 } else {
@@ -308,8 +319,7 @@ function HomePage(user, pageOrchestrator) {
             } else {
                 console.warn('Existing file info element not found.');
             }
-        }
-        else {
+        } else {
             console.warn("No CV data available to populate.");
             // Optionally, clear existing file info
             const existingFileInfo = document.getElementById("existing-file-info");
@@ -617,10 +627,6 @@ function HomePage(user, pageOrchestrator) {
         document.body.removeChild(form);
     }
 
-    function populateMessages() {
-
-    }
-
     // Function to save CV
     function saveCv() {
         // Collect data from textareas
@@ -633,25 +639,31 @@ function HomePage(user, pageOrchestrator) {
             showErrorAlert("Validation Error", "All CV fields must be filled out.");
             return;
         }
-
+        console.log('Has cv value ' + hasCv);
         // Validate file selection
-        if (!selectedFile) {
-            showErrorAlert("Validation Error", "Please select a CV file to upload.");
-            return;
+        if(hasCv){
+            if (cv.file === null) {
+                showErrorAlert("Validation Error", "Please select a CV file to upload.");
+                return;
+            }
+        }else{
+            if(!selectedFile){
+                showErrorAlert("Validation Error", "Please select a CV file to upload.");
+                return;
+            }
         }
 
-        // Append CV ID if modifying an existing CV
-        if (hasCv && currentCvId) {
-            // Create a hidden input for cvId if it doesn't exist
-            let cvIdInput = saveCvForm.querySelector('input[name="cvId"]');
-            if (!cvIdInput) {
-                cvIdInput = document.createElement('input');
-                cvIdInput.type = 'hidden';
-                cvIdInput.name = 'cvId';
-                saveCvForm.appendChild(cvIdInput);
-            }
-            cvIdInput.value = currentCvId;
+        // Create a hidden input for cvId if it doesn't exist
+        let cvIdInput = saveCvForm.querySelector('input[name="cvId"]');
+        if (!cvIdInput) {
+            cvIdInput = document.createElement('input');
+            cvIdInput.type = 'hidden';
+            cvIdInput.name = 'cvId';
+            saveCvForm.appendChild(cvIdInput);
         }
+        cvIdInput.value = currentCvId;
+        cvActionBtn.innerText = 'Modify Cv';
+        isEditing = false;
 
         // Show loading indicator
         Swal.fire({
@@ -667,7 +679,6 @@ function HomePage(user, pageOrchestrator) {
         if (hasCv) {
             servletUrl = "ModifyCv";
         }
-
         // Make the AJAX call using makeCall
         makeCall("POST", servletUrl, saveCvForm, function (x) {
             if (x.readyState === XMLHttpRequest.DONE) {
@@ -677,32 +688,19 @@ function HomePage(user, pageOrchestrator) {
                 switch (x.status) {
                     case 200:
                         if (servletUrl === "UploadNewCv") {
-                            showSuccessAlert("Success", "Your CV has been created successfully.");
+                            showSuccessAlert("Success", "Your CV has been created successfully.").then(() => {
+                                window.location.reload();
+                            });
                             hasCv = true;
                             // Optionally, retrieve and set the new CV ID from the server response
                             // Example:
                             // const responseData = JSON.parse(x.responseText);
                             // currentCvId = responseData.cvId;
                         } else if (servletUrl === "ModifyCv") {
-                            showSuccessAlert("Success", "Your CV has been modified successfully.");
-                            // Optionally, process the returned data if necessary
-                            // Example:
-                            // let data = JSON.parse(x.responseText);
-                            // if (data.modifiedCv) { ... }
-                            try {
-                                let data = JSON.parse(x.responseText);
-                                if (data.modifiedCv) {
-                                    // Update CV data and ID based on server response
-                                    // Example:
-                                    // cv = data.modifiedCv;
-                                    // currentCvId = cv.id;
-                                }
-                            } catch (e) {
-                                // Handle JSON parse error if response is not JSON
-                                console.error("Failed to parse server response as JSON.", e);
-                            }
+                            showSuccessAlert("Success", "Your CV has been modified successfully.").then(() => {
+                                window.location.reload();
+                            });
                         }
-
                         // Update UI to read-only mode
                         experiencesInput.readOnly = true;
                         programmingSkillsInput.readOnly = true;
@@ -711,11 +709,6 @@ function HomePage(user, pageOrchestrator) {
                         // Disable file input and upload button
                         cvFileInput.disabled = true;
                         uploadCvBtn.disabled = true;
-                        selectedFileName.textContent = '';
-                        selectedFile = null;
-
-                        // Disable the Save button until a new file is selected
-                        saveCvBtn.disabled = true;
 
                         break;
 
@@ -790,7 +783,7 @@ function HomePage(user, pageOrchestrator) {
     }
 
     function showSuccessAlert(title, message) {
-        Swal.fire({
+        return Swal.fire({
             title: title,
             text: message,
             icon: 'success',
@@ -811,6 +804,7 @@ function HomePage(user, pageOrchestrator) {
             // Show company main content and hide student content
             document.getElementById('company-content').style.display = 'block';
             document.getElementById('student-content').style.display = 'none';
+            document.getElementById('search-btn').innerText = 'Analytics Page';
         } else if (userType === 'student') {
             // Hide company-specific sidebar elements
             document.getElementById('feedback-dropdown-btn').style.display = 'none';
@@ -837,6 +831,7 @@ function HomePage(user, pageOrchestrator) {
             userType = 'student';
             user_class = jsonObject.student;
             cv = jsonObject.cv || null;
+            console.log('This is the file type: '+ cv.fileType);
             isStudent = true;
             console.log('User is a Student:', user_class);
             console.log('CV:', cv);
@@ -866,60 +861,12 @@ function HomePage(user, pageOrchestrator) {
             }
             populateCv();
         } else {
-            // **For Testing: Hardcode Feedbacks**
-            Feedbacks = [
-                {
-                    id: 201,
-                    text: "Great internship experience with clear communication.",
-                    read: false,
-                    rating: 5
-                },
-                {
-                    id: 202,
-                    text: "The project scope was well-defined and achievable.",
-                    read: false,
-                    rating: 4
-                },
-                {
-                    id: 203,
-                    text: "Would love to work with the team again.",
-                    read: true,
-                    rating: 5
-                }
-            ];
+
             populateFeedback();
             populateInternships();
         }
-        // **For Testing: Hardcode Complaints**
-        Complaints = [
-            {
-                id: 101,
-                text: "Issue with internship application process.",
-                readByStudent: false,
-                readByInternship: false,
-                closedByStudent: false,
-                closedByCompany: false
-            },
-            {
-                id: 102,
-                text: "Delayed responses from the company.",
-                readByStudent: false,
-                readByInternship: true,
-                closedByStudent: false,
-                closedByCompany: false
-            },
-            {
-                id: 103,
-                text: "Problem with the onboarding procedure.",
-                readByStudent: true,
-                readByInternship: false,
-                closedByStudent: true,
-                closedByCompany: false
-            }
-        ];
 
         populateComplaints();
-        populateMessages();
         // **Initialize the Homepage Layout Based on User Type**
         initializeHomePage();
         // **Update Badge Counts**

@@ -120,7 +120,7 @@ public class SendMessage extends HttpServlet {
 
             // Parsing process for sender id
             parsedId = parsingChecker(request, response, senderIdString);
-            if (parsedId.isPresent())		receiverId = parsedId.get();
+            if (parsedId.isPresent())		senderId = parsedId.get();
             else		return;
 
             // Extracting the internship used as a sender by the company]

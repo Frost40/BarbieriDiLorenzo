@@ -134,18 +134,30 @@ public class ModifyCv extends HttpServlet {
 
         // Validate and retrieve the file input
         String contentType = filePart.getContentType();
-        if (!contentType.equals("application/pdf") &&
-                !contentType.equals("application/msword") &&
-                !contentType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document") &&
-                !contentType.equals("text/plain")) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("File format not permitted!");
-            return;
+        String fileType = null;
+        switch (contentType) {
+            case "application/pdf" -> {
+                fileType = "pdf";
+            }
+            case "application/msword" -> {
+                fileType = "doc";
+            }
+            case "application/vnd.openxmlformats-officedocument.wordprocessingml.document" -> {
+                fileType = "docx";
+            }
+            case "text/plain" -> {
+                fileType = "txt";
+            }
+            default -> {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().println("File format not permitted!");
+                return;
+            }
         }
 
         // Saving updated info in the DB
         try (InputStream fileContent = filePart.getInputStream()) {
-            cvDAO.updateCv(cvId, fileContent, experiences, programmingSkills, otherSkills);
+            cvDAO.updateCv(cvId, fileContent, fileType, experiences, programmingSkills, otherSkills);
 
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
