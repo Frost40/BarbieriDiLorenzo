@@ -36,7 +36,12 @@ import static polimi.SE2.SC.utils.UtilityFunctions.parsingChecker;
 public class DisplaySingleChat extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
-
+    protected MessageDAO createMessageDAO() {
+        return new MessageDAO(connection);
+    }
+    protected InternshipDAO createInternshipDAO() {
+        return new InternshipDAO(connection);
+    }
     public DisplaySingleChat() {
         super();
     }
@@ -75,7 +80,7 @@ public class DisplaySingleChat extends HttpServlet {
         else	return;
 
         // Checking for internship existence
-        InternshipDAO internshipDAO = new InternshipDAO(connection);
+        InternshipDAO internshipDAO = createInternshipDAO();
         Internship internship = null;
         try {
             internship = internshipDAO.getInternshipById(internshipId);
@@ -92,7 +97,7 @@ public class DisplaySingleChat extends HttpServlet {
         }
 
         // Retrieving all previous messages inside the chat
-        MessageDAO messageDAO = new MessageDAO(connection);
+        MessageDAO messageDAO = createMessageDAO();
         ArrayList<Message> chat = null;
         try {
             chat = messageDAO.getAllChatMessages(user.getId(), internshipId);

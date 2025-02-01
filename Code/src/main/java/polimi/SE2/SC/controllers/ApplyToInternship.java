@@ -28,7 +28,12 @@ import static polimi.SE2.SC.utils.UtilityFunctions.parsingChecker;
 public class ApplyToInternship extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
-
+    protected InternshipDAO createInternshipDAO() {
+        return new InternshipDAO(connection);
+    }
+    protected StudentHasInternshipDAO createStudentHasInternshipDAO() {
+        return new StudentHasInternshipDAO(connection);
+    }
     public ApplyToInternship() {
         super();
     }
@@ -72,7 +77,7 @@ public class ApplyToInternship extends HttpServlet {
         if (parsedId.isPresent())			internshipId = parsedId.get();
         else	return;
 
-        InternshipDAO internshipDAO = new InternshipDAO(connection);
+        InternshipDAO internshipDAO = createInternshipDAO();
         Internship internship = null;
         try {
             internship = internshipDAO.getInternshipById(internshipId);
@@ -97,7 +102,7 @@ public class ApplyToInternship extends HttpServlet {
         }
 
         // Saving the application in the database
-        StudentHasInternshipDAO studentHasInternshipDAO = new StudentHasInternshipDAO(connection);
+        StudentHasInternshipDAO studentHasInternshipDAO = createStudentHasInternshipDAO();
         try {
             studentHasInternshipDAO.addApplication(internshipId, user.getId());
         } catch (SQLException e) {
