@@ -44,7 +44,17 @@ public class QuestionnaireDAO {
 
                 questionnaire.setId(resultSet.getInt("id"));
                 questionnaire.setFile(resultSet.getBytes("file"));
-                questionnaire.setEvaluation(resultSet.getBoolean("evaluation"));
+                questionnaire.setFileType(resultSet.getString("fileType"));
+                questionnaire.setCompleted(resultSet.getBoolean("completed"));
+                // Retrieve the evaluation column
+                Boolean evaluation = resultSet.getBoolean("evaluation");
+                if (resultSet.wasNull()) {
+                    // The evaluation column was null
+                    questionnaire.setEvaluation(null); // or handle it as needed
+                } else {
+                    // The evaluation column was not null, set the value
+                    questionnaire.setEvaluation(evaluation);
+                }
                 questionnaire.setStudentHasInternshipId(resultSet.getInt("studentHasInternshipId"));
             }
 
@@ -95,7 +105,17 @@ public class QuestionnaireDAO {
 
                 questionnaire.setId(resultSet.getInt("id"));
                 questionnaire.setFile(resultSet.getBytes("file"));
-                questionnaire.setEvaluation(resultSet.getBoolean("evaluation"));
+                questionnaire.setFileType(resultSet.getString("fileType"));
+                questionnaire.setCompleted(resultSet.getBoolean("completed"));
+                // Retrieve the evaluation column
+                Boolean evaluation = resultSet.getBoolean("evaluation");
+                if (resultSet.wasNull()) {
+                    // The evaluation column was null
+                    questionnaire.setEvaluation(null); // or handle it as needed
+                } else {
+                    // The evaluation column was not null, set the value
+                    questionnaire.setEvaluation(evaluation);
+                }
                 questionnaire.setStudentHasInternshipId(resultSet.getInt("studentHasInternshipId"));
 
                 questionnaires.add(questionnaire);
@@ -127,18 +147,20 @@ public class QuestionnaireDAO {
      * Method used to upload a new questionnaire for a given student-internship association into the database
      *
      * @param file The file representing the questionnaire to upload in the database
+     * @param fileType File extension
      * @param studentHasInternshipId Identifier for the student-internship association
      * @throws SQLException
      */
-    public void uploadQuestionnaire(InputStream file, int studentHasInternshipId) throws SQLException {
+    public void uploadQuestionnaire(InputStream file, String fileType, int studentHasInternshipId) throws SQLException {
         String performedAction = " inserting a new questionnaire into the database ";
-        String query = "INSERT into Questionnaire (file, evaluation, studentHasInternshipId) VALUES (?, NULL, ?)";
+        String query = "INSERT into Questionnaire (file, fileType, completed, evaluation, studentHasInternshipId) VALUES (?, ?, FALSE, NULL, ?)";
         PreparedStatement preparedStatement = null;
 
         try {
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setBlob(1, file);
-            preparedStatement.setInt(2, studentHasInternshipId);
+            preparedStatement.setString(2, fileType);
+            preparedStatement.setInt(3, studentHasInternshipId);
 
             preparedStatement.executeUpdate();
 
@@ -161,17 +183,21 @@ public class QuestionnaireDAO {
      *
      * @param id Identifier for the questionnaire
      * @param file The file representing the completed questionnaire
+     * @param fileType File extension
      * @throws SQLException
      */
-    public void completeQuestionnaire(int id, InputStream file) throws SQLException {
+    public void completeQuestionnaire(int id, InputStream file, String fileType) throws SQLException {
         String performedAction = " updating a questionnaire with the student answers ";
-        String query = "UPDATE Questionnaire SET file = ? WHERE id = ?";
+        String query = "UPDATE Questionnaire " +
+                "SET file = ?, fileType = ?, completed = TRUE" +
+                " WHERE id = ?";
         PreparedStatement preparedStatement = null;
 
         try {
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setBlob(1, file);
-            preparedStatement.setInt(2, id);
+            preparedStatement.setString(2, fileType);
+            preparedStatement.setInt(3, id);
 
             preparedStatement.executeUpdate();
 

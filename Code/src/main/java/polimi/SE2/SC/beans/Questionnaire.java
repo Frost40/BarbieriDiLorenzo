@@ -5,7 +5,9 @@ import java.util.Base64;
 public class Questionnaire {
     private int id;
     private String file;
-    private boolean evaluation;
+    private String fileType;
+    private boolean completed;
+    private Boolean evaluation;
     private int studentHasInternshipId;
 
     public int getId() {
@@ -24,11 +26,27 @@ public class Questionnaire {
         this.file = file != null ? Base64.getEncoder().encodeToString(file) : null;
     }
 
-    public boolean isEvaluation() {
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
+    public Boolean isEvaluation() {
         return evaluation;
     }
 
-    public void setEvaluation(boolean evaluation) {
+    public void setEvaluation(Boolean evaluation) {
         this.evaluation = evaluation;
     }
 

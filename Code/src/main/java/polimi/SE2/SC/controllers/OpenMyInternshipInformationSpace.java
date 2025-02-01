@@ -240,7 +240,9 @@ public class OpenMyInternshipInformationSpace extends HttpServlet {
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        Gson gson = new GsonBuilder().create();
+        Gson gson = new GsonBuilder()
+                .serializeNulls() // Ensure nulls are serialized
+                .create();
 
         String json = gson.toJson(jsonObject);
         response.getWriter().write(json);

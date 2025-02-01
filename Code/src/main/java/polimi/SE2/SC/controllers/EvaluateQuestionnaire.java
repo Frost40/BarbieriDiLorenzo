@@ -157,9 +157,17 @@ public class EvaluateQuestionnaire extends HttpServlet {
             return;
         }
 
+        // Making sure it is the correct time to evaluate a questionnaire
         if (!studentHasInternship.getApplicationStatus().equals("selectionProcess")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().println("This is not the correct time to evaluate an questionnaire");
+            return;
+        }
+
+        // Checking if the questionnaire has already been evaluated
+        if (questionnaire.isEvaluation() != null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().println("This questionnaire has already been evaluated");
             return;
         }
 

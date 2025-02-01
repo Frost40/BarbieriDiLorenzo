@@ -266,7 +266,7 @@ public class StudentHasInternshipDAO {
      */
     public void updateApplicationStatus(int id, boolean status) throws SQLException {
         System.out.println(status);
-        String performedAction = " setting the end date for the internship experience ";
+        String performedAction = " updating the application status ";
         String query = "UPDATE StudentHasInternship " +
                 "SET companyAccepted = ?, applicationStatus = ? " +
                 "WHERE id = ?";
