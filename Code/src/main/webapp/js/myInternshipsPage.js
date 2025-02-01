@@ -242,7 +242,7 @@ function MyInternshipsPage(user, pageOrchestrator) {
                                 break;
 
                             case "rejected":
-                                populateForRejected();
+                                populateForRejected(studentHasInternshipId);
                                 break;
                         }
 
@@ -445,6 +445,8 @@ function MyInternshipsPage(user, pageOrchestrator) {
 
     function populateForSelectionProcess(studentHasInternshipId) {
         removeDiv('questionnaires-div');
+        removeDiv('interviews-div');
+
         populateQuestionnaires(studentHasInternshipId);
         populateInterviews(studentHasInternshipId);
     }
@@ -862,8 +864,12 @@ function MyInternshipsPage(user, pageOrchestrator) {
         }
     }
 
-    function populateForRejected() {
+    function populateForRejected(studentHasInternshipId) {
+        removeDiv('questionnaires-div');
+        removeDiv('interviews-div');
 
+        populateQuestionnaires(studentHasInternshipId);
+        populateInterviews(studentHasInternshipId);
     }
 
     function manageStudentApplication(studentHasInternshipId, decision) {
