@@ -31,7 +31,9 @@ import polimi.SE2.SC.utils.ConnectionHandler;
 public class SearchPageManager extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
-
+    protected InternshipDAO createInternshipDAO() {
+        return new InternshipDAO(connection);
+    }
     public SearchPageManager() {
         super();
     }
@@ -61,7 +63,7 @@ public class SearchPageManager extends HttpServlet {
             response.getWriter().println("Company accounts are not authorize to view the Search Page");
             return;
         }
-        InternshipDAO internshipDAO = new InternshipDAO(connection);
+        InternshipDAO internshipDAO = createInternshipDAO();
         ArrayList<Internship> allInternships = null;
         try {
             allInternships = internshipDAO.getAllInternships();

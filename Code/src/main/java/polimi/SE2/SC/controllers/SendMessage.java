@@ -32,7 +32,15 @@ import static polimi.SE2.SC.utils.UtilityFunctions.parsingChecker;
 public class SendMessage extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
-
+    protected MessageDAO createMessageDAO() {
+        return new MessageDAO(connection);
+    }
+    protected InternshipDAO createInternshipDAO() {
+        return new InternshipDAO(connection);
+    }
+    protected StudentDAO createStudentDAO() {
+        return new StudentDAO(connection);
+    }
     public SendMessage() {
         super();
     }
@@ -90,8 +98,8 @@ public class SendMessage extends HttpServlet {
         else		return;
 
         // Accessing the database to retrieve info regarding the receiver user type
-        MessageDAO messageDAO = new MessageDAO(connection);
-        InternshipDAO internshipDAO = new InternshipDAO(connection);
+        MessageDAO messageDAO = createMessageDAO();
+        InternshipDAO internshipDAO = createInternshipDAO();
         if (isStudent) {
             // In case the sender is a student the receiver must be a valid internship
             try {
@@ -157,7 +165,7 @@ public class SendMessage extends HttpServlet {
             }
 
             // Extracting the student receiver
-            StudentDAO studentDAO = new StudentDAO(connection);
+            StudentDAO studentDAO = createStudentDAO();
             try {
                 studentReceiver = studentDAO.getStudentById(receiverId);
             } catch (SQLException e) {

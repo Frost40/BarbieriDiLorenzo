@@ -27,7 +27,13 @@ import polimi.SE2.SC.utils.ConnectionHandler;
 public class LoginManager extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
+    protected StudentDAO createStudentDAO() {
+        return new StudentDAO(connection);
+    }
 
+    protected CompanyDAO createCompanyDAO() {
+        return new CompanyDAO(connection);
+    }
     public LoginManager() {
         super();
     }
@@ -54,8 +60,11 @@ public class LoginManager extends HttpServlet {
         String email = request.getParameter("id");
         String password = request.getParameter("password");
 
-        StudentDAO studentDAO = new StudentDAO(connection);
-        CompanyDAO companyDAO = new CompanyDAO(connection);
+        StudentDAO studentDAO = createStudentDAO();
+        CompanyDAO companyDAO = createCompanyDAO();
+
+        //StudentDAO studentDAO = new StudentDAO(connection);
+        //CompanyDAO companyDAO = new CompanyDAO(connection);
         User user = null;
 
 

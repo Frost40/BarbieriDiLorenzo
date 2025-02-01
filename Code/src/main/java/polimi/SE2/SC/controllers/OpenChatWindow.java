@@ -2,8 +2,7 @@ package polimi.SE2.SC.controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import polimi.SE2.SC.DAOs.InternshipDAO;
-import polimi.SE2.SC.DAOs.MessageDAO;
+import polimi.SE2.SC.DAOs.*;
 import polimi.SE2.SC.beans.Internship;
 import polimi.SE2.SC.beans.Message;
 import polimi.SE2.SC.beans.Student;
@@ -30,7 +29,12 @@ import static polimi.SE2.SC.utils.UtilityFunctions.parsingChecker;
 public class OpenChatWindow extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
-
+    protected MessageDAO createMessageDAO() {
+        return new MessageDAO(connection);
+    }
+    protected InternshipDAO createInternshipDAO() {
+        return new InternshipDAO(connection);
+    }
     public OpenChatWindow() {
         super();
     }
@@ -90,7 +94,7 @@ public class OpenChatWindow extends HttpServlet {
             else return;
 
             // Checking that the current company user posses the internship he is trying to use
-            InternshipDAO internshipDAO = new InternshipDAO(connection);
+            InternshipDAO internshipDAO = createInternshipDAO();
             ArrayList<Internship> companyInternships;
             try {
                 companyInternships = internshipDAO.getCompanyInternships(user.getId());
@@ -108,7 +112,7 @@ public class OpenChatWindow extends HttpServlet {
             }
         }
 
-        MessageDAO messageDAO = new MessageDAO(connection);
+        MessageDAO messageDAO = createMessageDAO();
         ArrayList<Message> chat = null;
         try {
             if (isStudent) {

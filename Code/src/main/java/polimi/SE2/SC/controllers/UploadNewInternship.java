@@ -29,7 +29,9 @@ import polimi.SE2.SC.utils.ConnectionHandler;
 public class UploadNewInternship extends HttpServlet{
     private static final long serialVersionUID = 1L;
     private Connection connection;
-
+    protected InternshipDAO createInternshipDAO() {
+        return new InternshipDAO(connection);
+    }
     public UploadNewInternship() {
         super();
     }
@@ -81,7 +83,7 @@ public class UploadNewInternship extends HttpServlet{
         }
 
         // Adding the new internship to the database
-        InternshipDAO internshipDAO = new InternshipDAO(connection);
+        InternshipDAO internshipDAO = createInternshipDAO();
         try {
             internshipDAO.uploadNewInternship(name, description, user.getId());
         } catch (SQLException e) {

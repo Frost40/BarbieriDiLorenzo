@@ -29,6 +29,30 @@ import polimi.SE2.SC.utils.ConnectionHandler;
 public class HomePageManager extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
+    protected MessageDAO createMessageDAO() {
+        return new MessageDAO(connection);
+    }
+
+    protected CvDAO createCvDAO() {
+        return new CvDAO(connection);
+    }
+    protected StudentDAO createStudentDAO() {
+        return new StudentDAO(connection);
+    }
+
+    protected CompanyDAO createCompanyDAO() {
+        return new CompanyDAO(connection);
+    }
+    protected FeedbackDAO createFeedbackDAO() {
+        return new FeedbackDAO(connection);
+    }
+
+    protected ComplaintDAO createComplaintDAO() {
+        return new ComplaintDAO(connection);
+    }
+    protected InternshipDAO createInternshipDAO() {
+        return new InternshipDAO(connection);
+    }
 
     public HomePageManager() {
         super();
@@ -66,7 +90,7 @@ public class HomePageManager extends HttpServlet {
 
         if (isStudent) {
             // Handle student-specific logic
-            cvDAO = new CvDAO(connection);
+            cvDAO = createCvDAO();
             try {
                 cv = cvDAO.getStudentCv(user.getId());
             } catch (SQLException e) {
@@ -75,7 +99,7 @@ public class HomePageManager extends HttpServlet {
                 return;
             }
 
-            StudentDAO studentDAO = new StudentDAO(connection);
+            StudentDAO studentDAO = createStudentDAO();
             try {
                 student = studentDAO.getStudentById(user.getId());
             } catch (SQLException e) {
@@ -86,7 +110,7 @@ public class HomePageManager extends HttpServlet {
 
         } else {
             // Handle company-specific logic
-            internshipDAO = new InternshipDAO(connection);
+            internshipDAO = createInternshipDAO();
             try {
                 internships = internshipDAO.getCompanyInternships(user.getId());
             } catch (SQLException e) {
@@ -95,7 +119,7 @@ public class HomePageManager extends HttpServlet {
                 return;
             }
 
-            CompanyDAO companyDAO = new CompanyDAO(connection);
+            CompanyDAO companyDAO = createCompanyDAO();
             try {
                 company = companyDAO.getCompanyById(user.getId());
             } catch (SQLException e) {
@@ -104,7 +128,7 @@ public class HomePageManager extends HttpServlet {
                 return;
             }
 
-            FeedbackDAO feedbackDAO = new FeedbackDAO(connection);
+            FeedbackDAO feedbackDAO = createFeedbackDAO();
             try {
                 unreadFeedbacks = feedbackDAO.getNotReadFeedbacks(user.getId());
             } catch (SQLException e) {
@@ -114,7 +138,7 @@ public class HomePageManager extends HttpServlet {
             }
         }
 
-        MessageDAO messageDAO = new MessageDAO(connection);
+        MessageDAO messageDAO = createMessageDAO();
         ArrayList<Message> unreadMessages = null;
         try {
             unreadMessages = messageDAO.getNotReadMessages(user.getId(), isStudent);
@@ -124,7 +148,7 @@ public class HomePageManager extends HttpServlet {
             return;
         }
 
-        ComplaintDAO complaintDAO = new ComplaintDAO(connection);
+        ComplaintDAO complaintDAO = createComplaintDAO();
         ArrayList<Complaint> unreadComplaints = null;
         try {
             unreadComplaints = complaintDAO.getNotReadComplaints(user.getId(), isStudent);

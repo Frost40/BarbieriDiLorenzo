@@ -32,7 +32,9 @@ import static polimi.SE2.SC.utils.UtilityFunctions.splitStringByComma;
 public class ModifyInternship extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
-
+    protected InternshipDAO createInternshipDAO() {
+        return new InternshipDAO(connection);
+    }
     public ModifyInternship() {
         super();
     }
@@ -91,7 +93,7 @@ public class ModifyInternship extends HttpServlet {
         else	return;
 
         // Extracting from the DB the internship associated to the given id
-        InternshipDAO internshipDAO = new InternshipDAO(connection);
+        InternshipDAO internshipDAO = createInternshipDAO();
         Internship internship = null;
         try {
             internship = internshipDAO.getInternshipById(internshipId);

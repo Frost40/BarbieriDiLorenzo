@@ -1,9 +1,6 @@
 package polimi.SE2.SC.controllers;
 
-import polimi.SE2.SC.DAOs.FeedbackDAO;
-import polimi.SE2.SC.DAOs.InternshipDAO;
-import polimi.SE2.SC.DAOs.MessageDAO;
-import polimi.SE2.SC.DAOs.StudentHasInternshipDAO;
+import polimi.SE2.SC.DAOs.*;
 import polimi.SE2.SC.beans.*;
 import polimi.SE2.SC.utils.ConnectionHandler;
 
@@ -29,7 +26,12 @@ import static polimi.SE2.SC.utils.UtilityFunctions.parsingChecker;
 public class ReadMessage extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
-
+    protected MessageDAO createMessageDAO() {
+        return new MessageDAO(connection);
+    }
+    protected InternshipDAO createInternshipDAO() {
+        return new InternshipDAO(connection);
+    }
     public ReadMessage() {
         super();
     }
@@ -74,7 +76,7 @@ public class ReadMessage extends HttpServlet {
         else	return;
 
         // Retrieving the message from the database
-        MessageDAO messageDAO = new MessageDAO(connection);
+        MessageDAO messageDAO = createMessageDAO();
         Message message = null;
         try {
             message = messageDAO.getMessage(messageId);
@@ -100,7 +102,7 @@ public class ReadMessage extends HttpServlet {
             }
         } else {
             // Checking that the company in the current session is actually the owner of the internship associated to the receiver
-            InternshipDAO internshipDAO = new InternshipDAO(connection);
+            InternshipDAO internshipDAO = createInternshipDAO();
             ArrayList<Internship> companyInternships = null;
             try {
                 companyInternships = internshipDAO.getCompanyInternships(user.getId());

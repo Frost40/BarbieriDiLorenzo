@@ -26,7 +26,13 @@ import polimi.SE2.SC.utils.ServiceMessage;
 public class SignUpManager extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
+    protected StudentDAO createStudentDAO() {
+        return new StudentDAO(connection);
+    }
 
+    protected CompanyDAO createCompanyDAO() {
+        return new CompanyDAO(connection);
+    }
     public SignUpManager() {
         super();
     }
@@ -74,14 +80,16 @@ public class SignUpManager extends HttpServlet {
             nationality = request.getParameter("nationality");
             cityOfBirth = request.getParameter("cityOfBirth");
 
-            studentDAO = new StudentDAO(connection);
+            studentDAO = createStudentDAO();
+            //studentDAO = new StudentDAO(connection);
             returnedServiceMessage = readyForRegistration(email, password, repeatedPassword, name, surname, nationality, cityOfBirth, studentDAO);
         }
         else {
             mainOffice = request.getParameter("mainOffice");
             offices = request.getParameter("offices");
 
-            companyDAO = new CompanyDAO(connection);
+            companyDAO = createCompanyDAO();
+            //companyDAO = new CompanyDAO(connection);
             returnedServiceMessage = readyForRegistration(email, password, repeatedPassword, name, mainOffice, offices, companyDAO);
         }
 
