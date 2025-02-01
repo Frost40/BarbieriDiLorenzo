@@ -31,7 +31,9 @@ import polimi.SE2.SC.utils.ConnectionHandler;
 public class MessagesManager extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
-
+    protected MessageDAO createMessageDAO() {
+        return new MessageDAO(connection);
+    }
     public MessagesManager() {
         super();
     }
@@ -60,7 +62,7 @@ public class MessagesManager extends HttpServlet {
         ArrayList<Internship> allChatsForStudent = null;
         HashMap<Internship, ArrayList<Student>> allChatsForCompany = null;
 
-        MessageDAO messageDAO = new MessageDAO(connection);
+        MessageDAO messageDAO = createMessageDAO();
         try {
             if (isStudent) {
                 allChatsForStudent = messageDAO.getAllChatsForStudent(user.getId());

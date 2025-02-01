@@ -36,7 +36,9 @@ import static polimi.SE2.SC.utils.UtilityFunctions.splitStringByComma;
 public class ModifyCv extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
-
+    protected CvDAO createCvDAO() {
+        return new CvDAO(connection);
+    }
     public ModifyCv() {
         super();
     }
@@ -108,7 +110,7 @@ public class ModifyCv extends HttpServlet {
         if (parsedId.isPresent())			cvId = parsedId.get();
         else	return;
 
-        CvDAO cvDAO = new CvDAO(connection);
+        CvDAO cvDAO = createCvDAO();
         Cv cv = null;
         try {
             cv = cvDAO.getStudentCv(user.getId());
