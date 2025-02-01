@@ -1,5 +1,7 @@
 package polimi.SE2.SC.beans;
 
+import java.util.Objects;
+
 public class Complaint extends Communication{
     private boolean readByStudent;
     private boolean readByInternship;
@@ -36,5 +38,21 @@ public class Complaint extends Communication{
 
     public void setClosedByCompany(boolean closedByCompany) {
         this.closedByCompany = closedByCompany;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Complaint complaint = (Complaint) o;
+        return readByStudent == complaint.readByStudent &&
+                readByInternship == complaint.readByInternship &&
+                closedByStudent == complaint.closedByStudent &&
+                closedByCompany == complaint.closedByCompany;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(readByStudent, readByInternship, closedByStudent, closedByCompany);
     }
 }

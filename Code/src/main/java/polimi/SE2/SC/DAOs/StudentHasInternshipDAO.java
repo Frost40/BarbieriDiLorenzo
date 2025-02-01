@@ -221,6 +221,62 @@ public class StudentHasInternshipDAO {
     }
 
     /**
+     * Method used to retrieve a specific student-internship experience independently of the application status
+     *
+     * @param studentId Student identifier
+     * @param internshipId Internship identifier
+     * @return The corresponding internship period experience present in the database
+     * @throws SQLException
+     */
+    public StudentHasInternship getStudentHasInternship (int studentId, int internshipId) throws SQLException {
+        StudentHasInternship studentHasInternship = null;
+        String performedAction = " extracting student-internship experience (studentHasInternship) via studentId-internshipId ";
+        String query = "SELECT * FROM StudentHasInternship WHERE studentId = ? AND internshipId = ?";
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, studentId);
+            preparedStatement.setInt(2, internshipId);
+
+            resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                studentHasInternship = new StudentHasInternship();
+
+                studentHasInternship.setId(resultSet.getInt("id"));
+                studentHasInternship.setStartDate(resultSet.getDate("startDate"));
+                studentHasInternship.setEndDate(resultSet.getDate("endDate"));
+                studentHasInternship.setCompanyAccepted(resultSet.getBoolean("companyAccepted"));
+                studentHasInternship.setApplicationStatus(resultSet.getString("applicationStatus"));
+                studentHasInternship.setStudentId(resultSet.getInt("studentId"));
+                studentHasInternship.setInternshipId(resultSet.getInt("internshipId"));
+            }
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                resultSet.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the result set when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
+        return studentHasInternship;
+    }
+
+    /**
      * Method used to add a student application into the database
      *
      * @param internshipId Identifier for the internship

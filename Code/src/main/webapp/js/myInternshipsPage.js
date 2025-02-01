@@ -12,6 +12,7 @@ function MyInternshipsPage(user, pageOrchestrator) {
     let otherDataDiv = document.getElementById('other-data');
     let questionnairesDiv = document.getElementById('questionnaires-div');
     let interviewsDiv = document.getElementById('interviews-div');
+    let complaintsDiv = document.getElementById('complaints-div');
     let homePageButton = document.getElementById('home-page-btn');
     let searchPageButton = document.getElementById('search-page-btn');
     let logoutButton = document.getElementById('log-out-btn');
@@ -185,6 +186,17 @@ function MyInternshipsPage(user, pageOrchestrator) {
     function openInformationPage(studentHasInternshipId) {
         console.log(studentHasInternshipId);
         console.log(applicationStatus);
+        clearDiv(otherDataDiv.id);
+        removeDiv('end-message-div');
+        removeDiv('questionnaires-div');
+        removeDiv('complaints-div');
+
+        questionnaires = [];
+        complaints = [];
+        interviewsScheduled = [];
+        feedbacks = [];
+        student = null;
+        cv = null;
 
         var url = "OpenMyInternshipInformationSpace?studentHasInternshipId=" + encodeURIComponent(studentHasInternshipId);
 
@@ -222,11 +234,11 @@ function MyInternshipsPage(user, pageOrchestrator) {
                                 break;
 
                             case "ongoing":
-                                populateForOngoing();
+                                populateForOngoing(studentHasInternshipId);
                                 break;
 
                             case "ended":
-                                populateForEnded();
+                                populateForEnded(studentHasInternshipId);
                                 break;
 
                             case "rejected":
@@ -331,86 +343,53 @@ function MyInternshipsPage(user, pageOrchestrator) {
             feedbacks.forEach(feedback => {
                 let feedbackItem = document.createElement("div");
                 feedbackItem.className = "feedback-item";
-                feedbackItem.innerHTML = `
-                <p><strong>Rating:</strong> ${feedback.rating} ⭐</p>
-                <p><strong>Comment:</strong> ${feedback.text}</p>
-            `;
+
+                // Create a container for the feedback line
+                const feedbackLine = document.createElement("div");
+                feedbackLine.className = "feedback-line";
+
+                const userSpan = document.createElement("span");
+                userSpan.className = "feedback-user";
+                userSpan.textContent = `user #${feedback.studentHasInternshipId}:`;
+
+                // Create a span for the comment and rating
+                const commentRatingSpan = document.createElement("span");
+                commentRatingSpan.className = "feedback-comment-rating";
+
+                // Create a span for the comment
+                const commentSpan = document.createElement("span");
+                commentSpan.className = "feedback-comment";
+                commentSpan.textContent = feedback.text;
+
+                // Create a span for the rating
+                const ratingSpan = document.createElement("span");
+                ratingSpan.className = "feedback-rating";
+                ratingSpan.textContent = `Rating: ${feedback.rating} ⭐`;
+
+                // Append comment and rating to the commentRatingSpan
+                commentRatingSpan.appendChild(commentSpan);
+                commentRatingSpan.appendChild(ratingSpan);
+
+                // Append user and commentRatingSpan to the feedback line
+                feedbackLine.appendChild(userSpan);
+                feedbackLine.appendChild(commentRatingSpan);
+
+                // Append the feedback line to the feedback item
+                feedbackItem.appendChild(feedbackLine);
+
+                // Append the feedback item to the feedbacks div
                 feedbacksDiv.appendChild(feedbackItem);
             });
         } else {
             feedbacksDiv.innerHTML = "<p>No feedbacks available.</p>";
         }
-
-        if (isStudent) {
-            // Create the feedback form
-            const feedbackForm = document.createElement('form');
-            feedbackForm.id = 'feedbackForm';
-
-            // Create a text area for feedback
-            const feedbackTextArea = document.createElement('textarea');
-            feedbackTextArea.name = 'text'; // Set the name attribute
-            feedbackTextArea.placeholder = 'Enter your feedback (max 255 characters)';
-            feedbackTextArea.maxLength = 255; // Set maximum length
-            feedbackTextArea.style.width = '100%'; // Full width
-
-            // Create a container for the textarea and rating selector
-            const feedbackRatingContainer = document.createElement('div');
-            feedbackRatingContainer.className = 'feedback-rating-container';
-
-            // Append the textarea to the container
-            feedbackRatingContainer.appendChild(feedbackTextArea);
-
-            // Create a container for the rating selector
-            const ratingContainer = document.createElement('div');
-            ratingContainer.className = 'rating-container';
-
-            // Create a label for the rating selector
-            const ratingLabel = document.createElement('label');
-            ratingLabel.textContent = 'Rating (1-10): ';
-            ratingContainer.appendChild(ratingLabel);
-
-            // Create a rating selector
-            const ratingSelect = document.createElement('select');
-            ratingSelect.name = 'rating'; // Set the name attribute
-            for (let i = 1; i <= 10; i++) {
-                const option = document.createElement('option');
-                option.value = i;
-                option.textContent = i;
-                ratingSelect.appendChild(option);
-            }
-            ratingContainer.appendChild(ratingSelect);
-            feedbackRatingContainer.appendChild(ratingContainer); // Append the rating container to the feedback-rating-container
-
-            // Append the feedback-rating-container to the form
-            feedbackForm.appendChild(feedbackRatingContainer);
-
-            // Create a hidden input for ongoingInternshipId
-            const internshipIdInput = document.createElement('input');
-            internshipIdInput.type = 'hidden'; // Set type to hidden
-            internshipIdInput.name = 'ongoingInternshipId'; // Set the name attribute
-            internshipIdInput.value = studentHasInternshipId; // Set the value to the student's internship ID
-            feedbackForm.appendChild(internshipIdInput);
-
-            // Create a submit button
-            const submitButton = document.createElement('button');
-            submitButton.type = 'submit'; // Set type to submit
-            submitButton.textContent = 'Send Feedback';
-            feedbackForm.appendChild(submitButton);
-
-            // Append the form to the feedbacks div
-            feedbacksDiv.appendChild(feedbackForm);
-
-            // Handle form submission
-            feedbackForm.addEventListener('submit', (event) => {
-                event.preventDefault(); // Prevent default form submission
-                uploadFeedback(feedbackForm, studentHasInternshipId);
-            });
-        }
     }
 
-    function populateForEvaluation(studentHasInternshipId, isStudent) {
+
+    function populateForEvaluation(studentHasInternshipId) {
         const studentInfoDiv = document.createElement('div');
         studentInfoDiv.id = 'student-info';
+        console.log(isStudent);
 
         if (isStudent) {
             // Se isStudent è true, mostra il messaggio di valutazione
@@ -465,20 +444,22 @@ function MyInternshipsPage(user, pageOrchestrator) {
     }
 
     function populateForSelectionProcess(studentHasInternshipId) {
+        removeDiv('questionnaires-div');
         populateQuestionnaires(studentHasInternshipId);
         populateInterviews(studentHasInternshipId);
     }
 
     function populateQuestionnaires(studentHasInternshipId) {
+        questionnairesDiv = document.getElementById('questionnaires-div');
         // Check if the div already exists
         if (!questionnairesDiv) {
             // Create the first div for questionnaires
             questionnairesDiv = document.createElement('div');
             questionnairesDiv.id = 'questionnaires-div';
             questionnairesDiv.className = 'data-container'; // Assign a class name
-        } else {
-            clearDiv('questionnaires-div');
         }
+
+        clearDiv('questionnaires-div');
 
         // Check if questionnaires are empty
         if (questionnaires.length === 0) {
@@ -628,11 +609,11 @@ function MyInternshipsPage(user, pageOrchestrator) {
         }
 
         // Assuming 'otherDataDiv' is already defined and refers to the existing div
-        // Append both divs to the existing other-data div
         otherDataDiv.appendChild(questionnairesDiv);
     }
 
     function populateInterviews(studentHasInternshipId) {
+        interviewsDiv = document.getElementById('interviews-div');
         // Check if the div already exists
         if (!interviewsDiv) {
             // Create the second div for interviews scheduled
@@ -707,12 +688,178 @@ function MyInternshipsPage(user, pageOrchestrator) {
         otherDataDiv.appendChild(interviewsDiv);
     }
 
-    function populateForOngoing() {
+    function populateForOngoing(studentHasInternshipId) {
+        complaintsDiv = document.getElementById('complaints-div');
+        // Check if the div already exists
+        if (!complaintsDiv) {
+            // Create a new div to hold the complaints
+            complaintsDiv = document.createElement('div');
+            complaintsDiv.className = 'complaints-container';
+            complaintsDiv.id = 'complaint-div';
+        }
+        // Clear previous content
+        clearDiv(complaintsDiv.id);
 
+        // Check if there are complaints
+        if (complaints.length === 0) {
+            // Display a message if there are no complaints
+            const noComplaintsMessage = document.createElement('div');
+            noComplaintsMessage.className = 'no-complaints-message';
+            noComplaintsMessage.textContent = 'No complaints to display.';
+            complaintsDiv.appendChild(noComplaintsMessage);
+        } else {
+            // Iterate over each complaint and create a block for it
+            complaints.forEach(complaint => {
+                // Create a block for each complaint
+                const complaintBlock = document.createElement('div');
+                complaintBlock.className = 'complaint-block';
+
+                // Create a scrollable div for the complaint text
+                const complaintTextDiv = document.createElement('div');
+                complaintTextDiv.className = 'complaint-text';
+                complaintTextDiv.textContent = complaint.text;
+
+                // Append the text and button to the complaint block
+                complaintBlock.appendChild(complaintTextDiv);
+
+                if (!((isStudent && complaint.closedByStudent) || (isCompany && complaint.closedByCompany))) {
+                    // Create a Close button using the createButton function
+                    const closeButton = createButton('close-button btn-gossamer', 'Close', '❌', () => {
+                        closeComplaint(complaint.id, studentHasInternshipId);
+                    });
+                    complaintBlock.appendChild(closeButton);
+                }
+
+                // Append the complaint block to the complaints container
+                complaintsDiv.appendChild(complaintBlock);
+            });
+        }
+
+        // Create a form for uploading a complaint
+        const uploadForm = document.createElement('form');
+        uploadForm.className = 'upload-form';
+        uploadForm.onsubmit = (event) => {
+            event.preventDefault(); // Prevent default form submission
+            uploadComplaint(uploadForm, studentHasInternshipId); // Call the uploadComplaint function
+            complaintInput.value = ''; // Clear the input field after submission
+        };
+
+        // Create a text input for the complaint
+        const complaintInput = document.createElement('input');
+        complaintInput.type = 'text';
+        complaintInput.name = 'complaint'; // Name attribute for the input
+        complaintInput.maxLength = 255; // Set maximum characters
+        complaintInput.placeholder = 'Enter your complaint here...';
+        complaintInput.required = true; // Make it required
+
+        // Create a hidden input for ongoingInternshipId
+        const internshipIdInput = document.createElement('input');
+        internshipIdInput.type = 'hidden'; // Set type to hidden
+        internshipIdInput.name = 'ongoingInternshipId'; // Set the name attribute
+        internshipIdInput.value = studentHasInternshipId; // Set the value to the student's internship ID
+
+        // Create the Upload complaint button
+        const uploadButton = createButton('upload-button btn-gossamer', 'Upload complaint', '📤', () => {
+            // This function will be called on form submission
+        });
+
+        // Append the input and button to the form
+        uploadForm.appendChild(complaintInput);
+        uploadForm.appendChild(uploadButton);
+        uploadForm.appendChild(internshipIdInput);
+
+        // Append the form to the complaints container
+        complaintsDiv.appendChild(uploadForm);
+
+        // Append the complaints container to the other-data div
+        otherDataDiv.appendChild(complaintsDiv);
     }
 
-    function populateForEnded() {
+    function populateForEnded(studentHasInternshipId) {
+        // Clear any existing content in the other-data div
+        clearDiv(otherDataDiv.id)
 
+        // Create a new div for the message
+        const messageDiv = document.createElement('div');
+        messageDiv.id = 'end-message-div'
+        messageDiv.className = 'ended-message'; // Add a class for styling
+        messageDiv.textContent = 'The internship period has ended';
+
+        // Append the message div to the other-data div
+        otherDataDiv.appendChild(messageDiv);
+
+        if (isStudent) {
+            // Create the feedback form
+            const feedbackForm = document.createElement('form');
+            feedbackForm.id = 'feedbackForm';
+
+            // Create a text area for feedback
+            const feedbackTextArea = document.createElement('textarea');
+            feedbackTextArea.name = 'text'; // Set the name attribute
+            feedbackTextArea.placeholder = 'Enter your feedback (max 255 characters)';
+            feedbackTextArea.maxLength = 255; // Set maximum length
+            feedbackTextArea.style.width = '100%'; // Full width
+
+            console.log('Feedback Text:', feedbackTextArea.value);
+            console.log('Internship ID:', studentHasInternshipId);
+
+            // Create a container for the textarea and rating selector
+            const feedbackRatingContainer = document.createElement('div');
+            feedbackRatingContainer.className = 'feedback-rating-container';
+
+            // Append the textarea to the container
+            feedbackRatingContainer.appendChild(feedbackTextArea);
+
+            // Create a container for the rating selector
+            const ratingContainer = document.createElement('div');
+            ratingContainer.className = 'rating-container';
+
+            // Create a label for the rating selector
+            const ratingLabel = document.createElement('label');
+            ratingLabel.textContent = 'Rating (1-10): ';
+            ratingContainer.appendChild(ratingLabel);
+
+            // Create a rating selector
+            const ratingSelect = document.createElement('select');
+            ratingSelect.name = 'rating'; // Set the name attribute
+            for (let i = 1; i <= 10; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                ratingSelect.appendChild(option);
+            }
+            ratingContainer.appendChild(ratingSelect);
+            feedbackRatingContainer.appendChild(ratingContainer); // Append the rating container to the feedback-rating-container
+
+            // Append the feedback-rating-container to the form
+            feedbackForm.appendChild(feedbackRatingContainer);
+
+            // Create a hidden input for ongoingInternshipId
+            const internshipIdInput = document.createElement('input');
+            internshipIdInput.type = 'hidden'; // Set type to hidden
+            internshipIdInput.name = 'ongoingInternshipId'; // Set the name attribute
+            internshipIdInput.value = studentHasInternshipId; // Set the value to the student's internship ID
+            feedbackForm.appendChild(internshipIdInput);
+
+            // Create a submit button
+            const submitButton = document.createElement('button');
+            submitButton.type = 'submit'; // Set type to submit
+            submitButton.textContent = 'Send Feedback';
+            feedbackForm.appendChild(submitButton);
+
+            // Append the form to the feedbacks div
+            feedbacksDiv.appendChild(feedbackForm);
+
+            // Handle form submission
+            feedbackForm.addEventListener('submit', (event) => {
+                event.preventDefault(); // Prevent default form submission
+                console.log('Feedback Text:', feedbackTextArea.value);
+                console.log('Rating:', ratingSelect.value);
+                console.log('Internship ID:', studentHasInternshipId);
+                uploadFeedback(feedbackForm, studentHasInternshipId);
+                feedbackTextArea.value = '';
+            });
+        }
     }
 
     function populateForRejected() {
@@ -1020,7 +1167,89 @@ function MyInternshipsPage(user, pageOrchestrator) {
 
                         // Code to execute in case of successful callBack
                         applicationStatus = "ongoing";
+                        removeDiv(questionnairesDiv.id);
+                        removeDiv(interviewsDiv.id);
                         openInformationPage(studentHasInternshipId);
+
+                        break;
+
+                    case 400: // bad request
+                        showErrorAlert(message);
+                        break;
+
+                    case 401: // unauthorized
+                        showErrorAlert(message);
+                        break;
+
+                    case 500: // server error
+                        showErrorAlert(message);
+                        break;
+
+                    default:
+                        pageOrchestrator.showPage("home page");
+                        break;
+                }
+            }
+        });
+    }
+
+    function uploadComplaint(form, studentHasInternshipId) {
+        makeCall("POST", "UploadComplaint", form, function (x) {
+            if (x.readyState === XMLHttpRequest.DONE) {
+                var message = x.responseText;
+                switch (x.status) {
+                    case 200:
+                        var jsonObject = JSON.parse(message);
+
+                        // Code to execute in case of successful callBack
+                        complaints = jsonObject.openComplaints;
+                        clearDiv(complaintsDiv.id);
+                        populateForOngoing(studentHasInternshipId);
+
+                        break;
+
+                    case 400: // bad request
+                        showErrorAlert(message);
+                        break;
+
+                    case 401: // unauthorized
+                        showErrorAlert(message);
+                        break;
+
+                    case 500: // server error
+                        showErrorAlert(message);
+                        break;
+
+                    default:
+                        pageOrchestrator.showPage("home page");
+                        break;
+                }
+            }
+        });
+    }
+
+    function closeComplaint(complaintId, studentHasInternshipId) {
+        let tempFormCloseComplaint = document.createElement('form');
+
+        // Create hidden input for student-internship association id
+        const complaintIdInput = document.createElement('input');
+        complaintIdInput.type = 'hidden';
+        complaintIdInput.name = 'complaintId';
+        complaintIdInput.value = complaintId;
+        tempFormCloseComplaint.appendChild(complaintIdInput);
+
+
+        makeCall("POST", "CloseComplaint", tempFormCloseComplaint, function (x) {
+            if (x.readyState === XMLHttpRequest.DONE) {
+                var message = x.responseText;
+                switch (x.status) {
+                    case 200:
+                        var jsonObject = JSON.parse(message);
+
+                        // Code to execute in case of successful callBack
+                        complaints = jsonObject.openComplaints;
+                        clearDiv(complaintsDiv.id);
+                        populateForOngoing(studentHasInternshipId);
 
                         break;
 
@@ -1063,6 +1292,7 @@ function MyInternshipsPage(user, pageOrchestrator) {
 
                         // Code to execute in case of successful callBack
                         applicationStatus = "ended";
+                        removeDiv(complaintsDiv.id);
                         openInformationPage(studentHasInternshipId);
 
                         break;

@@ -81,7 +81,7 @@ public class QuestionnaireDAO {
     }
     
     /**
-     * Method used to retrieve all interview schedule dates for a given student-internship association
+     * Method used to retrieve all questionnaires for a given student-internship association
      *
      * @param studentHasInternshipId Identifier for the given student-internship association
      * @return Array list containing all the interview scheduled
@@ -91,6 +91,69 @@ public class QuestionnaireDAO {
         ArrayList<Questionnaire> questionnaires = new ArrayList<>();
         String performedAction = " extracting all questionnaires relative to the given student-internship association ";
         String query = "SELECT * FROM Questionnaire WHERE studentHasInternshipId = ?";
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, studentHasInternshipId);
+
+            resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                Questionnaire questionnaire = new Questionnaire();
+
+                questionnaire.setId(resultSet.getInt("id"));
+                questionnaire.setFile(resultSet.getBytes("file"));
+                questionnaire.setFileType(resultSet.getString("fileType"));
+                questionnaire.setCompleted(resultSet.getBoolean("completed"));
+                // Retrieve the evaluation column
+                Boolean evaluation = resultSet.getBoolean("evaluation");
+                if (resultSet.wasNull()) {
+                    // The evaluation column was null
+                    questionnaire.setEvaluation(null); // or handle it as needed
+                } else {
+                    // The evaluation column was not null, set the value
+                    questionnaire.setEvaluation(evaluation);
+                }
+                questionnaire.setStudentHasInternshipId(resultSet.getInt("studentHasInternshipId"));
+
+                questionnaires.add(questionnaire);
+            }
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                resultSet.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the result set when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
+        return questionnaires;
+    }
+
+    /**
+     * Method used to retrieve all questionnaires failed for a given student-internship association
+     *
+     * @param studentHasInternshipId Identifier for the given student-internship association
+     * @return Array list containing all the failed questionnaires
+     * @throws SQLException
+     */
+    public ArrayList<Questionnaire> getFailedQuestionnaires(int studentHasInternshipId) throws SQLException {
+        ArrayList<Questionnaire> questionnaires = new ArrayList<>();
+        String performedAction = " extracting all failed questionnaires relative to the given student-internship association ";
+        String query = "SELECT * FROM Questionnaire WHERE studentHasInternshipId = ? AND evaluation = false";
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
 
