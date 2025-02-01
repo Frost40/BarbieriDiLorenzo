@@ -140,6 +140,69 @@
     cursor: pointer; /* Pointer cursor on hover */
 }
 
+/* Style for the feedback form */
+#feedbackForm {
+    display: flex; /* Use flexbox for layout */
+    flex-direction: column; /* Stack elements vertically */
+    margin-bottom: 10px; /* Space below the form */
+}
+
+/* Container for the textarea and rating selector */
+.feedback-rating-container {
+    display: flex; /* Use flexbox for layout */
+    align-items: flex-start; /* Align items at the start */
+    margin-bottom: 10px; /* Space below the container */
+}
+
+/* Style for the text area */
+#feedbackForm textarea {
+    resize: none; /* Disable resizing */
+    padding: 10px; /* Add padding inside the text area */
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 4px; /* Rounded corners */
+    height: 60px; /* Set a reduced height for the textarea */
+    flex: 1; /* Allow the textarea to grow and take up available space */
+    margin-right: 10px; /* Space between textarea and rating selector */
+    font-size: 14px; /* Font size */
+}
+
+/* Style for the rating label */
+#feedbackForm label {
+    margin-bottom: 5px; /* Space below the label */
+    font-weight: bold; /* Make the label bold */
+}
+
+/* Style for the rating selector */
+#feedbackForm select {
+    padding: 10px; /* Add padding inside the select */
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 4px; /* Rounded corners */
+    font-size: 14px; /* Font size */
+}
+
+/* Style for the submit button */
+#feedbackForm button {
+    padding: 10px 15px; /* Add padding inside the button */
+    background-color: #4CAF50; /* Green background color */
+    color: white; /* White text color */
+    border: none; /* Remove border */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Change cursor to pointer */
+    font-size: 16px; /* Font size */
+    width: 100%; /* Full width */
+}
+
+/* Change button color on hover */
+#feedbackForm button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+/* Optional: Style for error messages */
+.error-message {
+    color: red; /* Red text for error messages */
+    margin-top: 10px; /* Space above the error message */
+}
+
 /* Responsive Styles */
 @media (max-width: 768px) {
     .container {

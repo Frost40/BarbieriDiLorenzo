@@ -310,7 +310,7 @@ public class StudentHasInternshipDAO {
     public void endInternshipExperience(int id) throws SQLException {
         String performedAction = " setting the end date for the internship experience ";
         String query = "UPDATE StudentHasInternship " +
-                    "SET endDate = CURDATE() AND applicationStatus = ? " +
+                    "SET endDate = CURDATE(), applicationStatus = ? " +
                     "WHERE id = ?";
 
         PreparedStatement preparedStatement = null;
@@ -346,7 +346,7 @@ public class StudentHasInternshipDAO {
     public void startInternshipExperience(int id) throws SQLException {
         String performedAction = " setting the start date for the internship experience ";
         String query = "UPDATE StudentHasInternship " +
-                "SET startDate = CURDATE() AND applicationStatus = ? " +
+                "SET startDate = CURDATE(), applicationStatus = ? " +
                 "WHERE id = ?";
 
         PreparedStatement preparedStatement = null;

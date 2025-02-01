@@ -68,7 +68,7 @@ public class UploadFeedback extends HttpServlet {
         boolean isStudent = user instanceof Student;
 
         // Checking complaint validity
-        if (feedbackText.length() > 255) {
+        if (feedbackText != null && feedbackText.length() > 255) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().println("Invalid feedback (a valid feedback has less than 255)!");
             return;
