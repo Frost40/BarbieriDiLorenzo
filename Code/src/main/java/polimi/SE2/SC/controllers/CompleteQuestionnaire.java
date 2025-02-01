@@ -143,19 +143,31 @@ public class CompleteQuestionnaire extends HttpServlet {
 
         // Validate and retrieve the file input
         String contentType = filePart.getContentType();
-        if (!contentType.equals("application/pdf") &&
-                !contentType.equals("application/msword") &&
-                !contentType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document") &&
-                !contentType.equals("text/plain")) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("File format not permitted!");
-            return;
+        String fileType = null;
+        switch (contentType) {
+            case "application/pdf" -> {
+                fileType = "pdf";
+            }
+            case "application/msword" -> {
+                fileType = "doc";
+            }
+            case "application/vnd.openxmlformats-officedocument.wordprocessingml.document" -> {
+                fileType = "docx";
+            }
+            case "text/plain" -> {
+                fileType = "txt";
+            }
+            default -> {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().println("File format not permitted!");
+                return;
+            }
         }
 
         // Saving the completed questionnaire into the database
         try (InputStream fileContent = filePart.getInputStream()) {
             // Save the questionnaire file as a binary object directly in the database
-            questionnaireDAO.completeQuestionnaire(questionnaireId, fileContent);
+            questionnaireDAO.completeQuestionnaire(questionnaireId, fileContent, fileType);
         } catch (IOException | SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().println(e.getMessage());
@@ -177,7 +189,9 @@ public class CompleteQuestionnaire extends HttpServlet {
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        Gson gson = new GsonBuilder().create();
+        Gson gson = new GsonBuilder()
+                .serializeNulls() // Ensure nulls are serialized
+                .create();
 
         jsonObject.put("questionnaires", questionnaires);
 

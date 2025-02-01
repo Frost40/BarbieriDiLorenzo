@@ -171,6 +171,13 @@ public class EvaluateQuestionnaire extends HttpServlet {
             return;
         }
 
+        // Checking if the questionnaire has already been completed by the student
+        if (!questionnaire.isCompleted()) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().println("This questionnaire has not been completed by the student yet");
+            return;
+        }
+
         // Uploading the evaluation into the database
         try {
             questionnaireDAO.setCompanyDecision(questionnaireId, evaluationBoolean);
