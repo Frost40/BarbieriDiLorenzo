@@ -19,6 +19,7 @@ import javax.servlet.http.*;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import polimi.SE2.SC.DAOs.CompanyDAO;
 import polimi.SE2.SC.DAOs.CvDAO;
 import polimi.SE2.SC.beans.Company;
 import polimi.SE2.SC.beans.Cv;
@@ -33,7 +34,9 @@ public class UploadNewCv extends HttpServlet{
     private static final long serialVersionUID = 1L;
     private Connection connection;
     private String cvStorage;
-
+    protected CvDAO createCvDAO() {
+        return new CvDAO(connection);
+    }
     public UploadNewCv() {
         super();
     }
@@ -90,7 +93,7 @@ public class UploadNewCv extends HttpServlet{
             return;
         }
 
-        CvDAO cvDAO = new CvDAO(connection);
+        CvDAO cvDAO = createCvDAO();
         Cv cv = null;
         try {
             cv = cvDAO.getStudentCv(user.getId());
