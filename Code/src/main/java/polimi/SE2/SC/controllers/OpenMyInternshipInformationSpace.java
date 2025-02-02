@@ -26,7 +26,39 @@ import static polimi.SE2.SC.utils.UtilityFunctions.parsingChecker;
 public class OpenMyInternshipInformationSpace extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
+    protected StudentHasInternshipDAO createStudentHasInternshipDAO() {
+        return new StudentHasInternshipDAO(connection);
+    }
+    protected MessageDAO createMessageDAO() {
+        return new MessageDAO(connection);
+    }
 
+    protected CvDAO createCvDAO() {
+        return new CvDAO(connection);
+    }
+    protected StudentDAO createStudentDAO() {
+        return new StudentDAO(connection);
+    }
+
+    protected CompanyDAO createCompanyDAO() {
+        return new CompanyDAO(connection);
+    }
+    protected FeedbackDAO createFeedbackDAO() {
+        return new FeedbackDAO(connection);
+    }
+
+    protected ComplaintDAO createComplaintDAO() {
+        return new ComplaintDAO(connection);
+    }
+    protected InternshipDAO createInternshipDAO() {
+        return new InternshipDAO(connection);
+    }
+    protected InterviewScheduleDAO createInterviewScheduleDAO() {
+        return new InterviewScheduleDAO(connection);
+    }
+    protected QuestionnaireDAO createQuestionnaireDAO() {
+        return new QuestionnaireDAO(connection);
+    }
     public OpenMyInternshipInformationSpace() {
         super();
     }
@@ -68,7 +100,7 @@ public class OpenMyInternshipInformationSpace extends HttpServlet {
         if (parsedId.isPresent())			studentHasInternshipId = parsedId.get();
         else	return;
 
-        StudentHasInternshipDAO studentHasInternshipDAO = new StudentHasInternshipDAO(connection);
+        StudentHasInternshipDAO studentHasInternshipDAO = createStudentHasInternshipDAO();
         StudentHasInternship studentHasInternship = null;
         try {
             studentHasInternship = studentHasInternshipDAO.getStudentHasInternship(studentHasInternshipId);
@@ -93,7 +125,7 @@ public class OpenMyInternshipInformationSpace extends HttpServlet {
             }
         } else {
             // Checking that the current company user posses the internship in the given student-internship association
-            InternshipDAO internshipDAO = new InternshipDAO(connection);
+            InternshipDAO internshipDAO = createInternshipDAO();
             ArrayList<Internship> companyInternships;
             try {
                 companyInternships = internshipDAO.getCompanyInternships(user.getId());
@@ -112,7 +144,7 @@ public class OpenMyInternshipInformationSpace extends HttpServlet {
         }
 
         // Extracting all internship feedbacks
-        FeedbackDAO feedbackDAO = new FeedbackDAO(connection);
+        FeedbackDAO feedbackDAO = createFeedbackDAO();
         ArrayList<Feedback> feedbacks = null;
         try {
             feedbacks = feedbackDAO.getInternshipFeedbacks(studentHasInternship.getInternshipId());
@@ -131,7 +163,7 @@ public class OpenMyInternshipInformationSpace extends HttpServlet {
                 // In case the user is the company the view will display student info to help evaluate the application
                 if (!isStudent) {
                     // Retrieving student information
-                    StudentDAO studentDAO = new StudentDAO(connection);
+                    StudentDAO studentDAO = createStudentDAO();
                     Student student = null;
                     try {
                         student = studentDAO.getStudentById(studentHasInternship.getStudentId());
@@ -142,7 +174,7 @@ public class OpenMyInternshipInformationSpace extends HttpServlet {
                     }
 
                     // Retrieving student cv
-                    CvDAO cvDAO = new CvDAO(connection);
+                    CvDAO cvDAO = createCvDAO();
                     Cv cv = null;
                     try {
                         cv = cvDAO.getStudentCv(studentHasInternship.getStudentId());
@@ -160,7 +192,7 @@ public class OpenMyInternshipInformationSpace extends HttpServlet {
             }
             case "selectionProcess" -> {
                 // Retrieving all questionnaires
-                QuestionnaireDAO questionnaireDAO = new QuestionnaireDAO(connection);
+                QuestionnaireDAO questionnaireDAO = createQuestionnaireDAO();
                 ArrayList<Questionnaire> questionnaires = null;
                 try {
                     questionnaires = questionnaireDAO.getOngoingInternshipQuestionnaires(studentHasInternshipId);
@@ -171,7 +203,7 @@ public class OpenMyInternshipInformationSpace extends HttpServlet {
                 }
 
                 // Retrieving all interview schedule
-                InterviewScheduleDAO interviewScheduleDAO = new InterviewScheduleDAO(connection);
+                InterviewScheduleDAO interviewScheduleDAO = createInterviewScheduleDAO();
                 ArrayList<InterviewSchedule> interviewSchedules = null;
                 try {
                     interviewSchedules = interviewScheduleDAO.getOngoingInternshipInterviewSchedules(studentHasInternshipId);
@@ -188,7 +220,7 @@ public class OpenMyInternshipInformationSpace extends HttpServlet {
             }
             case "ongoing" -> {
                 // Retrieving all complaints
-                ComplaintDAO complaintDAO = new ComplaintDAO(connection);
+                ComplaintDAO complaintDAO = createComplaintDAO();
                 ArrayList<Complaint> complaints = null;
                 try {
                     complaints = complaintDAO.getOngoingInternshipOpenComplaints(studentHasInternshipId);
@@ -206,7 +238,7 @@ public class OpenMyInternshipInformationSpace extends HttpServlet {
             }
             case "rejected" -> {
                 // Retrieving all questionnaires
-                QuestionnaireDAO questionnaireDAO = new QuestionnaireDAO(connection);
+                QuestionnaireDAO questionnaireDAO = createQuestionnaireDAO();
                 ArrayList<Questionnaire> questionnaires = null;
                 try {
                     questionnaires = questionnaireDAO.getFailedQuestionnaires(studentHasInternshipId);
@@ -217,7 +249,7 @@ public class OpenMyInternshipInformationSpace extends HttpServlet {
                 }
 
                 // Retrieving all interview schedule
-                InterviewScheduleDAO interviewScheduleDAO = new InterviewScheduleDAO(connection);
+                InterviewScheduleDAO interviewScheduleDAO = createInterviewScheduleDAO();
                 ArrayList<InterviewSchedule> interviewSchedules = null;
                 try {
                     interviewSchedules = interviewScheduleDAO.getFailedInterviews(studentHasInternshipId);

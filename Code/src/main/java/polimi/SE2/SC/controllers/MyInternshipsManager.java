@@ -34,7 +34,9 @@ import polimi.SE2.SC.utils.ConnectionHandler;
 public class MyInternshipsManager extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
-
+    protected StudentHasInternshipDAO createStudentHasInternshipDAO() {
+        return new StudentHasInternshipDAO(connection);
+    }
     public MyInternshipsManager() {
         super();
     }
@@ -63,7 +65,7 @@ public class MyInternshipsManager extends HttpServlet {
         HashMap<Internship, StudentHasInternship> allStudentHasInternshipForStudent = null;
         HashMap<Internship, HashMap<Student, StudentHasInternship>> allStudentHasInternshipForCompany = null;
 
-        StudentHasInternshipDAO studentHasInternshipDAO = new StudentHasInternshipDAO(connection);
+        StudentHasInternshipDAO studentHasInternshipDAO = createStudentHasInternshipDAO();
         try {
             if (isStudent) {
                 allStudentHasInternshipForStudent = studentHasInternshipDAO.getAllStudentInternships(user.getId());
