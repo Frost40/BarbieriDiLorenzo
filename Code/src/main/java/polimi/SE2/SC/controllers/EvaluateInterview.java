@@ -28,7 +28,15 @@ import static polimi.SE2.SC.utils.UtilityFunctions.parsingChecker;
 public class EvaluateInterview extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
-
+    protected StudentHasInternshipDAO createStudentHasInternshipDAO() {
+        return new StudentHasInternshipDAO(connection);
+    }
+    protected InternshipDAO createInternshipDAO() {
+        return new InternshipDAO(connection);
+    }
+    protected InterviewScheduleDAO createInterviewScheduleDAO() {
+        return new InterviewScheduleDAO(connection);
+    }
     public EvaluateInterview() {
         super();
     }
@@ -97,7 +105,7 @@ public class EvaluateInterview extends HttpServlet {
         else	return;
 
         // Checking if the given interview schedule exists
-        InterviewScheduleDAO interviewScheduleDAO = new InterviewScheduleDAO(connection);
+        InterviewScheduleDAO interviewScheduleDAO = createInterviewScheduleDAO();
         InterviewSchedule interviewSchedule = null;
         try {
             interviewSchedule = interviewScheduleDAO.getInterviewSchedule(interviewScheduleId);
@@ -121,13 +129,18 @@ public class EvaluateInterview extends HttpServlet {
         }
 
         // Retrieving the student-internship association
-        StudentHasInternshipDAO studentHasInternshipDAO = new StudentHasInternshipDAO(connection);
+        StudentHasInternshipDAO studentHasInternshipDAO = createStudentHasInternshipDAO();
         StudentHasInternship studentHasInternship = null;
         try {
             studentHasInternship = studentHasInternshipDAO.getStudentHasInternship(studentHasInternshipId);
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().println(e.getMessage());
+            return;
+        }
+        if (studentHasInternship == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().println("The given studentHasInternship id does not match any ongoing internship");
             return;
         }
 
@@ -139,7 +152,7 @@ public class EvaluateInterview extends HttpServlet {
         }
 
         // Checking that the company in the current session is actually the owner of the given internship
-        InternshipDAO internshipDAO = new InternshipDAO(connection);
+        InternshipDAO internshipDAO = createInternshipDAO();
         ArrayList<Internship> companyInternships = null;
         try {
             companyInternships = internshipDAO.getCompanyInternships(user.getId());
