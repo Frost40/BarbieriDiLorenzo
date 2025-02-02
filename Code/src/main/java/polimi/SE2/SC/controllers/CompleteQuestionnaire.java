@@ -123,7 +123,7 @@ public class CompleteQuestionnaire extends HttpServlet {
         // Checking that the user in the current session is a student
         if (!isStudent) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().println("Only students con complete questionnaires");
+            response.getWriter().println("Only students can complete questionnaires");
             return;
         }
 

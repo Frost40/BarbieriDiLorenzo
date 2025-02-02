@@ -103,7 +103,7 @@ public class OpenChatWindow extends HttpServlet {
             List<Integer> companyInternshipsIds = companyInternships.stream().map(Internship::getId).toList();
             if (!companyInternshipsIds.contains(myAccountId)) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().println("You do not posses the internship used to chat with the student");
+                response.getWriter().println("You do not possess the internship used to chat with the student");
                 return;
             }
         }

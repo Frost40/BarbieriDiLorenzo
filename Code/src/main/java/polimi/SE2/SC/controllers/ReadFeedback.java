@@ -64,7 +64,7 @@ public class ReadFeedback extends HttpServlet {
         // Checking if the given id is valid
         if(feedbackIdString == null || feedbackIdString.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("The id for the complaint is null!");
+            response.getWriter().println("The id for the feedback is null!");
             return;
         }
 

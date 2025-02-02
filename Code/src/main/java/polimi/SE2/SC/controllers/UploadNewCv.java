@@ -95,7 +95,7 @@ public class UploadNewCv extends HttpServlet{
         try {
             cv = cvDAO.getStudentCv(user.getId());
         } catch (SQLException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().println(e.getMessage());
             return;
         }

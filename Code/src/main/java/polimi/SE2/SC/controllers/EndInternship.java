@@ -128,7 +128,7 @@ public class EndInternship extends HttpServlet {
         } else {
             // The internship period is not started yet
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().println("Your not in the correct period to start the internship");
+            response.getWriter().println("Your not in the correct period to end the internship");
             return;
         }
 

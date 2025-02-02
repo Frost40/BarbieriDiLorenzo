@@ -59,7 +59,7 @@ public class UploadFeedback extends HttpServlet {
         String feedbackText = request.getParameter("text");
         String ratingString = request.getParameter("rating");
         String ongoingInternshipIdString = request.getParameter("ongoingInternshipId");
-        System.out.println(feedbackText);
+
         HttpSession session = request.getSession();
         User user    = (User)session.getAttribute("currentUser");
 
@@ -77,7 +77,7 @@ public class UploadFeedback extends HttpServlet {
         // Checking if the id of the given ongoing internship (studentHasInternship) is valid
         if(ongoingInternshipIdString == null || ongoingInternshipIdString.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("No valid id for the ongoing internship was associated to the request!");
+            response.getWriter().println("No valid id for the ongoing internship was associated with the request!");
             return;
         }
 

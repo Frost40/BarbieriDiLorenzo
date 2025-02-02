@@ -53,7 +53,7 @@ public class ManageStudentApplication extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String studentHasInternshipIdString = request.getParameter("studentHasInternshipId");
         String evaluation = request.getParameter("evaluation");
-        System.out.println(evaluation);
+
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("currentUser");
 
@@ -71,7 +71,7 @@ public class ManageStudentApplication extends HttpServlet {
         // Checking if the inserted evaluation is valid
         if (evaluation == null || (!evaluation.equalsIgnoreCase("true") && !evaluation.equalsIgnoreCase("false"))) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("Invalid evaluation parameter! Expected 'true' or 'false'.");
+            response.getWriter().println("Invalid evaluation parameter! Expected 'true' or 'false'");
             return;
         }
         evaluationBoolean = Boolean.parseBoolean(evaluation);
