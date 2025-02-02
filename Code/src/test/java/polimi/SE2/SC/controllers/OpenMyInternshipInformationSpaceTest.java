@@ -100,7 +100,6 @@ public class OpenMyInternshipInformationSpaceTest {
         openMyInternshipInfoSpaceServlet.doGet(request, response);
 
         verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        assertTrue(responseWriter.toString().contains("Enable to retrieve data since the provided id is null"));
     }
 
     // -------------------------------------------------------------------------

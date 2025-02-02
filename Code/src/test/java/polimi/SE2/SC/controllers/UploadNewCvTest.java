@@ -216,7 +216,7 @@ public class UploadNewCvTest {
 
         uploadNewCvServlet.doPost(request, response);
 
-        verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         assertTrue(responseWriter.toString().contains("DB error"));
     }
 

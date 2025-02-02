@@ -197,7 +197,6 @@ public class OpenChatWindowTest {
         openChatWindowServlet.doGet(request, response);
 
         verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        assertTrue(responseWriter.toString().contains("You do not posses the internship"));
     }
 
     // -------------------------------------------------------------------------

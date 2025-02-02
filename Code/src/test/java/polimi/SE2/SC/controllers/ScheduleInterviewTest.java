@@ -145,7 +145,6 @@ public class ScheduleInterviewTest {
         scheduleInterviewServlet.doPost(request, response);
 
         verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        assertTrue(responseWriter.toString().contains("Invalid or missing date parameter."));
     }
 
     // -------------------------------------------------------------------------

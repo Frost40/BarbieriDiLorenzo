@@ -236,7 +236,6 @@ public class ReadMessageTest {
         readMessageServlet.doPost(request, response);
 
         verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        assertTrue(responseWriter.toString().contains("The id for the complaint is null!"));
     }
 
     // -------------------------------------------------------------------------

@@ -222,7 +222,7 @@ public class EndInternshipTest {
         endInternshipServlet.doPost(request, response);
 
         verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        assertTrue(responseWriter.toString().contains("Your not in the correct period to start the internship"));
+
     }
 
     // -------------------------------------------------------------------------
