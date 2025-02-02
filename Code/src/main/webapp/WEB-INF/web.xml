@@ -45,7 +45,6 @@
     <url-pattern>/EvaluateInterview</url-pattern>
     <url-pattern>/EvaluateQuestionnaire</url-pattern>
     <url-pattern>/HomePageManager</url-pattern>
-    <url-pattern>/Logout</url-pattern>
     <url-pattern>/ManageStudentApplication</url-pattern>
     <url-pattern>/MessagesManager</url-pattern>
     <url-pattern>/ModifyCv</url-pattern>
@@ -61,7 +60,6 @@
     <url-pattern>/ScheduleInterview</url-pattern>
     <url-pattern>/SearchPageManager</url-pattern>
     <url-pattern>/SendMessage</url-pattern>
-    <url-pattern>/SignUpManager</url-pattern>
     <url-pattern>/StartInternship</url-pattern>
     <url-pattern>/UploadComplaint</url-pattern>
     <url-pattern>/UploadFeedback</url-pattern>
