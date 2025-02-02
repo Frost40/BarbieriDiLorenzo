@@ -1,5 +1,7 @@
 package polimi.SE2.SC.controllers;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import polimi.SE2.SC.DAOs.ComplaintDAO;
 import polimi.SE2.SC.beans.Complaint;
 import polimi.SE2.SC.beans.Student;
@@ -18,6 +20,8 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static polimi.SE2.SC.utils.UtilityFunctions.parsingChecker;
@@ -117,6 +121,25 @@ public class CloseComplaint extends HttpServlet {
             return;
         }
 
+        ArrayList<Complaint> complaints = null;
+        try {
+            complaints = complaintDAO.getOngoingInternshipOpenComplaints(complaint.getStudentHasInternshipId());
+        } catch (SQLException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().println(e.getMessage());
+            return;
+        }
+
+        // JSON serialization
+        Map<String, Object> jsonObject = new HashMap<>();
         response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        Gson gson = new GsonBuilder().create();
+
+        jsonObject.put("openComplaints", complaints);
+
+        String json = gson.toJson(jsonObject);
+        response.getWriter().write(json);
     }
 }

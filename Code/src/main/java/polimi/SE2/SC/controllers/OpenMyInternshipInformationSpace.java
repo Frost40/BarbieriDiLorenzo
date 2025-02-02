@@ -209,7 +209,7 @@ public class OpenMyInternshipInformationSpace extends HttpServlet {
                 QuestionnaireDAO questionnaireDAO = new QuestionnaireDAO(connection);
                 ArrayList<Questionnaire> questionnaires = null;
                 try {
-                    questionnaires = questionnaireDAO.getOngoingInternshipQuestionnaires(studentHasInternshipId);
+                    questionnaires = questionnaireDAO.getFailedQuestionnaires(studentHasInternshipId);
                 } catch (SQLException e) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     response.getWriter().println(e.getMessage());
@@ -220,7 +220,7 @@ public class OpenMyInternshipInformationSpace extends HttpServlet {
                 InterviewScheduleDAO interviewScheduleDAO = new InterviewScheduleDAO(connection);
                 ArrayList<InterviewSchedule> interviewSchedules = null;
                 try {
-                    interviewSchedules = interviewScheduleDAO.getOngoingInternshipInterviewSchedules(studentHasInternshipId);
+                    interviewSchedules = interviewScheduleDAO.getFailedInterviews(studentHasInternshipId);
                 } catch (SQLException e) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     response.getWriter().println(e.getMessage());

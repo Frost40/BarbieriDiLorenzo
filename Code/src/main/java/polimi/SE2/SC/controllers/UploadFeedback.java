@@ -59,7 +59,7 @@ public class UploadFeedback extends HttpServlet {
         String feedbackText = request.getParameter("text");
         String ratingString = request.getParameter("rating");
         String ongoingInternshipIdString = request.getParameter("ongoingInternshipId");
-
+        System.out.println(feedbackText);
         HttpSession session = request.getSession();
         User user    = (User)session.getAttribute("currentUser");
 
@@ -68,7 +68,7 @@ public class UploadFeedback extends HttpServlet {
         boolean isStudent = user instanceof Student;
 
         // Checking complaint validity
-        if (feedbackText.length() > 255) {
+        if (feedbackText != null && feedbackText.length() > 255) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().println("Invalid feedback (a valid feedback has less than 255)!");
             return;
@@ -122,8 +122,8 @@ public class UploadFeedback extends HttpServlet {
             return;
         }
 
-        // Checking if the given ongoing internship is in the correct time period to upload a questionnaire
-        if (!ongoingInternship.getApplicationStatus().equals("ongoing")) {
+        // Checking if the given ongoing internship is in the correct time period to upload a feedback
+        if (!ongoingInternship.getApplicationStatus().equals("ended")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().println("You are authorized to write a feedback only after the internship period has ended");
             return;

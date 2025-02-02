@@ -84,10 +84,10 @@ function showInfoAlert(title, message) {
 }
 
 // Helper function to create buttons with icons and listeners
-function createButton(text, icon, onClick) {
+function createButton(className, text, icon, onClick) {
     const button = document.createElement('button');
     button.textContent = `${icon} ${text}`;
-    button.className = 'action-button'; // Add a class for styling
+    button.className = className; // Add a class for styling
     button.addEventListener('click', onClick);
     return button;
 }

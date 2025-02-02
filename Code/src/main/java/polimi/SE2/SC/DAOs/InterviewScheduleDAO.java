@@ -120,6 +120,60 @@ public class InterviewScheduleDAO {
     }
 
     /**
+     * Method used to retrieve all interviews failed for a given student-internship association
+     *
+     * @param studentHasInternshipId Identifier for the given student-internship association
+     * @return Array list containing all the interview failed by the student
+     * @throws SQLException
+     */
+    public ArrayList<InterviewSchedule> getFailedInterviews(int studentHasInternshipId) throws SQLException {
+        ArrayList<InterviewSchedule> interviewSchedules = new ArrayList<>();
+        String performedAction = " extracting all interviews failed relative to the given student-internship association ";
+        String query = "SELECT * FROM InterviewSchedule WHERE studentHasInternshipId = ? AND evaluation = FALSE";
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, studentHasInternshipId);
+
+            resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                InterviewSchedule interviewSchedule = new InterviewSchedule();
+
+                interviewSchedule.setId(resultSet.getInt("id"));
+                interviewSchedule.setDate(resultSet.getDate("date"));
+                interviewSchedule.setEvaluation(resultSet.getBoolean("evaluation"));
+                interviewSchedule.setHasBeenRejected(resultSet.getBoolean("hasBeenRejected"));
+                interviewSchedule.setStudentHasInternshipId(resultSet.getInt("studentHasInternshipId"));
+
+                interviewSchedules.add(interviewSchedule);
+            }
+
+        } catch (SQLException e) {
+            throw new SQLException("Error accessing the DB when" + performedAction + "[ " + e.getMessage() + " ]");
+
+        } finally {
+
+            try {
+                resultSet.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the result set when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+
+            try {
+                preparedStatement.close();
+
+            } catch (Exception e) {
+                throw new SQLException("Error closing the statement when" + performedAction + "[ " + e.getMessage() + " ]");
+            }
+        }
+        return interviewSchedules;
+    }
+
+    /**
      * Method used to schedule a new interview for a given student-internship association
      *
      * @param date Date and time for the scheduled interview

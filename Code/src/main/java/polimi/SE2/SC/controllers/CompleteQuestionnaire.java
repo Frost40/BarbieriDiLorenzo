@@ -149,6 +149,13 @@ public class CompleteQuestionnaire extends HttpServlet {
             return;
         }
 
+        // Checking if the questionnaire was already completed
+        if (questionnaire.isCompleted()) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().println("The operation was blocked since the questionnaire was already completed");
+            return;
+        }
+
         // Validate and retrieve the file input
         String contentType = filePart.getContentType();
         String fileType = null;

@@ -10,7 +10,9 @@ function MyInternshipsPage(user, pageOrchestrator) {
     let internshipDescriptionDiv = document.getElementById("internship-description");
     let feedbacksDiv = document.getElementById("feedbacks");
     let otherDataDiv = document.getElementById('other-data');
-    let questionnairesDiv = document.getElementById('questionnairesDiv');
+    let questionnairesDiv = document.getElementById('questionnaires-div');
+    let interviewsDiv = document.getElementById('interviews-div');
+    let complaintsDiv = document.getElementById('complaints-div');
     let homePageButton = document.getElementById('home-page-btn');
     let searchPageButton = document.getElementById('search-page-btn');
     let logoutButton = document.getElementById('log-out-btn');
@@ -35,12 +37,18 @@ function MyInternshipsPage(user, pageOrchestrator) {
     homePageButton.addEventListener('click', function() {
         pageOrchestrator.showPage("home page", "placeHolder", "placeHolder", "placeHolder");
     });
+    searchPageButton.addEventListener('click', function() {
+        pageOrchestrator.showPage("search page", "placeHolder", "placeHolder", "placeHolder");
+    });
     logoutButton.addEventListener('click', function() {
         pageOrchestrator.showPage("main page", "placeHolder", "placeHolder", "placeHolder");
     });
 
     this.open = function () {
         myInternshipPageDiv.style.display = "";
+        clearDiv('internship-description');
+        clearDiv('feedbacks');
+        clearDiv('other-data');
         // Construct query string
         var url = "MyInternshipsManager";
         makeCall("GET", url, null, function (x) {
@@ -178,6 +186,17 @@ function MyInternshipsPage(user, pageOrchestrator) {
     function openInformationPage(studentHasInternshipId) {
         console.log(studentHasInternshipId);
         console.log(applicationStatus);
+        clearDiv(otherDataDiv.id);
+        removeDiv('end-message-div');
+        removeDiv('questionnaires-div');
+        removeDiv('complaints-div');
+
+        questionnaires = [];
+        complaints = [];
+        interviewsScheduled = [];
+        feedbacks = [];
+        student = null;
+        cv = null;
 
         var url = "OpenMyInternshipInformationSpace?studentHasInternshipId=" + encodeURIComponent(studentHasInternshipId);
 
@@ -215,15 +234,15 @@ function MyInternshipsPage(user, pageOrchestrator) {
                                 break;
 
                             case "ongoing":
-                                populateForOngoing();
+                                populateForOngoing(studentHasInternshipId);
                                 break;
 
                             case "ended":
-                                populateForEnded();
+                                populateForEnded(studentHasInternshipId);
                                 break;
 
                             case "rejected":
-                                populateForRejected();
+                                populateForRejected(studentHasInternshipId);
                                 break;
                         }
 
@@ -270,24 +289,95 @@ function MyInternshipsPage(user, pageOrchestrator) {
         });
 
         if (!internshipData) return; // If no internship found, exit
+        let internship = internshipData.internship;
 
         // Populate Internship Description
-        let internship = internshipData.internship;
+        populateInternshipDescription(internship, studentHasInternshipId);
+
+        // Populate Feedbacks Section
+        populateFeedbacks(studentHasInternshipId);
+    }
+
+    function populateInternshipDescription(internship, studentHasInternshipId) {
         internshipDescriptionDiv.innerHTML = `
             <h2>${internship.name}</h2>
             <p><strong>Description:</strong> ${internship.description}</p>
             <p><strong>Rating:</strong> ${internship.rating} ⭐</p>
         `;
 
-        // Populate Feedbacks Section
-        if (internship.feedbacks && internship.feedbacks.length > 0) {
-            internship.feedbacks.forEach(feedback => {
+        if (isCompany) {
+            // Create and append the Start or End button based on application status
+            let actionButton;
+
+            if (applicationStatus === "selectionProcess") {
+                actionButton = createButton('btn btn-medium btn-gossamer', 'Start', '▶️', () => {
+                    // Implement the logic for starting the internship
+                    console.log(`Starting internship with ID: ${studentHasInternshipId}`);
+                    startInternship(studentHasInternshipId);
+                });
+
+                let rejectButton = createButton('btn btn-medium btn-gossamer', 'Reject', '❌', () => {
+                    // Implement the logic for starting the internship
+                    console.log(`Rejecting internship with ID: ${studentHasInternshipId}`);
+                    manageStudentApplication(studentHasInternshipId, false);
+                });
+
+                internshipDescriptionDiv.appendChild(rejectButton);
+            } else if (applicationStatus === "ongoing") {
+                actionButton = createButton('btn btn-medium btn-gossamer', 'End', '⏹️', () => {
+                    // Implement the logic for ending the internship
+                    console.log(`Ending internship with ID: ${studentHasInternshipId}`);
+                    endInternship(studentHasInternshipId);
+                });
+            }
+
+            // Append the action button to the internship description div if it exists
+            if (actionButton) {
+                internshipDescriptionDiv.appendChild(actionButton);
+            }
+        }
+    }
+
+    function populateFeedbacks(studentHasInternshipId) {
+        if (feedbacks && feedbacks.length > 0) {
+            feedbacks.forEach(feedback => {
                 let feedbackItem = document.createElement("div");
                 feedbackItem.className = "feedback-item";
-                feedbackItem.innerHTML = `
-                <p><strong>Rating:</strong> ${feedback.rating} ⭐</p>
-                <p><strong>Comment:</strong> ${feedback.text}</p>
-            `;
+
+                // Create a container for the feedback line
+                const feedbackLine = document.createElement("div");
+                feedbackLine.className = "feedback-line";
+
+                const userSpan = document.createElement("span");
+                userSpan.className = "feedback-user";
+                userSpan.textContent = `user #${feedback.studentHasInternshipId}:`;
+
+                // Create a span for the comment and rating
+                const commentRatingSpan = document.createElement("span");
+                commentRatingSpan.className = "feedback-comment-rating";
+
+                // Create a span for the comment
+                const commentSpan = document.createElement("span");
+                commentSpan.className = "feedback-comment";
+                commentSpan.textContent = feedback.text;
+
+                // Create a span for the rating
+                const ratingSpan = document.createElement("span");
+                ratingSpan.className = "feedback-rating";
+                ratingSpan.textContent = `Rating: ${feedback.rating} ⭐`;
+
+                // Append comment and rating to the commentRatingSpan
+                commentRatingSpan.appendChild(commentSpan);
+                commentRatingSpan.appendChild(ratingSpan);
+
+                // Append user and commentRatingSpan to the feedback line
+                feedbackLine.appendChild(userSpan);
+                feedbackLine.appendChild(commentRatingSpan);
+
+                // Append the feedback line to the feedback item
+                feedbackItem.appendChild(feedbackLine);
+
+                // Append the feedback item to the feedbacks div
                 feedbacksDiv.appendChild(feedbackItem);
             });
         } else {
@@ -295,9 +385,11 @@ function MyInternshipsPage(user, pageOrchestrator) {
         }
     }
 
-    function populateForEvaluation(studentHasInternshipId, isStudent) {
+
+    function populateForEvaluation(studentHasInternshipId) {
         const studentInfoDiv = document.createElement('div');
         studentInfoDiv.id = 'student-info';
+        console.log(isStudent);
 
         if (isStudent) {
             // Se isStudent è true, mostra il messaggio di valutazione
@@ -352,19 +444,24 @@ function MyInternshipsPage(user, pageOrchestrator) {
     }
 
     function populateForSelectionProcess(studentHasInternshipId) {
+        removeDiv('questionnaires-div');
+        removeDiv('interviews-div');
+
         populateQuestionnaires(studentHasInternshipId);
         populateInterviews(studentHasInternshipId);
     }
 
     function populateQuestionnaires(studentHasInternshipId) {
-        // Create the first div for questionnaires
-
+        questionnairesDiv = document.getElementById('questionnaires-div');
         // Check if the div already exists
         if (!questionnairesDiv) {
+            // Create the first div for questionnaires
             questionnairesDiv = document.createElement('div');
             questionnairesDiv.id = 'questionnaires-div';
             questionnairesDiv.className = 'data-container'; // Assign a class name
         }
+
+        clearDiv('questionnaires-div');
 
         // Check if questionnaires are empty
         if (questionnaires.length === 0) {
@@ -381,28 +478,77 @@ function MyInternshipsPage(user, pageOrchestrator) {
 
                 // Create buttons for students
                 if (isStudent) {
-                    const downloadButton = createButton('Download', '📥', () => {
+                    const downloadButton = createButton('action-button', 'Download', '📥', () => {
                         console.log(`Downloading questionnaire ${index + 1}`);
-                        // Implement download logic here
+                        immediateQuestionnaireDownload(questionnaire, index);
                     });
-                    const uploadButton = createButton('Upload', '📤', () => {
+
+                    // Create the form element
+                    const uploadForm = document.createElement('form');
+                    uploadForm.id = 'completedQuestionnaireForm'; // Set an ID for the form
+                    uploadForm.method = 'POST'; // Set the method
+                    uploadForm.enctype = 'multipart/form-data'; // Set enctype for file uploads
+
+                    // Create a hidden input for studentHasInternshipId
+                    const studentInput = document.createElement('input');
+                    studentInput.type = 'hidden';
+                    studentInput.name = 'studentHasInternshipId';
+                    studentInput.value = studentHasInternshipId; // Set the value to the ID
+                    uploadForm.appendChild(studentInput);
+
+                    // Create a hidden input for studentHasInternshipId
+                    const questionnaireIdInput = document.createElement('input');
+                    questionnaireIdInput.type = 'hidden';
+                    questionnaireIdInput.name = 'questionnaireId';
+                    questionnaireIdInput.value = questionnaire.id; // Set the value to the ID
+                    uploadForm.appendChild(questionnaireIdInput);
+
+                    // Create a file input element
+                    const fileInput = document.createElement('input');
+                    fileInput.type = 'file';
+                    fileInput.name = 'questionnaire'; // Backend must recognize this field
+                    fileInput.accept = '.pdf, .doc, .docx'; // Accept specific file types (optional)
+                    fileInput.required = true; // Make it required
+                    fileInput.style.display = 'none'; // Hide the file input
+                    uploadForm.appendChild(fileInput);
+
+                    const uploadButton = createButton('action-button', 'Upload', '📤', () => {
                         console.log(`Uploading questionnaire ${index + 1}`);
-                        // Implement upload logic here
+
+                        // Trigger the file input click
+                        fileInput.click();
                     });
+
+                    // Handle the file selection
+                    fileInput.addEventListener('change', (event) => {
+                        const file = event.target.files[0]; // Get the selected file
+                        if (file) {
+                            console.log('Selected file:', file.name);
+                            // Call the uploadQuestionnaire function with the form as an argument
+                            completeQuestionnaire(uploadForm, studentHasInternshipId);
+                        } else {
+                            console.log('No file selected.');
+                        }
+                    });
+
                     questionnairesDiv.appendChild(downloadButton);
+                    // Append the button to the questionnairesDiv
                     questionnairesDiv.appendChild(uploadButton);
+                    // Append the form to the questionnairesDiv (hidden)
+                    questionnairesDiv.appendChild(uploadForm);
                 } else {
                     // Create buttons for non-students
-                    const downloadButtonCompany = createButton('Download', '📥', () => {
+                    const downloadButtonCompany = createButton('action-button', 'Download', '📥', () => {
                         console.log(`Downloading questionnaire ${index + 1}`);
-                        // Implement download logic here
+                        immediateQuestionnaireDownload(questionnaire, index);
                     });
+
                     if (questionnaire.evaluation == null) {
-                        const approveButton = createButton('Approve', '✅', () => {
+                        const approveButton = createButton('action-button', 'Approve', '✅', () => {
                             console.log(`Approving questionnaire ${index + 1}`);
                             evaluateQuestionnaire(studentHasInternshipId, questionnaire.id, true);
                         });
-                        const rejectButton = createButton('Reject', '❌', () => {
+                        const rejectButton = createButton('action-button', 'Reject', '❌', () => {
                             console.log(`Rejecting questionnaire ${index + 1}`);
                             evaluateQuestionnaire(studentHasInternshipId, questionnaire.id, false);
                         });
@@ -441,7 +587,7 @@ function MyInternshipsPage(user, pageOrchestrator) {
             uploadForm.appendChild(fileInput);
 
             // Create the upload button
-            const uploadButton = createButton('Upload Questionnaire', '📤', () => {
+            const uploadButton = createButton('action-button', 'Upload Questionnaire', '📤', () => {
                 // Trigger the file input click
                 fileInput.click();
             });
@@ -465,15 +611,20 @@ function MyInternshipsPage(user, pageOrchestrator) {
         }
 
         // Assuming 'otherDataDiv' is already defined and refers to the existing div
-        // Append both divs to the existing other-data div
         otherDataDiv.appendChild(questionnairesDiv);
     }
 
     function populateInterviews(studentHasInternshipId) {
-        // Create the second div for interviews scheduled
-        const interviewsDiv = document.createElement('div');
-        interviewsDiv.id = 'interviews-div';
-        interviewsDiv.className = 'data-container'; // Assign the same class name
+        interviewsDiv = document.getElementById('interviews-div');
+        // Check if the div already exists
+        if (!interviewsDiv) {
+            // Create the second div for interviews scheduled
+            interviewsDiv = document.createElement('div');
+            interviewsDiv.id = 'interviews-div';
+            interviewsDiv.className = 'data-container'; // Assign the same class name
+        } else {
+            clearDiv('interviews-div');
+        }
 
         // Check if interviewsScheduled are empty
         if (interviewsScheduled.length === 0) {
@@ -486,14 +637,25 @@ function MyInternshipsPage(user, pageOrchestrator) {
             interviewsScheduled.forEach(interview => {
                 const interviewItem = document.createElement('p');
                 interviewItem.textContent = `Interview Scheduled: ${interview.date}`; // Accessing the date property
+
+                // Check if the interview has been rejected
+                if (interview.hasBeenRejected) {
+                    const rejectedText = document.createElement('span');
+                    rejectedText.textContent = ' Rejected'; // Text to display
+                    rejectedText.style.color = 'red'; // Set the text color to red
+                    interviewItem.appendChild(rejectedText); // Append the rejected text to the interview item
+                }
+
                 interviewsDiv.appendChild(interviewItem);
 
-                // Create reject button for each interview
-                const rejectButton = createButton('Reject', '❌', () => {
-                    console.log(`Rejecting interview scheduled on ${interview.date}`);
-                    // Implement reject logic here
-                });
-                interviewsDiv.appendChild(rejectButton);
+                if (isStudent && !interview.hasBeenRejected) {
+                    // Create reject button for each interview
+                    const rejectButton = createButton('action-button', 'Reject', '❌', () => {
+                        console.log(`Rejecting interview scheduled on ${interview.date}`);
+                        rejectInterviewDate(studentHasInternshipId, interview.id);
+                    });
+                    interviewsDiv.appendChild(rejectButton);
+                }
             });
         }
 
@@ -509,10 +671,11 @@ function MyInternshipsPage(user, pageOrchestrator) {
                 dateTimeInput.style.marginTop = '10px'; // Add some margin for better spacing
 
                 // Create a send button
-                const sendButton = createButton('Send', '📤', () => {
+                const sendButton = createButton('action-button', 'Send', '📤', () => {
                     const selectedDateTime = dateTimeInput.value;
-                    console.log(`Sending date/time: ${selectedDateTime}`);
-                    scheduleInterview(studentHasInternshipId, selectedDateTime);
+                    const formattedDateTime = selectedDateTime.replace('T', ' '); // Replace 'T' with a space
+                    console.log(`Sending date/time: ${formattedDateTime}`);
+                    scheduleInterview(studentHasInternshipId, formattedDateTime);
                 });
 
                 // Append the input and send button to the interviewsDiv
@@ -527,16 +690,186 @@ function MyInternshipsPage(user, pageOrchestrator) {
         otherDataDiv.appendChild(interviewsDiv);
     }
 
-    function populateForOngoing() {
+    function populateForOngoing(studentHasInternshipId) {
+        complaintsDiv = document.getElementById('complaints-div');
+        // Check if the div already exists
+        if (!complaintsDiv) {
+            // Create a new div to hold the complaints
+            complaintsDiv = document.createElement('div');
+            complaintsDiv.className = 'complaints-container';
+            complaintsDiv.id = 'complaint-div';
+        }
+        // Clear previous content
+        clearDiv(complaintsDiv.id);
 
+        // Check if there are complaints
+        if (complaints.length === 0) {
+            // Display a message if there are no complaints
+            const noComplaintsMessage = document.createElement('div');
+            noComplaintsMessage.className = 'no-complaints-message';
+            noComplaintsMessage.textContent = 'No complaints to display.';
+            complaintsDiv.appendChild(noComplaintsMessage);
+        } else {
+            // Iterate over each complaint and create a block for it
+            complaints.forEach(complaint => {
+                // Create a block for each complaint
+                const complaintBlock = document.createElement('div');
+                complaintBlock.className = 'complaint-block';
+
+                // Create a scrollable div for the complaint text
+                const complaintTextDiv = document.createElement('div');
+                complaintTextDiv.className = 'complaint-text';
+                complaintTextDiv.textContent = complaint.text;
+
+                // Append the text and button to the complaint block
+                complaintBlock.appendChild(complaintTextDiv);
+
+                if (!((isStudent && complaint.closedByStudent) || (isCompany && complaint.closedByCompany))) {
+                    // Create a Close button using the createButton function
+                    const closeButton = createButton('close-button btn-gossamer', 'Close', '❌', () => {
+                        closeComplaint(complaint.id, studentHasInternshipId);
+                    });
+                    complaintBlock.appendChild(closeButton);
+                }
+
+                // Append the complaint block to the complaints container
+                complaintsDiv.appendChild(complaintBlock);
+            });
+        }
+
+        // Create a form for uploading a complaint
+        const uploadForm = document.createElement('form');
+        uploadForm.className = 'upload-form';
+        uploadForm.onsubmit = (event) => {
+            event.preventDefault(); // Prevent default form submission
+            uploadComplaint(uploadForm, studentHasInternshipId); // Call the uploadComplaint function
+            complaintInput.value = ''; // Clear the input field after submission
+        };
+
+        // Create a text input for the complaint
+        const complaintInput = document.createElement('input');
+        complaintInput.type = 'text';
+        complaintInput.name = 'complaint'; // Name attribute for the input
+        complaintInput.maxLength = 255; // Set maximum characters
+        complaintInput.placeholder = 'Enter your complaint here...';
+        complaintInput.required = true; // Make it required
+
+        // Create a hidden input for ongoingInternshipId
+        const internshipIdInput = document.createElement('input');
+        internshipIdInput.type = 'hidden'; // Set type to hidden
+        internshipIdInput.name = 'ongoingInternshipId'; // Set the name attribute
+        internshipIdInput.value = studentHasInternshipId; // Set the value to the student's internship ID
+
+        // Create the Upload complaint button
+        const uploadButton = createButton('upload-button btn-gossamer', 'Upload complaint', '📤', () => {
+            // This function will be called on form submission
+        });
+
+        // Append the input and button to the form
+        uploadForm.appendChild(complaintInput);
+        uploadForm.appendChild(uploadButton);
+        uploadForm.appendChild(internshipIdInput);
+
+        // Append the form to the complaints container
+        complaintsDiv.appendChild(uploadForm);
+
+        // Append the complaints container to the other-data div
+        otherDataDiv.appendChild(complaintsDiv);
     }
 
-    function populateForEnded() {
+    function populateForEnded(studentHasInternshipId) {
+        // Clear any existing content in the other-data div
+        clearDiv(otherDataDiv.id)
 
+        // Create a new div for the message
+        const messageDiv = document.createElement('div');
+        messageDiv.id = 'end-message-div'
+        messageDiv.className = 'ended-message'; // Add a class for styling
+        messageDiv.textContent = 'The internship period has ended';
+
+        // Append the message div to the other-data div
+        otherDataDiv.appendChild(messageDiv);
+
+        if (isStudent) {
+            // Create the feedback form
+            const feedbackForm = document.createElement('form');
+            feedbackForm.id = 'feedbackForm';
+
+            // Create a text area for feedback
+            const feedbackTextArea = document.createElement('textarea');
+            feedbackTextArea.name = 'text'; // Set the name attribute
+            feedbackTextArea.placeholder = 'Enter your feedback (max 255 characters)';
+            feedbackTextArea.maxLength = 255; // Set maximum length
+            feedbackTextArea.style.width = '100%'; // Full width
+
+            console.log('Feedback Text:', feedbackTextArea.value);
+            console.log('Internship ID:', studentHasInternshipId);
+
+            // Create a container for the textarea and rating selector
+            const feedbackRatingContainer = document.createElement('div');
+            feedbackRatingContainer.className = 'feedback-rating-container';
+
+            // Append the textarea to the container
+            feedbackRatingContainer.appendChild(feedbackTextArea);
+
+            // Create a container for the rating selector
+            const ratingContainer = document.createElement('div');
+            ratingContainer.className = 'rating-container';
+
+            // Create a label for the rating selector
+            const ratingLabel = document.createElement('label');
+            ratingLabel.textContent = 'Rating (1-10): ';
+            ratingContainer.appendChild(ratingLabel);
+
+            // Create a rating selector
+            const ratingSelect = document.createElement('select');
+            ratingSelect.name = 'rating'; // Set the name attribute
+            for (let i = 1; i <= 10; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                ratingSelect.appendChild(option);
+            }
+            ratingContainer.appendChild(ratingSelect);
+            feedbackRatingContainer.appendChild(ratingContainer); // Append the rating container to the feedback-rating-container
+
+            // Append the feedback-rating-container to the form
+            feedbackForm.appendChild(feedbackRatingContainer);
+
+            // Create a hidden input for ongoingInternshipId
+            const internshipIdInput = document.createElement('input');
+            internshipIdInput.type = 'hidden'; // Set type to hidden
+            internshipIdInput.name = 'ongoingInternshipId'; // Set the name attribute
+            internshipIdInput.value = studentHasInternshipId; // Set the value to the student's internship ID
+            feedbackForm.appendChild(internshipIdInput);
+
+            // Create a submit button
+            const submitButton = document.createElement('button');
+            submitButton.type = 'submit'; // Set type to submit
+            submitButton.textContent = 'Send Feedback';
+            feedbackForm.appendChild(submitButton);
+
+            // Append the form to the feedbacks div
+            feedbacksDiv.appendChild(feedbackForm);
+
+            // Handle form submission
+            feedbackForm.addEventListener('submit', (event) => {
+                event.preventDefault(); // Prevent default form submission
+                console.log('Feedback Text:', feedbackTextArea.value);
+                console.log('Rating:', ratingSelect.value);
+                console.log('Internship ID:', studentHasInternshipId);
+                uploadFeedback(feedbackForm, studentHasInternshipId);
+                feedbackTextArea.value = '';
+            });
+        }
     }
 
-    function populateForRejected() {
+    function populateForRejected(studentHasInternshipId) {
+        removeDiv('questionnaires-div');
+        removeDiv('interviews-div');
 
+        populateQuestionnaires(studentHasInternshipId);
+        populateInterviews(studentHasInternshipId);
     }
 
     function manageStudentApplication(studentHasInternshipId, decision) {
@@ -591,6 +924,41 @@ function MyInternshipsPage(user, pageOrchestrator) {
 
     function uploadQuestionnaire(form, studentHasInternshipId) {
         makeCall("POST", "UploadQuestionnaire", form, function (x) {
+            if (x.readyState === XMLHttpRequest.DONE) {
+                var message = x.responseText;
+                switch (x.status) {
+                    case 200:
+                        var jsonObject = JSON.parse(message);
+
+                        // Code to execute in case of successful callBack
+                        questionnaires = jsonObject.questionnaires;
+                        clearDiv('questionnaires-div');
+                        populateQuestionnaires(studentHasInternshipId);
+
+                        break;
+
+                    case 400: // bad request
+                        showErrorAlert(message);
+                        break;
+
+                    case 401: // unauthorized
+                        showErrorAlert(message);
+                        break;
+
+                    case 500: // server error
+                        showErrorAlert(message);
+                        break;
+
+                    default:
+                        pageOrchestrator.showPage("home page");
+                        break;
+                }
+            }
+        });
+    }
+
+    function completeQuestionnaire(form, studentHasInternshipId) {
+        makeCall("POST", "CompleteQuestionnaire", form, function (x) {
             if (x.readyState === XMLHttpRequest.DONE) {
                 var message = x.responseText;
                 switch (x.status) {
@@ -734,6 +1102,260 @@ function MyInternshipsPage(user, pageOrchestrator) {
         });
     }
 
+    function rejectInterviewDate(studentHasInternshipId, interviewScheduleId) {
+        let tempFormRejectInterview = document.createElement('form');
+
+        // Create hidden input for message
+        const studentHasInternshipIdInput = document.createElement('input');
+        studentHasInternshipIdInput.type = 'hidden';
+        studentHasInternshipIdInput.name = 'studentHasInternshipId';
+        studentHasInternshipIdInput.value = studentHasInternshipId;
+        tempFormRejectInterview.appendChild(studentHasInternshipIdInput);
+
+        // Create hidden input for internshipId
+        const interviewIdInput = document.createElement('input');
+        interviewIdInput.type = 'hidden';
+        interviewIdInput.name = 'interviewScheduleId';
+        interviewIdInput.value = interviewScheduleId;
+        tempFormRejectInterview.appendChild(interviewIdInput);
+
+        makeCall("POST", "RejectInterviewDate", tempFormRejectInterview, function (x) {
+            if (x.readyState === XMLHttpRequest.DONE) {
+                var message = x.responseText;
+                switch (x.status) {
+                    case 200:
+
+                        // Code to execute in case of successful callBack
+                        let rejectedInterview = interviewsScheduled.find(interview => interview.id === interviewScheduleId);
+                        rejectedInterview.hasBeenRejected = true;
+
+                        clearDiv('interviews-div');
+                        populateInterviews(studentHasInternshipId);
+
+                        break;
+
+                    case 400: // bad request
+                        showErrorAlert(message);
+                        break;
+
+                    case 401: // unauthorized
+                        showErrorAlert(message);
+                        break;
+
+                    case 500: // server error
+                        showErrorAlert(message);
+                        break;
+
+                    default:
+                        pageOrchestrator.showPage("home page");
+                        break;
+                }
+            }
+        });
+    }
+
+    function startInternship(studentHasInternshipId) {
+        let tempFormStartInternship = document.createElement('form');
+
+        // Create hidden input for student-internship association id
+        const studentHasInternshipIdInput = document.createElement('input');
+        studentHasInternshipIdInput.type = 'hidden';
+        studentHasInternshipIdInput.name = 'studentHasInternshipId';
+        studentHasInternshipIdInput.value = studentHasInternshipId;
+        tempFormStartInternship.appendChild(studentHasInternshipIdInput);
+
+
+        makeCall("POST", "StartInternship", tempFormStartInternship, function (x) {
+            if (x.readyState === XMLHttpRequest.DONE) {
+                var message = x.responseText;
+                switch (x.status) {
+                    case 200:
+
+                        // Code to execute in case of successful callBack
+                        applicationStatus = "ongoing";
+                        removeDiv(questionnairesDiv.id);
+                        removeDiv(interviewsDiv.id);
+                        openInformationPage(studentHasInternshipId);
+
+                        break;
+
+                    case 400: // bad request
+                        showErrorAlert(message);
+                        break;
+
+                    case 401: // unauthorized
+                        showErrorAlert(message);
+                        break;
+
+                    case 500: // server error
+                        showErrorAlert(message);
+                        break;
+
+                    default:
+                        pageOrchestrator.showPage("home page");
+                        break;
+                }
+            }
+        });
+    }
+
+    function uploadComplaint(form, studentHasInternshipId) {
+        makeCall("POST", "UploadComplaint", form, function (x) {
+            if (x.readyState === XMLHttpRequest.DONE) {
+                var message = x.responseText;
+                switch (x.status) {
+                    case 200:
+                        var jsonObject = JSON.parse(message);
+
+                        // Code to execute in case of successful callBack
+                        complaints = jsonObject.openComplaints;
+                        clearDiv(complaintsDiv.id);
+                        populateForOngoing(studentHasInternshipId);
+
+                        break;
+
+                    case 400: // bad request
+                        showErrorAlert(message);
+                        break;
+
+                    case 401: // unauthorized
+                        showErrorAlert(message);
+                        break;
+
+                    case 500: // server error
+                        showErrorAlert(message);
+                        break;
+
+                    default:
+                        pageOrchestrator.showPage("home page");
+                        break;
+                }
+            }
+        });
+    }
+
+    function closeComplaint(complaintId, studentHasInternshipId) {
+        let tempFormCloseComplaint = document.createElement('form');
+
+        // Create hidden input for student-internship association id
+        const complaintIdInput = document.createElement('input');
+        complaintIdInput.type = 'hidden';
+        complaintIdInput.name = 'complaintId';
+        complaintIdInput.value = complaintId;
+        tempFormCloseComplaint.appendChild(complaintIdInput);
+
+
+        makeCall("POST", "CloseComplaint", tempFormCloseComplaint, function (x) {
+            if (x.readyState === XMLHttpRequest.DONE) {
+                var message = x.responseText;
+                switch (x.status) {
+                    case 200:
+                        var jsonObject = JSON.parse(message);
+
+                        // Code to execute in case of successful callBack
+                        complaints = jsonObject.openComplaints;
+                        clearDiv(complaintsDiv.id);
+                        populateForOngoing(studentHasInternshipId);
+
+                        break;
+
+                    case 400: // bad request
+                        showErrorAlert(message);
+                        break;
+
+                    case 401: // unauthorized
+                        showErrorAlert(message);
+                        break;
+
+                    case 500: // server error
+                        showErrorAlert(message);
+                        break;
+
+                    default:
+                        pageOrchestrator.showPage("home page");
+                        break;
+                }
+            }
+        });
+    }
+
+    function endInternship(studentHasInternshipId) {
+        let tempFormEndInternship = document.createElement('form');
+
+        // Create hidden input for student-internship association id
+        const studentHasInternshipIdInput = document.createElement('input');
+        studentHasInternshipIdInput.type = 'hidden';
+        studentHasInternshipIdInput.name = 'studentHasInternshipId';
+        studentHasInternshipIdInput.value = studentHasInternshipId;
+        tempFormEndInternship.appendChild(studentHasInternshipIdInput);
+
+
+        makeCall("POST", "EndInternship", tempFormEndInternship, function (x) {
+            if (x.readyState === XMLHttpRequest.DONE) {
+                var message = x.responseText;
+                switch (x.status) {
+                    case 200:
+
+                        // Code to execute in case of successful callBack
+                        applicationStatus = "ended";
+                        removeDiv(complaintsDiv.id);
+                        openInformationPage(studentHasInternshipId);
+
+                        break;
+
+                    case 400: // bad request
+                        showErrorAlert(message);
+                        break;
+
+                    case 401: // unauthorized
+                        showErrorAlert(message);
+                        break;
+
+                    case 500: // server error
+                        showErrorAlert(message);
+                        break;
+
+                    default:
+                        pageOrchestrator.showPage("home page");
+                        break;
+                }
+            }
+        });
+    }
+
+    function uploadFeedback(form, studentHasInternshipId) {
+        makeCall("POST", "UploadFeedback", form, function (x) {
+            if (x.readyState === XMLHttpRequest.DONE) {
+                var message = x.responseText;
+                switch (x.status) {
+                    case 200:
+                        var jsonObject = JSON.parse(message);
+
+                        // Code to execute in case of successful callBack
+                        feedbacks = jsonObject.feedbacks;
+                        clearDiv('feedbacks');
+                        populateFeedbacks(studentHasInternshipId);
+                        break;
+
+                    case 400: // bad request
+                        showErrorAlert(message);
+                        break;
+
+                    case 401: // unauthorized
+                        showErrorAlert(message);
+                        break;
+
+                    case 500: // server error
+                        showErrorAlert(message);
+                        break;
+
+                    default:
+                        pageOrchestrator.showPage("home page");
+                        break;
+                }
+            }
+        });
+    }
 
     function removeDiv(divId) {
         const div = document.getElementById(divId);
@@ -754,6 +1376,47 @@ function MyInternshipsPage(user, pageOrchestrator) {
         } else {
             console.log(`Il div con id "${divId}" non esiste.`);
         }
+    }
+
+    function immediateQuestionnaireDownload(questionnaire, index) {
+        // Extract file extension
+        const fileExtension = questionnaire.fileType;
+        console.log('File extension: ' + fileExtension);
+
+        // Map extensions to MIME types
+        const mimeTypes = {
+            'pdf': 'application/pdf',
+            'doc': 'application/msword',
+            'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'txt': 'text/plain',
+            // Add more mappings as needed
+        };
+
+        // Determine MIME type, default to 'application/octet-stream'
+        const mimeType = mimeTypes[fileExtension] || 'application/octet-stream';
+
+        // Create a Blob from the Base64 string
+        const byteCharacters = atob(questionnaire.file); // Split to get the Base64 part
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: mimeType });
+
+        // Create a URL for the Blob
+        const fileUrl = URL.createObjectURL(blob);
+
+        // Create a download link and trigger the download
+        const a = document.createElement('a');
+        a.href = fileUrl;
+        a.download = `Questionnaire${index + 1}.${fileExtension}`; // Set the file name with extension
+        document.body.appendChild(a); // Append to the body
+        a.click(); // Trigger the download
+        document.body.removeChild(a); // Clean up
+
+        // Optionally revoke the object URL after some time
+        setTimeout(() => URL.revokeObjectURL(fileUrl), 100);
     }
 
     // Function to hide the page
