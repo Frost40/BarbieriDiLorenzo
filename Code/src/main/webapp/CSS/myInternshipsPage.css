@@ -42,6 +42,7 @@
 
 /* Information space: occupa solo lo spazio rimanente */
 .information-space {
+    margin-bottom: 20px;
     display: flex;
     flex-direction: row;
     gap: 20px;
@@ -60,11 +61,10 @@
 #internship-description {
     flex: 1;
     max-width: 40%;
-    height: 100%;
     padding: 15px;
-    border-radius: 8px;
-    background: #f9f9f9;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    border: 2px solid var(--normal-gossamer);
+    border-radius: 20px;
+    box-shadow: 0 1rem 3rem rgba(0,0,0,0.15);
     align-self: stretch;
     order: 2; /* Lo sposta a destra */
 }
@@ -78,20 +78,66 @@
     order: 1; /* Lo sposta a sinistra */
 }
 
-/* Feedbacks (in alto a sinistra) */
-#feedbacks {
+/* Feedbacks */
+.feedbacks {
     padding: 40px;
-    border-radius: 8px;
-    background: #fff5e6;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    border: 2px solid var(--normal-gossamer);
+    border-radius: 20px;
+    box-shadow: 0 1rem 3rem rgba(0,0,0,0.15); /* x-offset y-offset radius color */
+
+    /* New properties for scrollable content */
+    max-height: 150px; /* Set a maximum height for the container */
+    overflow-y: auto; /* Enable vertical scrolling if content exceeds max-height */
 }
 
+/* Custom scrollbar for WebKit browsers (Chrome, Safari) */
+.feedbacks::-webkit-scrollbar {
+    width: 8px; /* Width of the scrollbar */
+}
+
+.feedbacks::-webkit-scrollbar-track {
+    background: transparent; /* Background of the scrollbar track */
+}
+
+.feedbacks::-webkit-scrollbar-thumb {
+    background-color: var(--normal-gossamer); /* Color of the scrollbar thumb */
+    border-radius: 10px; /* Rounded corners for the scrollbar thumb */
+}
+
+.feedback-item {
+    margin-bottom: 10px; /* Space between feedback items */
+}
+
+.feedback-line {
+    display: flex; /* Use flexbox for layout */
+    flex-direction: column; /* Stack user and feedback line vertically */
+}
+
+.feedback-user {
+    font-weight: bold; /* Make the user text bold */
+}
+
+.feedback-comment-rating {
+    display: flex; /* Use flexbox for comment and rating */
+    justify-content: space-between; /* Space between comment and rating */
+    align-items: center; /* Center items vertically */
+}
+
+.feedback-comment {
+    flex: 1; /* Allow comment to take up more space */
+    margin-right: 10px; /* Space between comment and rating */
+}
+
+.feedback-rating {
+    flex: 0 0 100px; /* Fixed width for the rating */
+    text-align: right; /* Align text to the right */
+}
 /* Other data (sotto feedbacks, allineato a sinistra) */
 .other-data {
     padding: 15px;
-    border-radius: 8px;
-    background: #e6f7ff;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    border: 2px solid var(--normal-gossamer);
+    border-radius: 20px;
+    box-shadow: 0 1rem 3rem rgba(0,0,0,0.15);
     flex: 1;
     display: flex; /* Use flexbox to align child elements */
     justify-content: space-between; /* Space between the divs */
@@ -118,15 +164,32 @@
 
 
 .data-container {
-    border: 1px solid #ccc; /* Light gray border */
-    border-radius: 5px; /* Rounded corners */
     padding: 10px; /* Padding inside the div */
     margin: 10px; /* Margin around each div */
-    background-color: #f9f9f9; /* Light background color */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    border: 2px solid var(--normal-gossamer);
+    border-radius: 20px;
+    box-shadow: 0 1rem 3rem rgba(0,0,0,0.15); /* Subtle shadow */
     flex: 1; /* Allow the divs to grow and fill the space */
     min-width: 200px; /* Minimum width for each div */
     max-width: 45%; /* Maximum width to prevent them from being too wide */
+
+    /* New properties for scrollable content */
+    max-height: 300px; /* Set a maximum height for the container */
+    overflow-y: auto; /* Enable vertical scrolling if content exceeds max-height */
+}
+
+/* Custom scrollbar for WebKit browsers (Chrome, Safari) */
+.data-container::-webkit-scrollbar {
+    width: 8px; /* Width of the scrollbar */
+}
+
+.data-container::-webkit-scrollbar-track {
+    background: transparent; /* Background of the scrollbar track */
+}
+
+.data-container::-webkit-scrollbar-thumb {
+    background-color: var(--normal-gossamer); /* Color of the scrollbar thumb */
+    border-radius: 10px; /* Rounded corners for the scrollbar thumb */
 }
 
 .data-container p {
@@ -183,8 +246,9 @@
 /* Style for the submit button */
 #feedbackForm button {
     padding: 10px 15px; /* Add padding inside the button */
-    background-color: #4CAF50; /* Green background color */
-    color: white; /* White text color */
+    color: #fff;
+    background-color: var(--dark-gossamer);
+    border-color: var(--dark-gossamer);
     border: none; /* Remove border */
     border-radius: 4px; /* Rounded corners */
     cursor: pointer; /* Change cursor to pointer */
@@ -194,13 +258,97 @@
 
 /* Change button color on hover */
 #feedbackForm button:hover {
-    background-color: #45a049; /* Darker green on hover */
+    background-color: var(--light-gossamer); /* Change to a lighter color */
+    border-color: var(--light-gossamer); /* Change border to match */
 }
 
 /* Optional: Style for error messages */
 .error-message {
     color: red; /* Red text for error messages */
     margin-top: 10px; /* Space above the error message */
+}
+
+.complaint-block {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 10px;
+    width: 100%; /* Fixed width */
+    height: 150px; /* Fixed height */
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box; /* Include padding and border in the width */
+}
+
+.upload-form {
+    display: flex;
+    flex-direction: column; /* Stack input and button vertically */
+    margin-top: auto; /* Push the form to the bottom */
+}
+
+.upload-form input {
+    width: 100%; /* Full width of the form */
+    padding: 10px; /* Padding for the input */
+    margin-bottom: 10px; /* Space between input and button */
+    border: 1px solid #ccc; /* Border for the input */
+    border-radius: 5px; /* Rounded corners */
+    box-sizing: border-box; /* Include padding and border in the width */
+}
+
+.complaint-text {
+    overflow-y: auto; /* Enable vertical scrolling */
+    flex-grow: 1; /* Allow the text area to grow */
+    margin-bottom: 10px; /* Space between text and button */
+}
+
+.close-button {
+    width: 100%; /* Full width */
+    padding: 10px; /* Padding for the button */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    margin-top: auto; /* Push the button to the bottom of the container */
+}
+
+.no-complaints-message {
+    margin: 10px;
+    color: #888; /* Grey color for the message */
+    text-align: center;
+}
+
+.complaints-container {
+    width: 100%; /* Full width of the parent container */
+    padding-bottom: 60px; /* Add padding to the bottom to prevent content overlap */
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+    box-sizing: border-box; /* Include padding in the element's total width */
+
+    /* New properties for scrollable content */
+    max-height: 300px; /* Set a maximum height for the container */
+    overflow-y: auto; /* Enable vertical scrolling if content exceeds max-height */
+}
+
+/* Custom scrollbar for WebKit browsers (Chrome, Safari) */
+.complaints-container::-webkit-scrollbar {
+    width: 8px; /* Width of the scrollbar */
+}
+
+.complaints-container::-webkit-scrollbar-track {
+    background: transparent; /* Background of the scrollbar track */
+}
+
+.complaints-container::-webkit-scrollbar-thumb {
+    background-color: var(--normal-gossamer); /* Color of the scrollbar thumb */
+    border-radius: 10px; /* Rounded corners for the scrollbar thumb */
+}
+
+.upload-button {
+    width: 100%; /* Full width */
+    padding: 10px; /* Padding for the button */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    margin-top: auto; /* Push the button to the bottom of the container */
 }
 
 /* Responsive Styles */

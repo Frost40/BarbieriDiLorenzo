@@ -101,8 +101,23 @@ public class ApplyToInternship extends HttpServlet {
             return;
         }
 
-        // Saving the application in the database
         StudentHasInternshipDAO studentHasInternshipDAO = createStudentHasInternshipDAO();
+        StudentHasInternship studentHasInternship = null;
+        try {
+            studentHasInternship = studentHasInternshipDAO.getStudentHasInternship(user.getId(), internshipId);
+        } catch (SQLException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().println(e.getMessage());
+            return;
+        }
+
+        if (studentHasInternship != null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().println("You can only apply to an internship once");
+            return;
+        }
+        // Saving the application in the database
+
         try {
             studentHasInternshipDAO.addApplication(internshipId, user.getId());
         } catch (SQLException e) {
