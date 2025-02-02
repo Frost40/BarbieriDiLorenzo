@@ -91,7 +91,7 @@ public class OpenMyInternshipInformationSpace extends HttpServlet {
         // Checking if the given otherAccountIdString is valid
         if(studentHasInternshipIdString == null || studentHasInternshipIdString.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("Enable to retrieve data since the provided id is null");
+            response.getWriter().println("Not able to retrieve data since the provided id is null");
             return;
         }
 

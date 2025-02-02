@@ -149,7 +149,7 @@ public class EvaluateQuestionnaire extends HttpServlet {
         // Checking that the user in the current session is a company
         if (isStudent) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().println("Only the company is authorized to evaluate an interview");
+            response.getWriter().println("Only the company is authorized to evaluate a questionnaire");
             return;
         }
 

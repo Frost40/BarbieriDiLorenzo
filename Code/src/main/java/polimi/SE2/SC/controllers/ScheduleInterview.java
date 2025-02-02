@@ -79,14 +79,14 @@ public class ScheduleInterview extends HttpServlet {
         // Checking that the field data contains actual information
         if (dateString == null || dateString.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("Invalid or missing date parameter.");
+            response.getWriter().println("Invalid or missing date parameter!");
             return;
         }
 
         // Checking if the id of the given ongoing internship (studentHasInternship) is valid
         if(ongoingInternshipIdString == null || ongoingInternshipIdString.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("No valid id for the ongoing internship was associated to the request!");
+            response.getWriter().println("No valid id for the ongoing internship was associated with the request!");
             return;
         }
         // Parsing process for the given date and time

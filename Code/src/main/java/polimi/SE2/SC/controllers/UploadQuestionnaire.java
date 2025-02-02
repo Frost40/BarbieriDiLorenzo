@@ -75,7 +75,7 @@ public class UploadQuestionnaire extends HttpServlet{
         // Checking if the id of the given ongoing internship (studentHasInternship) is valid
         if(studentHasInternshipIdString == null || studentHasInternshipIdString.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("No valid id for the ongoing internship was associated to the request!");
+            response.getWriter().println("No valid id for the ongoing internship was associated with the request!");
             return;
         }
 

@@ -66,7 +66,7 @@ public class ReadMessage extends HttpServlet {
         // Checking if the given id is valid
         if(messageIdString == null || messageIdString.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("The id for the complaint is null!");
+            response.getWriter().println("The id for the message is null!");
             return;
         }
 
