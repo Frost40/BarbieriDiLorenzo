@@ -176,13 +176,13 @@ function MessagesPage(user, pageOrchestrator) {
                 const internshipEntry = document.createElement("div");
                 internshipEntry.classList.add("chat-entry");
                 internshipEntry.setAttribute("data-internship-id", internship.id);
+                /*
                 const unreadCount = unreadMessages.filter(msg =>
                     students.some(student => msg.senderId === student.id && msg.receiverId === internship.id)
-                ).length;
+                ).length; */
                 internshipEntry.innerHTML = `
                 <div>
                     <strong>${sanitizeHTML(internship.name)}</strong><br>
-                     ${unreadCount > 0 ? `<span class="chat-badge">${unreadCount}</span>` : ""}
                 </div>
             `;
 
@@ -233,13 +233,13 @@ function MessagesPage(user, pageOrchestrator) {
                 const studentEntry = document.createElement("div");
                 studentEntry.classList.add("chat-entry");
                 studentEntry.setAttribute("data-student-id", student.id); // Set student ID
-                const unreadCount = unreadMessages.filter(msg =>
+                /* const unreadCount = unreadMessages.filter(msg =>
                     students.some(student => msg.senderId === student.id && msg.receiverId === internshipId)
-                ).length;
+                ).length; */
                 studentEntry.innerHTML = `
                 <div>
                     <strong>${sanitizeHTML(student.name)}</strong><br>
-                    ${unreadCount > 0 ? `<span class="chat-badge">${unreadCount}</span>` : ""}
+              
                 </div>
             `;
 
@@ -407,7 +407,7 @@ function MessagesPage(user, pageOrchestrator) {
             const chatId = entry.getAttribute("data-chat-id") || entry.getAttribute("data-student-id");
             if (!chatId) return;
 
-            const unreadCount = unreadMessages.filter(msg => msg.senderId == chatId).length;
+            const unreadCount= unreadMessages.filter(msg => msg.senderId == chatId).length;
             let badge = entry.querySelector(".chat-badge");
 
             if (unreadCount > 0) {
