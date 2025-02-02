@@ -19,7 +19,6 @@ function PageOrchestrator(user){
     let myInternshipsPage = new MyInternshipsPage(user, this);
     let searchPage = new SearchPage(user, this);
     let messagesPage = new MessagesPage(user, this);
-    let notificationSection = new NotificationSection(user, this);
 
     this.logout = function (){
         makeCall("POST", "Logout", null,
@@ -72,10 +71,6 @@ function PageOrchestrator(user){
                 this.hideActualPage();
                 searchPage.open(info1, info2, info3);
                 actualPage = searchPage;
-                break;
-
-            case 'notification section':
-                notificationSection.open(info1, info2, info3);
                 break;
 
             case 'main page':
