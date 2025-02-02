@@ -302,12 +302,19 @@
 }
 
 .close-button {
-    width: 100%; /* Full width */
+    flex: 1; /* Allow buttons to grow and take equal space */
     padding: 10px; /* Padding for the button */
     border: none; /* No border */
     border-radius: 5px; /* Rounded corners */
     cursor: pointer; /* Pointer cursor on hover */
     margin-top: auto; /* Push the button to the bottom of the container */
+}
+
+
+.button-container {
+    gap: 10px; /* Add a gap between buttons */
+    display: flex; /* Use flexbox for layout */
+    width: 100%; /* Ensure the container takes full width */
 }
 
 .no-complaints-message {

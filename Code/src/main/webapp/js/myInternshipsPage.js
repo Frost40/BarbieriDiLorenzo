@@ -724,13 +724,28 @@ function MyInternshipsPage(user, pageOrchestrator) {
                 // Append the text and button to the complaint block
                 complaintBlock.appendChild(complaintTextDiv);
 
+                // Create a container for the buttons
+                const buttonContainer = document.createElement('div');
+                buttonContainer.className = 'button-container';
+
                 if (!((isStudent && complaint.closedByStudent) || (isCompany && complaint.closedByCompany))) {
                     // Create a Close button using the createButton function
                     const closeButton = createButton('close-button btn-gossamer', 'Close', '❌', () => {
                         closeComplaint(complaint.id, studentHasInternshipId);
                     });
-                    complaintBlock.appendChild(closeButton);
+                    buttonContainer.appendChild(closeButton);
                 }
+
+                if (complaint.closedByStudent || complaint.closedByCompany) {
+                    // Create a reject closure button using the createButton function
+                    const rejectButton = createButton('close-button btn-gossamer', 'Reject closure', '👎', () => {
+                        rejectComplaintClosure(complaint.id, studentHasInternshipId);
+                    });
+                    buttonContainer.appendChild(rejectButton);
+                }
+
+                // Append the button container to the complaint block
+                complaintBlock.appendChild(buttonContainer);
 
                 // Append the complaint block to the complaints container
                 complaintsDiv.appendChild(complaintBlock);
@@ -1257,6 +1272,50 @@ function MyInternshipsPage(user, pageOrchestrator) {
                         clearDiv(complaintsDiv.id);
                         populateForOngoing(studentHasInternshipId);
 
+                        break;
+
+                    case 400: // bad request
+                        showErrorAlert(message);
+                        break;
+
+                    case 401: // unauthorized
+                        showErrorAlert(message);
+                        break;
+
+                    case 500: // server error
+                        showErrorAlert(message);
+                        break;
+
+                    default:
+                        pageOrchestrator.showPage("home page");
+                        break;
+                }
+            }
+        });
+    }
+
+    function rejectComplaintClosure(complaintId, studentHasInternshipId) {
+        let tempFormRejectCloseComplaint = document.createElement('form');
+
+        // Create hidden input for student-internship association id
+        const complaintIdInput = document.createElement('input');
+        complaintIdInput.type = 'hidden';
+        complaintIdInput.name = 'complaintId';
+        complaintIdInput.value = complaintId;
+        tempFormRejectCloseComplaint.appendChild(complaintIdInput);
+
+        makeCall("POST", "RejectComplaintClosure", tempFormRejectCloseComplaint, function (x) {
+            if (x.readyState === XMLHttpRequest.DONE) {
+                var message = x.responseText;
+                switch (x.status) {
+                    case 200:
+                        // Code to execute in case of successful callBack
+                        let closedComplaint = complaints.find(complaint => complaint.id === complaintId);
+                        closedComplaint.closeByStudent = false;
+                        closedComplaint.closeByStudent = false;
+
+                        clearDiv(complaintsDiv.id);
+                        populateForOngoing(studentHasInternshipId);
                         break;
 
                     case 400: // bad request
