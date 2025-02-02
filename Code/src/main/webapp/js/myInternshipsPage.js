@@ -14,7 +14,7 @@ function MyInternshipsPage(user, pageOrchestrator) {
     let interviewsDiv = document.getElementById('interviews-div');
     let complaintsDiv = document.getElementById('complaints-div');
     let homePageButton = document.getElementById('home-page-btn');
-    let searchPageButton = document.getElementById('search-page-btn');
+    let userSpecificButton = document.getElementById('user-specific-page-btn');
     let logoutButton = document.getElementById('log-out-btn');
 
     // Variables of the page
@@ -37,8 +37,12 @@ function MyInternshipsPage(user, pageOrchestrator) {
     homePageButton.addEventListener('click', function() {
         pageOrchestrator.showPage("home page", "placeHolder", "placeHolder", "placeHolder");
     });
-    searchPageButton.addEventListener('click', function() {
-        pageOrchestrator.showPage("search page", "placeHolder", "placeHolder", "placeHolder");
+    userSpecificButton.addEventListener('click', function() {
+        if (isStudent) {
+            pageOrchestrator.showPage("search page", "placeHolder", "placeHolder", "placeHolder");
+        } else {
+            showInfoAlert("Info", "The page has yet to be implemented!")
+        }
     });
     logoutButton.addEventListener('click', function() {
         pageOrchestrator.showPage("main page", "placeHolder", "placeHolder", "placeHolder");
@@ -63,9 +67,14 @@ function MyInternshipsPage(user, pageOrchestrator) {
 
                         internshipsMap = new Map();
 
-                        // Controlla se l'utente è uno studente o una company
                         isStudent = internshipsData.length > 0 && internshipsData[0].studentHasInternship;
                         isCompany = !isStudent;
+
+                        if (isCompany) {
+                            userSpecificButton.textContent = 'Analytics Page';
+                        } else {
+                            userSpecificButton.textContent = 'Search';
+                        }
 
                         internshipsData.forEach(entry => {
                             if (isStudent) {
@@ -739,45 +748,39 @@ function MyInternshipsPage(user, pageOrchestrator) {
     }
 
     function populateForOngoing(studentHasInternshipId) {
-        complaintsDiv = document.getElementById('complaints-div');
-        // Check if the div already exists
+        let complaintsDiv = document.getElementById('complaints-div');
+
+        // Se il div non esiste, crealo una volta sola
         if (!complaintsDiv) {
-            // Create a new div to hold the complaints
             complaintsDiv = document.createElement('div');
             complaintsDiv.className = 'complaints-container';
-            complaintsDiv.id = 'complaint-div';
+            complaintsDiv.id = 'complaints-div';
+            otherDataDiv.appendChild(complaintsDiv); // Assumi che otherDataDiv sia già dichiarato
         }
-        // Clear previous content
-        clearDiv("complaints-div");
 
-        // Check if there are complaints
+        // Cancella il contenuto del div
+        complaintsDiv.innerHTML = '';
+
+        // Controlla se ci sono reclami
         if (complaints.length === 0) {
-            // Display a message if there are no complaints
             const noComplaintsMessage = document.createElement('div');
             noComplaintsMessage.className = 'no-complaints-message';
             noComplaintsMessage.textContent = 'No complaints to display.';
             complaintsDiv.appendChild(noComplaintsMessage);
         } else {
-            // Iterate over each complaint and create a block for it
             complaints.forEach(complaint => {
-                // Create a block for each complaint
                 const complaintBlock = document.createElement('div');
                 complaintBlock.className = 'complaint-block';
 
-                // Create a scrollable div for the complaint text
                 const complaintTextDiv = document.createElement('div');
                 complaintTextDiv.className = 'complaint-text';
                 complaintTextDiv.textContent = complaint.text;
-
-                // Append the text and button to the complaint block
                 complaintBlock.appendChild(complaintTextDiv);
 
-                // Create a container for the buttons
                 const buttonContainer = document.createElement('div');
                 buttonContainer.className = 'button-container';
 
                 if (!((isStudent && complaint.closedByStudent) || (isCompany && complaint.closedByCompany))) {
-                    // Create a Close button using the createButton function
                     const closeButton = createButton('close-button btn-gossamer', 'Close', '❌', () => {
                         closeComplaint(complaint.id, studentHasInternshipId);
                     });
@@ -785,59 +788,45 @@ function MyInternshipsPage(user, pageOrchestrator) {
                 }
 
                 if (complaint.closedByStudent || complaint.closedByCompany) {
-                    // Create a reject closure button using the createButton function
                     const rejectButton = createButton('close-button btn-gossamer', 'Reject closure', '👎', () => {
                         rejectComplaintClosure(complaint.id, studentHasInternshipId);
                     });
                     buttonContainer.appendChild(rejectButton);
                 }
 
-                // Append the button container to the complaint block
                 complaintBlock.appendChild(buttonContainer);
-
-                // Append the complaint block to the complaints container
                 complaintsDiv.appendChild(complaintBlock);
             });
         }
 
-        // Create a form for uploading a complaint
+        // Form per il caricamento del reclamo
         const uploadForm = document.createElement('form');
         uploadForm.className = 'upload-form';
         uploadForm.onsubmit = (event) => {
-            event.preventDefault(); // Prevent default form submission
-            uploadComplaint(uploadForm, studentHasInternshipId); // Call the uploadComplaint function
-            complaintInput.value = ''; // Clear the input field after submission
+            event.preventDefault();
+            uploadComplaint(uploadForm, studentHasInternshipId);
+            complaintInput.value = '';
         };
 
-        // Create a text input for the complaint
         const complaintInput = document.createElement('input');
         complaintInput.type = 'text';
-        complaintInput.name = 'complaint'; // Name attribute for the input
-        complaintInput.maxLength = 255; // Set maximum characters
+        complaintInput.name = 'complaint';
+        complaintInput.maxLength = 255;
         complaintInput.placeholder = 'Enter your complaint here...';
-        complaintInput.required = true; // Make it required
+        complaintInput.required = true;
 
-        // Create a hidden input for ongoingInternshipId
         const internshipIdInput = document.createElement('input');
-        internshipIdInput.type = 'hidden'; // Set type to hidden
-        internshipIdInput.name = 'ongoingInternshipId'; // Set the name attribute
-        internshipIdInput.value = studentHasInternshipId; // Set the value to the student's internship ID
+        internshipIdInput.type = 'hidden';
+        internshipIdInput.name = 'ongoingInternshipId';
+        internshipIdInput.value = studentHasInternshipId;
 
-        // Create the Upload complaint button
-        const uploadButton = createButton('upload-button btn-gossamer', 'Upload complaint', '📤', () => {
-            // This function will be called on form submission
-        });
+        const uploadButton = createButton('upload-button btn-gossamer', 'Upload complaint', '📤', () => {});
 
-        // Append the input and button to the form
         uploadForm.appendChild(complaintInput);
         uploadForm.appendChild(uploadButton);
         uploadForm.appendChild(internshipIdInput);
 
-        // Append the form to the complaints container
         complaintsDiv.appendChild(uploadForm);
-
-        // Append the complaints container to the other-data div
-        otherDataDiv.appendChild(complaintsDiv);
     }
 
     function populateForEnded(studentHasInternshipId) {
@@ -955,29 +944,57 @@ function MyInternshipsPage(user, pageOrchestrator) {
                 questionnaireItem.textContent = `Questionnaire ${index + 1}`; // Sequential numbering
                 questionnairesDiv.appendChild(questionnaireItem);
 
-                // Create buttons for students
-                if (isStudent) {
-                    const downloadButton = createButton('action-button', 'Download', '📥', () => {
-                        console.log(`Downloading questionnaire ${index + 1}`);
-                        immediateQuestionnaireDownload(questionnaire, index);
-                    });
+                // Create buttons for non-students
+                const downloadButton = createButton('action-button', 'Download', '📥', () => {
+                    console.log(`Downloading questionnaire ${index + 1}`);
+                    immediateQuestionnaireDownload(questionnaire, index);
+                });
 
-
-                    questionnairesDiv.appendChild(downloadButton);
-                    // Append the button to the questionnairesDiv
-
-                } else {
-                    // Create buttons for non-students
-                    const downloadButtonCompany = createButton('action-button', 'Download', '📥', () => {
-                        console.log(`Downloading questionnaire ${index + 1}`);
-                        immediateQuestionnaireDownload(questionnaire, index);
-                    });
-
-                    questionnairesDiv.appendChild(downloadButtonCompany);
-                }
+                questionnairesDiv.appendChild(downloadButton);
             });
         }
-        populateInterviews(studentHasInternshipId);
+
+        // Assuming 'otherDataDiv' is already defined and refers to the existing div
+        otherDataDiv.appendChild(questionnairesDiv);
+
+        interviewsDiv = document.getElementById('interviews-div');
+        // Check if the div already exists
+        if (!interviewsDiv) {
+            // Create the second div for interviews scheduled
+            interviewsDiv = document.createElement('div');
+            interviewsDiv.id = 'interviews-div';
+            interviewsDiv.className = 'data-container'; // Assign the same class name
+        } else {
+            clearDiv('interviews-div');
+        }
+
+        // Check if interviewsScheduled are empty
+        if (interviewsScheduled.length === 0) {
+            const emptyMessage = document.createElement('p');
+            emptyMessage.textContent = "No interviews scheduled.";
+            emptyMessage.style.textAlign = 'center'; // Center the message
+            interviewsDiv.appendChild(emptyMessage);
+        } else {
+            // Populate the second div with data from the interviewsScheduled variable
+            interviewsScheduled.forEach(interview => {
+                const interviewItem = document.createElement('p');
+                interviewItem.textContent = `Interview Scheduled: ${interview.date}`; // Accessing the date property
+
+                // Check if the interview has been rejected
+                if (interview.hasBeenRejected) {
+                    const rejectedText = document.createElement('span');
+                    rejectedText.textContent = ' Rejected'; // Text to display
+                    rejectedText.style.color = 'red'; // Set the text color to red
+                    interviewItem.appendChild(rejectedText); // Append the rejected text to the interview item
+                }
+
+                interviewsDiv.appendChild(interviewItem);
+            });
+        }
+
+        // Assuming 'otherDataDiv' is already defined and refers to the existing div
+        // Append both divs to the existing other-data div
+        otherDataDiv.appendChild(interviewsDiv);
     }
 
     function manageStudentApplication(studentHasInternshipId, decision) {
@@ -1318,7 +1335,7 @@ function MyInternshipsPage(user, pageOrchestrator) {
 
                         // Code to execute in case of successful callBack
                         complaints = jsonObject.openComplaints;
-                        clearDiv(complaintsDiv.id);
+                        //clearDiv(complaintsDiv.id);
                         populateForOngoing(studentHasInternshipId);
 
                         break;
@@ -1363,7 +1380,7 @@ function MyInternshipsPage(user, pageOrchestrator) {
 
                         // Code to execute in case of successful callBack
                         complaints = jsonObject.openComplaints;
-                        clearDiv(complaintsDiv.id);
+                        //removeDiv(complaintsDiv.id);
                         populateForOngoing(studentHasInternshipId);
 
                         break;
@@ -1408,7 +1425,7 @@ function MyInternshipsPage(user, pageOrchestrator) {
                         closedComplaint.closeByStudent = false;
                         closedComplaint.closeByStudent = false;
 
-                        clearDiv(complaintsDiv.id);
+                        //removeDiv(complaintsDiv.id);
                         populateForOngoing(studentHasInternshipId);
                         break;
 
