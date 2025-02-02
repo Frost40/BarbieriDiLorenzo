@@ -358,8 +358,13 @@ function HomePage(user, pageOrchestrator) {
                 button.classList.add('feedback-button'); // Add a class for styling
 
                 // Extract the first 3-4 words from the feedback text
-                const words = feedback.text.split(' ');
-                const buttonText = words.slice(0, 4).join(' ') + (words.length > 4 ? '...' : '');
+                let buttonText;
+                if (!feedback.text) {
+                    buttonText = "No text";
+                } else {
+                    const words = feedback.text.split(' ');
+                    buttonText = words.slice(0, 4).join(' ') + (words.length > 4 ? '...' : '');
+                }
                 button.textContent = buttonText;
 
                 button.addEventListener('click', () => {
