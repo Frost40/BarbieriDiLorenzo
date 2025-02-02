@@ -28,7 +28,15 @@ import static polimi.SE2.SC.utils.UtilityFunctions.parsingChecker;
 public class RejectComplaintClosure extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
-
+    protected StudentHasInternshipDAO createStudentHasInternshipDAO() {
+        return new StudentHasInternshipDAO(connection);
+    }
+    protected ComplaintDAO createComplaintDAO() {
+        return new ComplaintDAO(connection);
+    }
+    protected InternshipDAO createInternshipDAO() {
+        return new InternshipDAO(connection);
+    }
     public RejectComplaintClosure() {
         super();
     }
@@ -73,7 +81,7 @@ public class RejectComplaintClosure extends HttpServlet {
         else	return;
 
         // Retrieving the complaint from the database
-        ComplaintDAO complaintDAO = new ComplaintDAO(connection);
+        ComplaintDAO complaintDAO = createComplaintDAO();
         Complaint complaint = null;
         try {
             complaint = complaintDAO.getComplaint(complaintId);
@@ -91,7 +99,7 @@ public class RejectComplaintClosure extends HttpServlet {
         }
 
         // Retrieving the studentHasInternship associated with the complaint
-        StudentHasInternshipDAO studentHasInternshipDAO = new StudentHasInternshipDAO(connection);
+        StudentHasInternshipDAO studentHasInternshipDAO = createStudentHasInternshipDAO();
         StudentHasInternship studentHasInternship = null;
         try {
             studentHasInternship = studentHasInternshipDAO.getStudentHasInternship(complaint.getStudentHasInternshipId());
@@ -117,7 +125,7 @@ public class RejectComplaintClosure extends HttpServlet {
             }
         } else {
             // Checking that the company in the current session is actually the owner of the internship associated to the complaint
-            InternshipDAO internshipDAO = new InternshipDAO(connection);
+            InternshipDAO internshipDAO = createInternshipDAO();
             ArrayList<Internship> companyInternships = null;
             try {
                 companyInternships = internshipDAO.getCompanyInternships(user.getId());

@@ -3,6 +3,8 @@ package polimi.SE2.SC.controllers;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import polimi.SE2.SC.DAOs.ComplaintDAO;
+import polimi.SE2.SC.DAOs.InternshipDAO;
+import polimi.SE2.SC.DAOs.StudentHasInternshipDAO;
 import polimi.SE2.SC.beans.Complaint;
 import polimi.SE2.SC.beans.Student;
 import polimi.SE2.SC.beans.User;
@@ -31,6 +33,15 @@ import static polimi.SE2.SC.utils.UtilityFunctions.parsingChecker;
 public class CloseComplaint extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
+    protected StudentHasInternshipDAO createStudentHasInternshipDAO() {
+        return new StudentHasInternshipDAO(connection);
+    }
+    protected ComplaintDAO createComplaintDAO() {
+        return new ComplaintDAO(connection);
+    }
+    protected InternshipDAO createInternshipDAO() {
+        return new InternshipDAO(connection);
+    }
 
     public CloseComplaint() {
         super();
@@ -74,7 +85,7 @@ public class CloseComplaint extends HttpServlet {
         else	return;
 
         // Checking whether the given id refers to an existing complaint
-        ComplaintDAO complaintDAO = new ComplaintDAO(connection);
+        ComplaintDAO complaintDAO = createComplaintDAO();
         Complaint complaint = null;
         try {
             complaint = complaintDAO.getComplaint(complaintId);
