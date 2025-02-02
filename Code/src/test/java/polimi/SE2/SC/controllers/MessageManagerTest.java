@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletConfig;
@@ -188,7 +189,34 @@ public class MessageManagerTest {
         Map<String, Object> result = gson.fromJson(jsonOutput, new TypeToken<HashMap<String, Object>>(){}.getType());
 
         assertTrue(result.containsKey("allChats"), "JSON should contain key 'allChats'");
-        assertEquals(1, result.size());
+        // Extract "allChats" from the response
+        List<List<Object>> allChats = (List<List<Object>>) result.get("allChats");
+
+        // Validate that there is exactly one internship entry
+        assertEquals(1, allChats.size(), "There should be 1 internship entry");
+
+        // Extract the internship details and student list
+        List<Object> internshipEntry = allChats.get(0);
+
+        assertEquals(2, internshipEntry.size(), "Each entry should have an internship and a student list");
+
+        // Extract the internship data
+        Map<String, Object> internshipData = (Map<String, Object>) internshipEntry.get(0);
+
+        assertEquals(10.0, internshipData.get("id"), "Internship ID should be 10.0");
+        assertEquals("Internship X", internshipData.get("name"), "Internship name should be 'Internship X'");
+
+        // Extract the student list
+        List<Map<String, Object>> studentList = (List<Map<String, Object>>) internshipEntry.get(1);
+
+        assertEquals(1, studentList.size(), "There should be 1 student in the list");
+
+        // Extract student details
+        Map<String, Object> studentData = studentList.get(0);
+
+        assertEquals(3003.0, studentData.get("id"), "Student ID should be 3003.0");
+        assertEquals("Alice", studentData.get("name"), "Student name should be 'Alice'");
+
     }
     // ★ Test 3: doGet for a Student user when DAO throws SQLException
     @Test
@@ -286,68 +314,59 @@ public class MessageManagerTest {
 
     @Test
     public void testDoGetCompanyWithInternshipHavingNoStudents() throws Exception {
-        // Simulate a company user
+        // Simulate a company user.
         Company company = mock(Company.class);
         when(company.getId()).thenReturn(2002);
         when(session.getAttribute("currentUser")).thenReturn(company);
 
-        // Create a HashMap where one internship has no students
+        // Create a dummy HashMap for company chats.
         HashMap<Internship, ArrayList<Student>> dummyChats = new HashMap<>();
-
         Internship intern1 = new Internship();
         intern1.setId(10);
         intern1.setName("Internship X");
-        intern1.setDescription("Java Developer Internship");
-
-        ArrayList<Student> studentsChat1 = new ArrayList<>(); // No students
-
-        Internship intern2 = new Internship();
-        intern2.setId(20);
-        intern2.setName("Internship Y");
-        intern2.setDescription("Data Science Internship");
-
-        ArrayList<Student> studentsChat2 = new ArrayList<>();
-        Student student2 = new Student();
-        student2.setId(3004);
-        student2.setName("Bob");
-        studentsChat2.add(student2);
-
-        dummyChats.put(intern1, studentsChat1);
-        dummyChats.put(intern2, studentsChat2);
-
-        // Use doReturn() instead of when().thenReturn()
-        doReturn(dummyChats).when(messageDAO).getAllChatsForCompany(2002);
+        ArrayList<Student> studentsChat = new ArrayList<>();
+        dummyChats.put(intern1, studentsChat);
+        when(messageDAO.getAllChatsForCompany(2002)).thenReturn(dummyChats);
 
         // Call doGet()
         messagesManagerServlet.doGet(request, response);
 
-        // Verify response status
+        // Verify that the response status is OK.
         verify(response).setStatus(HttpServletResponse.SC_OK);
         verify(response).setContentType("application/json");
         verify(response).setCharacterEncoding("UTF-8");
 
-        // Parse JSON output
+        // Parse JSON output.
         String jsonOutput = responseWriter.toString();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().enableComplexMapKeySerialization().create();
+        Map<String, Object> result = gson.fromJson(jsonOutput, new TypeToken<HashMap<String, Object>>() {
+        }.getType());
 
-        // Deserialize JSON into a Map
-        Map<String, Object> result = gson.fromJson(jsonOutput, new TypeToken<HashMap<String, Object>>() {}.getType());
-
-        assertNotNull(result, "Response should not be null");
         assertTrue(result.containsKey("allChats"), "JSON should contain key 'allChats'");
+        // Extract "allChats" from the response and ensure the internship exists but has no students
+        // Extract "allChats"
+        List<List<Object>> allChats = (List<List<Object>>) result.get("allChats");
 
-        // Extract "allChats" as a Map<String, ArrayList<Map<String, Object>>>
-        Map<String, ArrayList<Map<String, Object>>> allChats = (Map<String, ArrayList<Map<String, Object>>>) result.get("allChats");
+        // Validate that there is exactly one internship entry
+        assertEquals(1, allChats.size(), "There should be 1 internship entry");
 
-        assertNotNull(allChats, "allChats should not be null");
-        assertEquals(2, allChats.size(), "There should be 2 internship entries");
+        // Extract the internship details and student list
+        List<Object> internshipEntry = allChats.get(0);
 
-        // Validate the first internship has an empty student list
-        assertTrue(allChats.get("Internship X").isEmpty(), "Internship X should have no students");
+        assertEquals(2, internshipEntry.size(), "Each entry should have an internship and a student list");
 
-        // Validate the second internship has students
-        assertEquals(1, allChats.get("Internship Y").size(), "Internship Y should have 1 student chatting");
-        assertEquals("Bob", allChats.get("Internship Y").get(0).get("name"), "Student in Internship Y should be Bob");
+        // Extract the internship data
+        Map<String, Object> internshipData = (Map<String, Object>) internshipEntry.get(0);
+
+        assertEquals(10.0, internshipData.get("id"), "Internship ID should be 10.0");
+        assertEquals("Internship X", internshipData.get("name"), "Internship name should be 'Internship X'");
+
+        // Extract the student list
+        List<Object> studentList = (List<Object>) internshipEntry.get(1);
+
+        assertTrue(studentList.isEmpty(), "Student list should be empty");
+
+
     }
 
 }

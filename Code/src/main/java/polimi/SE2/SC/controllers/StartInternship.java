@@ -30,7 +30,12 @@ import static polimi.SE2.SC.utils.UtilityFunctions.parsingChecker;
 public class StartInternship extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
-
+    protected StudentHasInternshipDAO createStudentHasInternshipDAO() {
+        return new StudentHasInternshipDAO(connection);
+    }
+    protected InternshipDAO createInternshipDAO() {
+        return new InternshipDAO(connection);
+    }
     public StartInternship() {
         super();
     }
@@ -74,7 +79,7 @@ public class StartInternship extends HttpServlet {
         if (parsedId.isPresent())			studentHasInternshipId = parsedId.get();
         else	return;
 
-        StudentHasInternshipDAO studentHasInternshipDAO = new StudentHasInternshipDAO(connection);
+        StudentHasInternshipDAO studentHasInternshipDAO = createStudentHasInternshipDAO();
         StudentHasInternship studentHasInternship = null;
         try {
             studentHasInternship = studentHasInternshipDAO.getStudentHasInternship(studentHasInternshipId);
@@ -99,7 +104,7 @@ public class StartInternship extends HttpServlet {
         }
 
         // Checking that the company in the current session is actually the owner of the given internship
-        InternshipDAO internshipDAO = new InternshipDAO(connection);
+        InternshipDAO internshipDAO = createInternshipDAO();
         ArrayList<Internship> companyInternships = null;
         try {
             companyInternships = internshipDAO.getCompanyInternships(user.getId());

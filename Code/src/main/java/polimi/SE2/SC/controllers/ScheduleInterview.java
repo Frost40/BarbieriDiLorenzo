@@ -32,7 +32,15 @@ import static polimi.SE2.SC.utils.UtilityFunctions.parsingChecker;
 public class ScheduleInterview extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
-
+    protected StudentHasInternshipDAO createStudentHasInternshipDAO() {
+        return new StudentHasInternshipDAO(connection);
+    }
+    protected InternshipDAO createInternshipDAO() {
+        return new InternshipDAO(connection);
+    }
+    protected InterviewScheduleDAO createInterviewScheduleDAO() {
+        return new InterviewScheduleDAO(connection);
+    }
     public ScheduleInterview() {
         super();
     }
@@ -102,7 +110,7 @@ public class ScheduleInterview extends HttpServlet {
         else		return;
 
         // Making sure the association student-internship exists
-        StudentHasInternshipDAO studentHasInternshipDAO = new StudentHasInternshipDAO(connection);
+        StudentHasInternshipDAO studentHasInternshipDAO = createStudentHasInternshipDAO();
         StudentHasInternship ongoingInternship = null;
         try {
             ongoingInternship = studentHasInternshipDAO.getStudentHasInternship(ongoingInternshipId);
@@ -133,7 +141,7 @@ public class ScheduleInterview extends HttpServlet {
         }
 
         // Checking that the company in the current session is actually the owner of the given internship
-        InternshipDAO internshipDAO = new InternshipDAO(connection);
+        InternshipDAO internshipDAO = createInternshipDAO();
         ArrayList<Internship> companyInternships = null;
         try {
             companyInternships = internshipDAO.getCompanyInternships(user.getId());
@@ -151,7 +159,7 @@ public class ScheduleInterview extends HttpServlet {
         }
 
         // Adding the scheduled interview to the database
-        InterviewScheduleDAO interviewScheduleDAO = new InterviewScheduleDAO(connection);
+        InterviewScheduleDAO interviewScheduleDAO = createInterviewScheduleDAO();
         try {
             interviewScheduleDAO.scheduleInterview(parsedSQLDate, ongoingInternshipId);
         } catch (SQLException e) {

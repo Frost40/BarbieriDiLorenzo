@@ -26,7 +26,15 @@ import static polimi.SE2.SC.utils.UtilityFunctions.parsingChecker;
 public class CompleteQuestionnaire extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
-
+    protected StudentHasInternshipDAO createStudentHasInternshipDAO() {
+        return new StudentHasInternshipDAO(connection);
+    }
+    protected InternshipDAO createInternshipDAO() {
+        return new InternshipDAO(connection);
+    }
+    protected QuestionnaireDAO createQuestionnaireDAO() {
+        return new QuestionnaireDAO(connection);
+    }
     public CompleteQuestionnaire() {
         super();
     }
@@ -86,7 +94,7 @@ public class CompleteQuestionnaire extends HttpServlet {
         else	return;
 
         // Checking if the given questionnaire exists
-        QuestionnaireDAO questionnaireDAO = new QuestionnaireDAO(connection);
+        QuestionnaireDAO questionnaireDAO = createQuestionnaireDAO();
         Questionnaire questionnaire = null;
         try {
             questionnaire = questionnaireDAO.getQuestionnaire(questionnaireId);
@@ -110,7 +118,7 @@ public class CompleteQuestionnaire extends HttpServlet {
         }
 
         // Retrieving the student-internship association
-        StudentHasInternshipDAO studentHasInternshipDAO = new StudentHasInternshipDAO(connection);
+        StudentHasInternshipDAO studentHasInternshipDAO = createStudentHasInternshipDAO();
         StudentHasInternship studentHasInternship = null;
         try {
             studentHasInternship = studentHasInternshipDAO.getStudentHasInternship(studentHasInternshipId);

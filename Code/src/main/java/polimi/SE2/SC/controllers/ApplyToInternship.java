@@ -117,7 +117,6 @@ public class ApplyToInternship extends HttpServlet {
             return;
         }
         // Saving the application in the database
-
         try {
             studentHasInternshipDAO.addApplication(internshipId, user.getId());
         } catch (SQLException e) {

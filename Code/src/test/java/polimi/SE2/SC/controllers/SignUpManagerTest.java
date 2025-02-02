@@ -175,6 +175,10 @@ public class SignUpManagerTest {
         when(request.getParameter("email")).thenReturn("student@example.com");
         when(request.getParameter("password")).thenReturn("123");
         when(request.getParameter("repeat_pwd")).thenReturn("123");
+        when(request.getParameter("name")).thenReturn("John");
+        when(request.getParameter("surname")).thenReturn("Doe");
+        when(request.getParameter("nationality")).thenReturn("English");
+        when(request.getParameter("cityOfBirth")).thenReturn("London");
 
         when(studentDAO.getStudentByEmail("student@example.com")).thenThrow(new SQLException("Database error"));
 

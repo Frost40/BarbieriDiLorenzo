@@ -31,7 +31,15 @@ import static polimi.SE2.SC.utils.UtilityFunctions.parsingChecker;
 public class UploadQuestionnaire extends HttpServlet{
     private static final long serialVersionUID = 1L;
     private Connection connection;
-
+    protected StudentHasInternshipDAO createStudentHasInternshipDAO() {
+        return new StudentHasInternshipDAO(connection);
+    }
+    protected InternshipDAO createInternshipDAO() {
+        return new InternshipDAO(connection);
+    }
+    protected QuestionnaireDAO createQuestionnaireDAO() {
+        return new QuestionnaireDAO(connection);
+    }
     public UploadQuestionnaire() {
         super();
     }
@@ -83,7 +91,7 @@ public class UploadQuestionnaire extends HttpServlet{
         else		return;
 
         // Making sure the association student-company exists
-        StudentHasInternshipDAO studentHasInternshipDAO = new StudentHasInternshipDAO(connection);
+        StudentHasInternshipDAO studentHasInternshipDAO = createStudentHasInternshipDAO();
         StudentHasInternship studentHasInternship = null;
         try {
             studentHasInternship = studentHasInternshipDAO.getStudentHasInternship(studentHasInternshipId);
@@ -107,7 +115,7 @@ public class UploadQuestionnaire extends HttpServlet{
         }
 
         // Checking that the company in the current session is actually the owner of the given internship
-        InternshipDAO internshipDAO = new InternshipDAO(connection);
+        InternshipDAO internshipDAO = createInternshipDAO();
         ArrayList<Internship> companyInternships = null;
         try {
             companyInternships = internshipDAO.getCompanyInternships(user.getId());
@@ -154,7 +162,7 @@ public class UploadQuestionnaire extends HttpServlet{
             }
         }
 
-        QuestionnaireDAO questionnaireDAO = new QuestionnaireDAO(connection);
+        QuestionnaireDAO questionnaireDAO = createQuestionnaireDAO();
         try (InputStream fileContent = filePart.getInputStream()) {
             // Save the questionnaire file as a binary object directly in the database
             questionnaireDAO.uploadQuestionnaire(fileContent, fileType, studentHasInternshipId);

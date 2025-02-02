@@ -20,6 +20,7 @@ import javax.servlet.http.HttpSession;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import polimi.SE2.SC.DAOs.ComplaintDAO;
+import polimi.SE2.SC.DAOs.FeedbackDAO;
 import polimi.SE2.SC.DAOs.InternshipDAO;
 import polimi.SE2.SC.DAOs.StudentHasInternshipDAO;
 import polimi.SE2.SC.beans.*;
@@ -32,7 +33,15 @@ import static polimi.SE2.SC.utils.UtilityFunctions.parsingChecker;
 public class UploadComplaint extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
-
+    protected StudentHasInternshipDAO createStudentHasInternshipDAO() {
+        return new StudentHasInternshipDAO(connection);
+    }
+    protected ComplaintDAO createComplaintDAO() {
+        return new ComplaintDAO(connection);
+    }
+    protected InternshipDAO createInternshipDAO() {
+        return new InternshipDAO(connection);
+    }
     public UploadComplaint() {
         super();
     }
@@ -85,7 +94,7 @@ public class UploadComplaint extends HttpServlet {
         else		return;
 
         // Making sure the association student-company exists
-        StudentHasInternshipDAO studentHasInternshipDAO = new StudentHasInternshipDAO(connection);
+        StudentHasInternshipDAO studentHasInternshipDAO = createStudentHasInternshipDAO();
         StudentHasInternship ongoingInternship = null;
         try {
             ongoingInternship = studentHasInternshipDAO.getStudentHasInternship(ongoingInternshipId);
@@ -117,7 +126,7 @@ public class UploadComplaint extends HttpServlet {
             }
         } else {
             // Checking that the company in the current session is the owner of the given internship
-            InternshipDAO internshipDAO = new InternshipDAO(connection);
+            InternshipDAO internshipDAO = createInternshipDAO();
             ArrayList<Internship> companyInternships = null;
             try {
                 companyInternships = internshipDAO.getCompanyInternships(user.getId());
@@ -136,7 +145,7 @@ public class UploadComplaint extends HttpServlet {
         }
 
         // Creating the new complaint in the database
-        ComplaintDAO complaintDAO = new ComplaintDAO(connection);
+        ComplaintDAO complaintDAO = createComplaintDAO();
         try {
             complaintDAO.uploadComplaint(complaint, ongoingInternshipId, isStudent);
         } catch (SQLException e) {

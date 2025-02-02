@@ -32,7 +32,15 @@ import static polimi.SE2.SC.utils.UtilityFunctions.parsingChecker;
 public class UploadFeedback extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection;
-
+    protected StudentHasInternshipDAO createStudentHasInternshipDAO() {
+        return new StudentHasInternshipDAO(connection);
+    }
+    protected FeedbackDAO createFeedbackDAO() {
+        return new FeedbackDAO(connection);
+    }
+    protected InternshipDAO createInternshipDAO() {
+        return new InternshipDAO(connection);
+    }
     public UploadFeedback() {
         super();
     }
@@ -106,7 +114,7 @@ public class UploadFeedback extends HttpServlet {
         }
 
         // Making sure the association student-company exists
-        StudentHasInternshipDAO studentHasInternshipDAO = new StudentHasInternshipDAO(connection);
+        StudentHasInternshipDAO studentHasInternshipDAO = createStudentHasInternshipDAO();
         StudentHasInternship ongoingInternship = null;
         try {
             ongoingInternship = studentHasInternshipDAO.getStudentHasInternship(ongoingInternshipId);
@@ -144,7 +152,7 @@ public class UploadFeedback extends HttpServlet {
         }
 
         // Each student is authorized to upload a feedback once for each internship experience
-        FeedbackDAO feedbackDAO = new FeedbackDAO(connection);
+        FeedbackDAO feedbackDAO = createFeedbackDAO();
         ArrayList<Feedback> feedbacks = null;
         try {
             feedbacks = feedbackDAO.getFeedbacksGivenByStudent(user.getId());
@@ -181,7 +189,7 @@ public class UploadFeedback extends HttpServlet {
 
         // Updating the average rating for the internship given the new feedback
         double newInternshipRating = calculateAverageRating(feedbacks);
-        InternshipDAO internshipDAO = new InternshipDAO(connection);
+        InternshipDAO internshipDAO = createInternshipDAO();
         try {
             internshipDAO.updateInternshipRating(ongoingInternship.getInternshipId(), newInternshipRating);
         } catch (SQLException e) {
