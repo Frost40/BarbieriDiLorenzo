@@ -402,7 +402,7 @@ public class ComplaintDAO {
     public void rejectClosure(int complaintId) throws SQLException {
         String performedAction = " rejecting the complaint closure ";
         String query = "UPDATE Complaint " +
-                    "SET closedByCompany = FALSE and closedByStudent = FALSE " +
+                    "SET closedByCompany = FALSE, closedByStudent = FALSE " +
                     "WHERE id = ?";
         PreparedStatement preparedStatement = null;
 

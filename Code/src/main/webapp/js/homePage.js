@@ -812,7 +812,7 @@ function HomePage(user, pageOrchestrator) {
 
             // Show student-specific sidebar elements
             document.getElementById('cv-action-btn').style.display = 'block';
-            document.getElementById('save-internship-btn').style.display = 'none';
+            document.getElementById('save-internship-btn').style.display = "none";
 
             // Show student main content and hide company content
             document.getElementById('student-content').style.display = 'block';
@@ -831,7 +831,6 @@ function HomePage(user, pageOrchestrator) {
             userType = 'student';
             user_class = jsonObject.student;
             cv = jsonObject.cv || null;
-            console.log('This is the file type: '+ cv.fileType);
             isStudent = true;
             console.log('User is a Student:', user_class);
             console.log('CV:', cv);
@@ -886,6 +885,7 @@ function HomePage(user, pageOrchestrator) {
                 switch (x.status) {
                     case 200:
                         var jsonObject = JSON.parse(message);
+                        console.log(hasCv);
                         processUserData(jsonObject);
 
                         break;

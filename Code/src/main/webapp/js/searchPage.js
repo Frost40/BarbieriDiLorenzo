@@ -38,7 +38,6 @@ function SearchPage(user, pageOrchestrator) {
             entry.innerHTML = `
                 <h3>${sanitizeHTML(internship.name)}</h3>
                 <p>${sanitizeHTML(internship.description)}</p>
-                <p class="company-name">Company: ${sanitizeHTML(internship.companyName)}</p>
                 <p class="rating">Rating: ${internship.rating.toFixed(1)} ⭐</p>
                 <div class="action-buttons">
                     <button class="message-btn" data-id="${internship.id}">Message</button>

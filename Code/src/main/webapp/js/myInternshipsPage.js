@@ -400,22 +400,30 @@ function MyInternshipsPage(user, pageOrchestrator) {
         } else {
             // Aggiungi le informazioni dello studente al div
             studentInfoDiv.innerHTML = `
-            <h2>Informazioni Studente</h2>
-            <p><strong>Nome:</strong> ${student.name}</p>
-            <p><strong>Cognome:</strong> ${student.surname}</p>
-            <p><strong>Email:</strong> ${student.email}</p>
-            <p><strong>Nazionalità:</strong> ${student.nationality}</p>
-            <p><strong>Città di Nascita:</strong> ${student.cityOfBirth}</p>
-            <a href="${cv.file}" download="cv_${student.name}_${student.surname}.pdf">Scarica CV</a>
-        `;
+                <h2>Informazioni Studente</h2>
+                <p><strong>Nome:</strong> ${student.name}</p>
+                <p><strong>Cognome:</strong> ${student.surname}</p>
+                <p><strong>Email:</strong> ${student.email}</p>
+                <p><strong>Nazionalità:</strong> ${student.nationality}</p>
+                <p><strong>Città di Nascita:</strong> ${student.cityOfBirth}</p>
+            `;
 
-            // Crea un link per il download
-            const link = document.createElement('a');
-            link.href = `data:application/pdf;base64,${cv.file}`; // Imposta l'URL del link
-            link.download = 'cv_studente.pdf'; // Nome del file da scaricare
-            document.body.appendChild(link); // Aggiungi il link al DOM
+            // Check if cv is not null
+            if (cv) {
+                // Create the link element
+                const cvLink = document.createElement('a');
+                cvLink.href = cv.file;
+                cvLink.download = `cv_${student.name}_${student.surname}.pdf`;
+                cvLink.textContent = 'Download CV';
 
-            studentInfoDiv.appendChild(link);
+                // Add a click event listener to call a function
+                cvLink.addEventListener('click', function() {
+                    immediateDownloadCv(cv);
+                });
+
+                // Append the link to the studentInfoDiv
+                studentInfoDiv.appendChild(cvLink);
+            }
 
             // Crea i bottoni "Accept" e "Reject"
             const acceptButton = document.createElement('button');
@@ -441,6 +449,46 @@ function MyInternshipsPage(user, pageOrchestrator) {
 
         // Aggiungi il nuovo div all'elemento 'other-data'
         otherDataDiv.appendChild(studentInfoDiv);
+    }
+
+    function immediateDownloadCv(cv) {
+        const fileExtension = cv.fileType;
+        console.log('File extension: ' + fileExtension);
+
+        // Map extensions to MIME types
+        const mimeTypes = {
+            'pdf': 'application/pdf',
+            'doc': 'application/msword',
+            'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'txt': 'text/plain',
+            // Add more mappings as needed
+        };
+
+        // Determine MIME type, default to 'application/octet-stream'
+        const mimeType = mimeTypes[fileExtension] || 'application/octet-stream';
+
+        // Create a Blob from the Base64 string
+        const byteCharacters = atob(cv.file); // Split to get the Base64 part
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], {type: mimeType});
+
+        // Create a URL for the Blob
+        const fileUrl = URL.createObjectURL(blob);
+
+        // Create a download link and trigger the download
+        const a = document.createElement('a');
+        a.href = fileUrl;
+        a.download = `${student.name}_cv.${fileExtension}`; // Set the file name with extension
+        document.body.appendChild(a); // Append to the body
+        a.click(); // Trigger the download
+        document.body.removeChild(a); // Clean up
+
+        // Optionally revoke the object URL after some time
+        setTimeout(() => URL.revokeObjectURL(fileUrl), 100);
     }
 
     function populateForSelectionProcess(studentHasInternshipId) {
@@ -700,7 +748,7 @@ function MyInternshipsPage(user, pageOrchestrator) {
             complaintsDiv.id = 'complaint-div';
         }
         // Clear previous content
-        clearDiv(complaintsDiv.id);
+        clearDiv("complaints-div");
 
         // Check if there are complaints
         if (complaints.length === 0) {
@@ -883,7 +931,52 @@ function MyInternshipsPage(user, pageOrchestrator) {
         removeDiv('questionnaires-div');
         removeDiv('interviews-div');
 
-        populateQuestionnaires(studentHasInternshipId);
+        questionnairesDiv = document.getElementById('questionnaires-div');
+        // Check if the div already exists
+        if (!questionnairesDiv) {
+            // Create the first div for questionnaires
+            questionnairesDiv = document.createElement('div');
+            questionnairesDiv.id = 'questionnaires-div';
+            questionnairesDiv.className = 'data-container'; // Assign a class name
+        }
+
+        clearDiv('questionnaires-div');
+
+        // Check if questionnaires are empty
+        if (questionnaires.length === 0) {
+            const emptyMessage = document.createElement('p');
+            emptyMessage.textContent = "No questionnaires available.";
+            emptyMessage.style.textAlign = 'center'; // Center the message
+            questionnairesDiv.appendChild(emptyMessage);
+        } else {
+            // Populate the first div with data from the questionnaires variable
+            questionnaires.forEach((questionnaire, index) => {
+                const questionnaireItem = document.createElement('p');
+                questionnaireItem.textContent = `Questionnaire ${index + 1}`; // Sequential numbering
+                questionnairesDiv.appendChild(questionnaireItem);
+
+                // Create buttons for students
+                if (isStudent) {
+                    const downloadButton = createButton('action-button', 'Download', '📥', () => {
+                        console.log(`Downloading questionnaire ${index + 1}`);
+                        immediateQuestionnaireDownload(questionnaire, index);
+                    });
+
+
+                    questionnairesDiv.appendChild(downloadButton);
+                    // Append the button to the questionnairesDiv
+
+                } else {
+                    // Create buttons for non-students
+                    const downloadButtonCompany = createButton('action-button', 'Download', '📥', () => {
+                        console.log(`Downloading questionnaire ${index + 1}`);
+                        immediateQuestionnaireDownload(questionnaire, index);
+                    });
+
+                    questionnairesDiv.appendChild(downloadButtonCompany);
+                }
+            });
+        }
         populateInterviews(studentHasInternshipId);
     }
 
@@ -910,6 +1003,7 @@ function MyInternshipsPage(user, pageOrchestrator) {
                 switch (x.status) {
                     case 200:
                         // Code to execute in case of successful callBack
+                        applicationStatus = null;
                         removeDiv('student-info');
                         feedbacksDiv.innerHTML = '';
                         internshipDescriptionDiv.innerHTML = '';

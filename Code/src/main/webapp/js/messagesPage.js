@@ -120,7 +120,7 @@ function MessagesPage(user, pageOrchestrator) {
                         //updateBadgeCounts();
                     } catch (e) {
                         console.error("Failed to parse chats JSON:", e);
-                        showErrorAlert("Error", "Failed to load chats.");
+                        showInfoAlert("Error", "No current chats.");
                     }
                 } else {
                     console.error("Failed to fetch chats:", x.responseText);
