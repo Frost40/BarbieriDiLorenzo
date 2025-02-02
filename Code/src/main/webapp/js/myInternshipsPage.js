@@ -67,7 +67,8 @@ function MyInternshipsPage(user, pageOrchestrator) {
 
                         internshipsMap = new Map();
 
-                        isStudent = internshipsData.length > 0 && internshipsData[0].studentHasInternship;
+                        let user = JSON.parse(sessionStorage.getItem('user'));
+                        isStudent = !!user.surname;
                         isCompany = !isStudent;
 
                         if (isCompany) {
