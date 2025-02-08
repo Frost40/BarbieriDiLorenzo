@@ -59,7 +59,7 @@ CREATE TABLE `cv` (
   `experiences` varchar(255),
   `programmingSkills` varchar(255),
   `otherSkills` varchar(255),
-  `student_id` int NOT NULL,
+  `studentId` int NOT NULL,
   `fileType` varchar(10) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
