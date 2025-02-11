@@ -1300,8 +1300,8 @@ function MyInternshipsPage(user, pageOrchestrator) {
 
                         // Code to execute in case of successful callBack
                         applicationStatus = "ongoing";
-                        removeDiv(questionnairesDiv.id);
-                        removeDiv(interviewsDiv.id);
+                        removeDiv("questionnaires-div");
+                        removeDiv('interviews-div');
                         openInformationPage(studentHasInternshipId);
 
                         break;
@@ -1469,7 +1469,7 @@ function MyInternshipsPage(user, pageOrchestrator) {
 
                         // Code to execute in case of successful callBack
                         applicationStatus = "ended";
-                        removeDiv(complaintsDiv.id);
+                        removeDiv("complaints-div");
                         openInformationPage(studentHasInternshipId);
 
                         break;

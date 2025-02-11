@@ -196,7 +196,7 @@ function SearchPage(user, pageOrchestrator) {
                 if (response.status === 200) {
                     showSuccessAlert("Applied!", "You have successfully applied to this internship.");
                 } else {
-                    showErrorAlert("Application Failed", response.responseText || "Failed to apply to internship.");
+                    showErrorAlert(response.responseText);
                 }
                 document.body.removeChild(tempForm);
             }

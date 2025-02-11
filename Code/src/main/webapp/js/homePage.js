@@ -270,7 +270,7 @@ function HomePage(user, pageOrchestrator) {
     function populateCv() {
         if (cv) {
             // **Populate Textareas with CV Data**
-            const maxItemsPerLine = 10;
+            const maxItemsPerLine = 30;
             experiencesInput.value = joinWithSpacesAndNewlines(cv.experiences, maxItemsPerLine);
             programmingSkillsInput.value = joinWithSpacesAndNewlines(cv.programmingSkills, maxItemsPerLine);
             otherSkillsInput.value = joinWithSpacesAndNewlines(cv.otherSkills, maxItemsPerLine);
@@ -338,10 +338,11 @@ function HomePage(user, pageOrchestrator) {
         const lines = [];
         for (let i = 0; i < items.length; i += maxPerLine) {
             const chunk = items.slice(i, i + maxPerLine);
-            lines.push(chunk.join(' '));
+            lines.push(chunk.join(', '));
         }
         return lines.join('\n');
     }
+
     function populateFeedback() {
         if (!FeedbackContainer) {
             console.error('Feedback container element not found in the DOM.');
@@ -666,9 +667,8 @@ function HomePage(user, pageOrchestrator) {
             cvIdInput.name = 'cvId';
             saveCvForm.appendChild(cvIdInput);
         }
+
         cvIdInput.value = currentCvId;
-        cvActionBtn.innerText = 'Modify Cv';
-        isEditing = false;
 
         // Show loading indicator
         Swal.fire({
@@ -692,6 +692,9 @@ function HomePage(user, pageOrchestrator) {
                 var message = x.responseText;
                 switch (x.status) {
                     case 200:
+                        cvActionBtn.innerText = 'Modify Cv';
+                        isEditing = false;
+
                         if (servletUrl === "UploadNewCv") {
                             showSuccessAlert("Success", "Your CV has been created successfully.").then(() => {
                                 window.location.reload();
@@ -718,7 +721,11 @@ function HomePage(user, pageOrchestrator) {
                         break;
 
                     case 400: // Bad Request
+                        showErrorAlert("Error", message);
+                        break;
                     case 401: // Unauthorized
+                        showErrorAlert("Error", message);
+                        break;
                     case 500: // Server Error
                         showErrorAlert("Error", message);
                         break;
