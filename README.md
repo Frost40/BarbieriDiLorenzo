@@ -13,11 +13,10 @@ This project is part of the **Software Engineering 2** course for the academic y
 This repository contains the code, documentation, and resources related to the implementation of the S&C platform.
 
 
-## Group Members
+## Team
 
 - Flavio Di Lorenzo (flavio.dilorenzo@mail.polimi.it) (GitHub: [@Frost40](https://github.com/Frost40))
-- **Alessandro** (GitHub: [@Alessandro](https://github.com/Alessandro))
-
+- Alessabdro Barbieri (alessandrogwyn.barbieri@mail.polimi.it) (GitHub: [@AleGB29](https://github.com/AleGB29))
 
 ## Repository Structure
 
