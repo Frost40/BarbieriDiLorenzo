@@ -21,7 +21,8 @@
    - [Test Coverage](#5-test-coverage)
    - [Acceptance Testing](#6-acceptance-testing)
 7. [Documentation](#documentation)
-8. [License](#license)
+8. [Evaluation](#evaluation)
+9. [License](#license)
 
 ## Project Overview
 
@@ -262,6 +263,15 @@ The following documents are included in this repository:
 4. ATD: Acceptance Test Deliverable.
 
 You can find these documents in the DeliveryFolder directory.
+
+## Evaluation
+
+The project was evaluated by **Professor Elisabetta Di Nitto** as part of the **Software Engineering 2** course. After a thorough review of the deliverables, including the **Requirement Analysis and Specification Document (RASD)**, **Design Document (DD)**, **Implementation and Test Deliverable (ITD)**, and **Acceptance Test Deliverable (ATD)**, our team received the following evaluation:
+
+- **Score**: **30/30** (Full marks)
+- **Feedback**: The project was praised for its thoroughness, attention to detail, and high-quality implementation. The testing process, particularly the focus on servlet testing and DAO coverage, was highlighted as a strong point. The documentation was also commended for its clarity and completeness.
+
+This achievement reflects the hard work and dedication of the team throughout the project lifecycle.
 
 ## License
 This project is licensed under the MIT License. See the LICENSE file for details.
