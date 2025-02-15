@@ -1,5 +1,28 @@
 # Students&Companies (S&C) Platform
 
+## Table of Contents
+1. [Project Overview](#project-overview)
+2. [Team](#team)
+3. [Repository Structure](#repository-structure)
+4. [Installation Instructions](#installation-instructions)
+   - [Prerequisites](#prerequisites)
+   - [Importing the Project into IntelliJ](#1-importing-the-project-into-intellij)
+   - [Configuring Apache Tomcat in IntelliJ](#2-configuring-apache-tomcat-in-intellij)
+   - [Setting Up the MySQL Database](#3-setting-up-the-mysql-database)
+   - [Importing the Database Schema](#4-importing-the-database-schema)
+   - [Updating Database Configuration in the Project](#5-updating-database-configuration-in-the-project)
+   - [Running the Project](#6-running-the-project)
+5. [Features Implemented](#features-implemented)
+6. [Testing](#testing)
+   - [Servlet Testing](#1-servlet-testing)
+   - [DAO Testing](#2-dao-testing)
+   - [Test Cases](#3-test-cases)
+   - [Testing Tools](#4-testing-tools)
+   - [Test Coverage](#5-test-coverage)
+   - [Acceptance Testing](#6-acceptance-testing)
+7. [Documentation](#documentation)
+8. [License](#license)
+
 ## Project Overview
 
 The **Students&Companies (S&C)** platform is a web application designed to match university students looking for internships with companies offering them. The platform facilitates the matching process based on students' skills, experiences, and attitudes, as well as the projects and terms offered by companies. The system also includes features for recommendation, selection processes, and monitoring of internships.
@@ -42,7 +65,128 @@ S&C-Platform/
 └── ITD/                            # Working directory for ITD (if separate from DeliveryFolder)
 ```
 
+---
+
 ## Installation Instructions
+This section provides detailed instructions for setting up and running the **Students&Companies (S&C)** platform locally. The project is implemented as a Java web application and requires the following software to be installed:
+
+### Prerequisites
+
+Before starting, ensure that the following software is installed on your system:
+
+- **IntelliJ IDEA** (Ultimate edition)
+- **Apache Tomcat** (Version 9 or later) – We used version 9.0.98
+- **MySQL Workbench** (Version 8 or later)
+
+
+### 1. Importing the Project into IntelliJ
+1. **Clone the repository**:
+   ```
+         git clone https://github.com/Frost40/BarbieriDILorenzo.git
+   ```
+2. Open IntelliJ IDEA and go to File -> Open.
+
+3. Select the project root folder and click OK to open it.
+
+4. Configure the project as a Maven module:
+      - Go to File -> Project Structure -> Modules.
+      - Click the + button and select Import Module.
+      - Navigate to the Code folder in the project directory and follow the import instructions.
+      - Click Create, then Apply, and OK.
+
+5. Enable Maven in the project:
+      - Right-click on the pom.xml file in the project root directory.
+      - Select Add as Maven Project to ensure all dependencies are downloaded.
+
+### 2. Configuring Apache Tomcat in IntelliJ
+1. Go to Run -> Edit Configurations.
+2. Click + and select Tomcat Server -> Local.
+3. Under the Application Server section, click Configure... and select the installed Tomcat directory.      
+4. Navigate to the Deployment tab and click + -> Artifact.      
+5. Select Code: war exploded and apply the changes.      
+6. Under the Server tab, make sure the port is set correctly (default is 8080).      
+7. Click Apply and OK.
+
+### 3. Setting Up the MySQL Database
+1. Open MySQL Workbench.
+
+2. Create a new database connection by clicking the + icon next to MySQL Connections.
+
+3. Enter the following details (adjust if your setup differs):
+      - Connection Name: S&C_DB (or any name you prefer)
+      - Hostname: localhost
+      - Port: 3306
+      - Username: root (or another MySQL username, if configured differently)
+      - Password: Enter your MySQL root password.
+
+4. Test the connection by clicking Test Connection.
+      - If the test is successful, click OK to save the connection.
+      - If it fails, double-check your hostname, port, username, and password.
+
+### 4. Importing the Database Schema
+1. Open MySQL Workbench and select the S&C_DB (or whichever connection you created).
+
+2. Click the folder icon in the query tab (or go to File > Open SQL Script).
+
+3. Locate the provided SQL script in your project repository and select it. The script is found in the Code folder and is called S&C.sql.
+
+4. Review the script:
+      - By default, the script creates a database named your_database_name.
+      - If you want a different name, edit these lines in the script:
+      ```
+            CREATE DATABASE IF NOT EXISTS `your_database_name`;
+            USE `your_database_name`;
+      ```
+      - Replace your_database_name with your chosen database name.
+
+5. Execute the script by clicking the lightning bolt icon (the “Execute” button). MySQL Workbench will run all statements, creating the database and its tables.
+
+6. Verify the tables:
+      - In the Schemas panel on the left, locate the newly created database (you may need to refresh the panel).
+      - Expand it to ensure you see all 10 tables: company, complaint, cv, feedback, internship, interviewschedule, message, questionnaire, student, and studentsinternship.
+
+### 5. Updating Database Configuration in the Project
+To ensure the application can access the database, update the following files with your MySQL credentials:
+
+1. Modify web.xml
+      1. Locate web.xml in src/main/webapp/WEB-INF/.
+      2. Find the database connection parameters and update them:
+      ```
+            <context-param>
+                <param-name>dbUrl</param-name>
+                <param-value>jdbc:mysql://127.0.0.1:3306/StudentCompany?serverTimezone=UTC</param-value>
+            </context-param>
+            <context-param>
+                <param-name>dbUser</param-name>
+                <param-value>root</param-value>
+            </context-param>
+            <context-param>
+                <param-name>dbPassword</param-name>
+                <param-value>your_db_password</param-value>
+            </context-param>
+            <context-param>
+                <param-name>dbDriver</param-name>
+                <param-value>com.mysql.cj.jdbc.Driver</param-value>
+            </context-param>
+      ```
+2. Modify TestUtils.java (for testing)
+If you intend to run tests that require database interaction:
+      1. Locate TestUtils.java in src/test/java/polimi/SE2/SC/.
+      2. Update the MySQL connection settings in this file to match your local database configuration.
+
+### 6. Running the Project
+1. Start Apache Tomcat:
+      - Go to Run -> Edit Configurations.
+      - Select Tomcat Server -> Local and click Run.
+
+2. Verify the deployment:
+      - Open a browser and navigate to:
+
+      ```
+            http://localhost:8080/Code_war_exploded/
+      ```
+
+---
 
 ## Features Implemented
 As a group of two students, we focused on implementing the following features:
