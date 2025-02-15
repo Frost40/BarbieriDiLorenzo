@@ -15,7 +15,7 @@ This repository contains the code, documentation, and resources related to the i
 
 ## Group Members
 
-- **Flavio** (GitHub: [@Flavio](https://github.com/Flavio))
+- Flavio Di Lorenzo (flavio.dilorenzo@mail.polimi.it) (GitHub: [@Frost40](https://github.com/Frost40))
 - **Alessandro** (GitHub: [@Alessandro](https://github.com/Alessandro))
 
 
