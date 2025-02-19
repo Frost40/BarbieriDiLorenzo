@@ -273,4 +273,4 @@ The project was evaluated by **Professor Elisabetta Di Nitto** as part of the **
 This achievement reflects the hard work and dedication of the team throughout the project lifecycle.
 
 ## License
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
